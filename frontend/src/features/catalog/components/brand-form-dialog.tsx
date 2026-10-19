@@ -18,19 +18,19 @@ import {
 } from '@/components/ui/dialog'
 import { useDirection } from '@/components/ui/direction'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { LogoTile } from '@/components/media/logo-tile'
 import { apiErrorMessage, showServerErrors } from '@/lib/forms'
+import { LOGO_TYPES } from '@/lib/logo-file'
 import i18n from '@/lib/i18n'
 import { useSaveBrand } from '../hooks/use-brands'
 import {
   type BrandFormValues,
-  LOGO_TYPES,
   brandFormValues,
   brandSchema,
   toBrandInput,
   toLogoChange,
 } from '../schemas/brand-schema'
 import type { Brand } from '../types'
-import { BrandLogo } from './brand-logo'
 
 const FIELDS = ['name', 'slug'] as const
 
@@ -164,7 +164,12 @@ function LogoField({
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel htmlFor="brand-logo">{t('brands.logo')}</FieldLabel>
           <div className="flex items-center gap-4">
-            <BrandLogo name={name} src={shown} className="size-16 rounded-2xl text-base" />
+            <LogoTile
+              name={name}
+              src={shown}
+              alt={t('brands.logoOf', { name })}
+              className="size-16 rounded-2xl text-base"
+            />
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"

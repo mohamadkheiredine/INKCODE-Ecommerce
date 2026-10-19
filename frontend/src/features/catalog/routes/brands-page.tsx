@@ -12,6 +12,7 @@ import {
 import { RowActions } from '@/components/data-table/row-actions'
 import { ConfirmDeleteDialog } from '@/components/feedback/confirm-delete-dialog'
 import { PageHeader } from '@/components/layout/page-header'
+import { LogoTile } from '@/components/media/logo-tile'
 import { Button } from '@/components/ui/button'
 import { useCan } from '@/features/auth/hooks/use-can'
 import { useListQuery } from '@/hooks/use-list-query'
@@ -21,7 +22,6 @@ import i18n from '@/lib/i18n'
 import type { ListQueryConfig } from '@/lib/list-query'
 import { useEntranceAnimation } from '@/lib/motion'
 import { BrandFormDialog } from '../components/brand-form-dialog'
-import { BrandLogo } from '../components/brand-logo'
 import { useBrands, useDeleteBrand } from '../hooks/use-brands'
 import type { Brand } from '../types'
 
@@ -57,7 +57,11 @@ export function BrandsPage() {
         meta: { sortField: 'name' },
         cell: ({ row }) => (
           <div className="flex min-w-48 items-center gap-3">
-            <BrandLogo name={row.original.name} src={row.original.logo_url} />
+            <LogoTile
+              name={row.original.name}
+              src={row.original.logo_url}
+              alt={t('brands.logoOf', { name: row.original.name })}
+            />
             <div className="flex flex-col gap-0.5">
               <span data-name dir="auto" className="self-start font-medium text-foreground">
                 {row.original.name}

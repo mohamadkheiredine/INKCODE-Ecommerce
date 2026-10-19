@@ -1,19 +1,19 @@
 import { ImageIcon } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { cn, initials } from '@/lib/utils'
 
-/** A Brand's logo on a neutral tile, or its initials when it has none. */
-export function BrandLogo({
+/** A logo (a Brand's, the store's) on a neutral tile, or the name's initials without one. */
+export function LogoTile({
   name,
   src,
+  alt,
   className,
 }: {
   name: string
   src: string | null
+  /** What the image shows, for screen readers ("Atlas logo"). */
+  alt: string
   className?: string
 }) {
-  const { t } = useTranslation('catalog')
-
   return (
     <span
       className={cn(
@@ -24,7 +24,7 @@ export function BrandLogo({
       {src ? (
         <img
           src={src}
-          alt={t('brands.logoOf', { name })}
+          alt={alt}
           className="size-full bg-background object-contain p-1"
           loading="lazy"
         />
