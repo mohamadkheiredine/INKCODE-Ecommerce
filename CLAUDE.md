@@ -51,6 +51,22 @@ Run both `check` commands before every commit. CI runs the same checks on GitHub
 
 Several dependencies are new majors that postdate most training data. Look up their current docs with the Context7 MCP before writing code against them: **Laravel 13**, **spatie/laravel-permission 8**, **Scramble 0.13**, **Pest 4**, **React 19**, **React Router 8**, **TanStack Query 5**, **TanStack Table 9**, **Vite 8**, **Vitest 5**, **TypeScript 7** (no `baseUrl`; `strict` is on), **Tailwind CSS 4**, **shadcn/ui 4** (`radix-nova` style, `cn` package), **Zod 4**, **i18next 26**, **GSAP 3.15**, **Lenis 1.3**.
 
+## Laravel Boost (AI tooling for the backend)
+
+Laravel Boost is installed as a dev dependency. Its MCP server (`laravel-boost`, registered in the root `.mcp.json`) gives you:
+
+- `search-docs`: version-matched Laravel ecosystem docs. Use it before writing Laravel, Sanctum, Pest or Scramble code.
+- `database-schema` / `database-query` (read-only) / `database-connections`: inspect the real MySQL schema and data.
+- `application-info`, `last-error`, `read-log-entries`, `browser-logs`, `get-absolute-url`.
+
+Boost's own guidelines live in `backend/CLAUDE.md` (mirrored to `backend/AGENTS.md`). Its skills (`laravel-best-practices`, `testing-best-practices`, `infer-conventions`, `deploying-to-cloud`) are in `backend/.claude/skills/`. Re-run `php artisan boost:install --guidelines --skills --mcp` from `backend/` after upgrading Laravel packages, then copy `backend/CLAUDE.md` over `backend/AGENTS.md`.
+
+Where Boost's generic guidelines conflict with this file, **this file wins**. In particular:
+
+- The per-feature workflow below counts as the user's explicit request for documentation updates.
+- Run the full test suite yourself (`composer check`) before committing. Don't just ask the user to run it.
+- Boost's notes about Blade and Vite bundling don't apply: the frontend is the separate React SPA.
+
 ## Backend conventions (Laravel)
 
 Request flow: route → thin controller → **Form Request** (validation + `authorize()`) → **Policy** → **service / action class** (business rules, `DB::transaction`) → **API Resource** (response shape).
@@ -85,7 +101,7 @@ Request flow: route → thin controller → **Form Request** (validation + `auth
 The UI is 25% of the score: aim for a premium, consistent SaaS admin, not a template.
 
 - Load the `frontend-design` skill before designing or building any screen.
-- Components: shadcn/ui first. For richer pieces use the **21st.dev Magic MCP** when it is connected, or **React Bits** (`npx shadcn@latest add https://reactbits.dev/r/<Component>-TS-TW`). Adapt copied code: i18n strings, logical RTL classes, project tokens.
+- Components: shadcn/ui first. For richer pieces use **21st.dev** (its MCP server when connected, or the CLI: `npx @21st-dev/cli@latest search "<query>"`, then `get <id>` / `add <user>/<slug>`), or **React Bits** (`npx shadcn@latest add https://reactbits.dev/r/<Component>-TS-TW`). Adapt copied code: i18n strings, logical RTL classes, project tokens.
 - Motion: GSAP through `useGSAP` (scoped, auto-cleanup), with `gsap.matchMedia()` and `prefers-reduced-motion`. Lenis is mounted once at the root, driven by `gsap.ticker`. Put `data-lenis-prevent` on inner scroll areas (tables, dialogs, sheets). Keep admin motion subtle (0.2–0.6s, `power2.out`).
 - Check every screen in light and dark, English and Arabic, at phone, tablet and desktop widths.
 
@@ -107,7 +123,8 @@ For each feature or module:
 
 ## Git
 
-- Remote: https://github.com/mohamadkheiredine/INKCODE-Ecommerce (`main`).
+- Remote: https://github.com/mohamadkheiredine/INKCODE-Ecommerce (`main`). The `gh` CLI is authenticated for this account.
+- CI (GitHub Actions) only runs once the account's GitHub billing lock is cleared. Until then, every job fails with "account is locked due to a billing issue" before any step runs. That isn't a code failure, so verify locally with the `check` commands.
 - Conventional Commits, one logical change per commit, never `--no-verify`.
 - `.env` files stay untracked. Only `.env.example` files are committed.
 
