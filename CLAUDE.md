@@ -58,6 +58,19 @@ act push -W .github/workflows/ci.yml --rm -P ubuntu-latest=catthehacker/ubuntu:a
 
 Afterwards, remove leftover `act-CI-*` containers and bring MySQL back with `docker compose up -d --force-recreate mysql`. A plain `docker start` can come back without its port mapping; the data volume is kept either way. `DB_HOST=host.docker.internal` is only needed under `act`. On GitHub's runners the workflow reaches MySQL on `127.0.0.1`.
 
+### Parallel worktrees (slots)
+
+Several git worktrees can develop, test and run e2e at once, each in its own **slot**: its own databases in the `inkcode-mysql` container and its own dev-server ports.
+
+| Slot | Dev DB | Test DB | API | SPA |
+|---|---|---|---|---|
+| 0 (main checkout) | `inkcode` | `inkcode_testing` | 8000 | 5173 |
+| N = 1–4 (a worktree) | `inkcode_wN` | `inkcode_testing_wN` | 800N | 517N |
+
+- Slot 0 needs nothing new. In a worktree, run `node scripts/use-slot.mjs <N>` from its root (add `--fresh` to rebuild the dev DB). It creates both databases, writes the untracked `backend/.env` and `frontend/.env.local`, installs dependencies if missing, migrates and seeds in demo mode, and prints the URLs.
+- Everything then follows the slot: Pest uses `DB_TEST_DATABASE` (`tests/bootstrap.php`), `php artisan serve` uses `SERVER_PORT`, and Vite and Playwright read `SPA_PORT`/`API_PORT` (`frontend/dev-servers.ts`), so e2e starts or reuses only this slot's servers and seeds only its DB.
+- Never run commands against another slot's servers or databases. Browsers share cookies across ports, so look at two slots in separate browser profiles (Playwright's contexts are already isolated).
+
 ## Library versions: always check current docs
 
 Several dependencies are new majors that postdate most training data. Look up their current docs with the Context7 MCP before writing code against them: **Laravel 13**, **spatie/laravel-permission 8**, **Scramble 0.13**, **Pest 4**, **React 19**, **React Router 8**, **TanStack Query 5**, **TanStack Table 9**, **Vite 8**, **Vitest 5**, **TypeScript 7** (no `baseUrl`; `strict` is on), **Tailwind CSS 4**, **shadcn/ui 4** (`radix-nova` style, `cn` package), **Zod 4**, **i18next 26**, **GSAP 3.15**, **Lenis 1.3**.
