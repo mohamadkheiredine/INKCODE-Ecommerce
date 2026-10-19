@@ -29,6 +29,8 @@ class NoopResizeObserver {
 }
 window.ResizeObserver ??= NoopResizeObserver as unknown as typeof ResizeObserver
 Element.prototype.scrollIntoView ??= () => {}
+// React Router's ScrollRestoration scrolls the window; jsdom has no scrolling.
+window.scrollTo = () => {}
 
 // Multi-step flows (sign in, then navigate) can exceed the 1s default on a busy machine.
 configure({ asyncUtilTimeout: 3000 })

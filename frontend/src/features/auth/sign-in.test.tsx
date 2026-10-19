@@ -238,7 +238,7 @@ describe('The guarded app', () => {
       http.get('*/api/v1/auth/me', () => apiError(401, 'unauthenticated', 'Unauthenticated.')),
     )
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+    await signOutFromUserMenu(user)
 
     expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument()
   })
@@ -252,7 +252,7 @@ describe('The guarded app', () => {
       http.post('*/api/v1/auth/logout', () => apiError(500, 'server_error', 'Server error')),
     )
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+    await signOutFromUserMenu(user)
 
     expect(
       await screen.findByText("We couldn't sign you out. Please try again."),
@@ -268,7 +268,7 @@ describe('The guarded app', () => {
     await signInWithForm(user, 'admin@inkcode.test', 'password')
     await screen.findByRole('heading', { name: 'Hello, Ahmed Ali' })
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+    await signOutFromUserMenu(user)
 
     expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/sign-in')
@@ -320,3 +320,9 @@ describe('Language and theme', () => {
     expect(document.documentElement).not.toHaveClass('dark')
   })
 })
+
+/** Signing out lives in the header's user menu. */
+async function signOutFromUserMenu(user: ReturnType<typeof renderApp>['user']) {
+  await user.click(screen.getByRole('button', { name: 'Open the user menu' }))
+  await user.click(await screen.findByRole('menuitem', { name: 'Sign out' }))
+}

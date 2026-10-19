@@ -168,4 +168,27 @@
     background-clip: text;
     color: transparent;
   }
+  /* The shell's page-loading bar, sweeping in the reading direction. */
+  .route-progress {
+    animation: route-progress 1s ease-in-out infinite;
+  }
+  :dir(rtl) .route-progress {
+    animation-direction: reverse;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .route-progress {
+      width: 100%;
+      animation: none;
+      opacity: 0.6;
+    }
+  }
+}
+
+@keyframes route-progress {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 300% 0;
+  }
 }

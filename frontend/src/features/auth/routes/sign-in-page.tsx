@@ -7,6 +7,7 @@ import { LanguageSwitcher } from '@/components/preferences/language-switcher'
 import { ThemeToggle } from '@/components/preferences/theme-toggle'
 import { BrandPanel } from '../components/brand-panel'
 import { SignInPanel } from '../components/sign-in-panel'
+import { useApplyPreferences } from '@/components/preferences/use-apply-preferences'
 import { useCurrentUser } from '../hooks/use-auth'
 import { safeRedirectTarget } from '../redirect'
 import type { CurrentUser } from '../types'
@@ -19,6 +20,7 @@ export function SignInPage() {
   const currentUser = useCurrentUser()
   const container = useRef<HTMLDivElement>(null)
   const target = safeRedirectTarget(searchParams.get('redirect'))
+  const applyPreferences = useApplyPreferences()
 
   useEntranceAnimation(container, [
     { targets: '.js-card', y: 24, duration: 0.6 },
@@ -29,6 +31,8 @@ export function SignInPage() {
   if (currentUser.isSuccess) return <Navigate to={target} replace />
 
   const handleSignedIn = (user: CurrentUser) => {
+    // The User's own language and theme follow them to this browser.
+    applyPreferences(user.preferences)
     toast.success(t('signIn.welcome', { name: user.name }))
     void navigate(target, { replace: true })
   }
