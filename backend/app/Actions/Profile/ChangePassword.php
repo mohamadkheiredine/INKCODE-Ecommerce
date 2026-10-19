@@ -2,15 +2,19 @@
 
 namespace App\Actions\Profile;
 
+use App\Enums\AuditAction;
 use App\Models\User;
+use App\Services\AuditTrail;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Support\Facades\DB;
 use LogicException;
 
 /**
  * Replaces a User's password. Every other session of that User ends (Sanctum's
  * AuthenticateSession compares the password hash on each request), while the device
- * that made the change stays signed in, including its "keep me signed in" cookie.
+ * that made the change stays signed in, including its "keep me signed in" cookie. The
+ * change is audited, without any password value.
  */
 final class ChangePassword
 {
@@ -21,7 +25,7 @@ final class ChangePassword
 
     private readonly SessionGuard $guard;
 
-    public function __construct(AuthFactory $auth)
+    public function __construct(AuthFactory $auth, private readonly AuditTrail $auditTrail)
     {
         $guard = $auth->guard('web');
 
@@ -37,7 +41,10 @@ final class ChangePassword
      */
     public function handle(User $user, #[\SensitiveParameter] string $newPassword): void
     {
-        $user->forceFill(['password' => $newPassword])->save();
+        DB::transaction(function () use ($user, $newPassword): void {
+            $user->forceFill(['password' => $newPassword])->save();
+            $this->auditTrail->record(AuditAction::PasswordChanged, $user);
+        });
 
         $this->guard->logoutOtherDevices($newPassword);
     }

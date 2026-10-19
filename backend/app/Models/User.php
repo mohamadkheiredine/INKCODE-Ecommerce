@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Contracts\Auditable;
 use App\Enums\Locale;
 use App\Enums\Role;
 use App\Enums\Theme;
+use App\Models\Concerns\Audited;
 use BackedEnum;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -30,8 +32,10 @@ use Spatie\Permission\Traits\HasRoles;
  */
 #[Fillable(['name', 'email', 'password', 'locale', 'theme'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
+    use Audited;
+
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -63,6 +67,16 @@ class User extends Authenticatable
             'locale' => Locale::class,
             'theme' => Theme::class,
         ];
+    }
+
+    /**
+     * Never in the audit trail: when the email was verified changes nothing a User did.
+     *
+     * @return list<string>
+     */
+    protected function auditExcept(): array
+    {
+        return ['email_verified_at'];
     }
 
     /**
