@@ -4,6 +4,7 @@ use App\Enums\Role;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /*
@@ -46,4 +47,31 @@ function seedStore(bool $demoMode): void
 {
     config(['app.demo_mode' => $demoMode]);
     test()->seed(DatabaseSeeder::class);
+}
+
+/**
+ * Sends the next request from one browser, holding only this session cookie (none for a
+ * new browser). Tests share one app, so the guards and the in-memory session are reset
+ * the way a real next request finds them.
+ */
+function asBrowser(string $session = ''): TestCase
+{
+    app('auth')->forgetGuards();
+    app('session')->driver()->flush();
+
+    return test()->withCredentials()->withCookie((string) config('session.cookie'), $session);
+}
+
+function signInFromNewBrowser(string $email, string $password): TestResponse
+{
+    return asBrowser()->postJson('/api/v1/auth/login', ['email' => $email, 'password' => $password]);
+}
+
+/**
+ * The session a response started, to send on that browser's later requests.
+ */
+function sessionOf(TestResponse $response): string
+{
+    return $response->getCookie((string) config('session.cookie'))?->getValue()
+        ?? throw new RuntimeException('The response started no session.');
 }

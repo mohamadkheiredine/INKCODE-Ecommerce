@@ -40,6 +40,16 @@ class User extends Authenticatable
     }
 
     /**
+     * The same defaults as the `users` table, so a new User has them before being reloaded.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'locale' => 'en',
+        'theme' => 'light',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
