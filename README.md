@@ -159,10 +159,17 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
 - **App shell, design system and profile (#7):** a sidebar built from one permission-aware registry (icon rail on tablets, drawer on phones), breadcrumbs, a header with language and theme switches and a user menu; English ↔ Arabic mirrors the layout with Western digits; language and theme are kept on the User and follow them to any device; a profile page to change the password (current password, minimum strength, other sessions signed out); shared skeleton, empty, error and toast patterns; GSAP entrances and Lenis smooth scrolling, all off under reduced motion.
 - **In-app notifications (#8):** a bell in the header with the unread count; it lists the User's own notifications newest first, opens the record each one links to, and marks one or all as read. It checks every 30 seconds while the tab is visible and pauses while it is hidden. Messages follow the interface language (English or Arabic), and demo accounts start with a welcome notification.
 
+- **Categories and Brands, shared lists, forms and audit trail (#9):**
+  - Categories come in two levels (a child never has children) and Brands can have an optional PNG, JPEG or WebP logo.
+  - Both have unique slugs generated from the name, and lists with search, filters, sorting and pages. The list state lives in the URL, so links can be shared and back/forward works.
+  - Creating and editing happen in dialogs, with server validation errors shown under the matching field. Deleting asks for confirmation, and a parent that still has children (or a record still in use) is refused with a clear message.
+  - Every Role can view the catalog; only Admin and Operations can change it, and the API enforces this.
+  - Every change, including profile preferences and password changes, writes an audit entry with who did it and the values before and after.
+
 ### Incomplete / assumptions
 
 - The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
-- Profile changes (preferences, password) will write audit entries once the audit trail exists (#9). Marking a notification as read is the User's own reading state and is not audited.
+- Marking a notification as read is the User's own reading state and is not audited. The audit log viewer arrives with #26. Refusing to delete a Category or Brand that Products use relies on the restricting foreign keys Products add in #10.
 - Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.
 - A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.

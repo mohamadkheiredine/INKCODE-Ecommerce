@@ -32,6 +32,10 @@ _Avoid_: Label, category
 The Revenue of a Customer's Counted orders minus that Customer's Refunds.
 _Avoid_: LTV (in the interface), total spent, customer value
 
+**Audit entry**:
+One recorded change to a record: who made it, what they did, which record, the values before and after, and when; together they form the audit log.
+_Avoid_: History row, activity, change log
+
 ## Catalog
 
 **Product**:
@@ -49,6 +53,18 @@ _Avoid_: Option, property, characteristic
 **Product status**:
 Draft, Active or Archived; a Product that appears on any Order can be Archived but never deleted.
 _Avoid_: Visibility, published
+
+**Category**:
+A group of Products in two levels: a top-level Category, or a child Category under one; a child never has children.
+_Avoid_: Collection, department, section
+
+**Brand**:
+Who makes a Product, with an optional logo; Products can be filtered and reported by Brand.
+_Avoid_: Manufacturer, label, vendor
+
+**Slug**:
+A record's short, unique, lowercase name for links ("summer-shirts"), generated from its name unless a User chooses one.
+_Avoid_: Handle, permalink, URL key
 
 ## Stock
 
