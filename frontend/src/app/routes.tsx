@@ -3,12 +3,14 @@ import { PageSkeleton } from '@/components/feedback/page-skeleton'
 import { RequireAuth } from '@/features/auth/components/require-auth'
 import { SIGN_IN_PATH } from '@/features/auth/redirect'
 import type { RouteHandle } from '@/lib/navigation'
+import { withPermission } from './with-permission'
 
 const crumb = (page: NonNullable<RouteHandle['crumb']>): RouteHandle => ({ crumb: page })
 
 /**
  * Route modules load lazily, so each page only ships when it is first visited. Each
  * page names itself in `handle.crumb`; the shell builds breadcrumbs and titles from it.
+ * A page that needs a permission is wrapped in `withPermission` (the API still checks).
  */
 export const routes: RouteObject[] = [
   {
@@ -37,6 +39,26 @@ export const routes: RouteObject[] = [
             handle: crumb('profile'),
             lazy: async () => ({
               Component: (await import('@/features/profile/routes/profile-page')).ProfilePage,
+            }),
+          },
+          {
+            path: 'catalog/categories',
+            handle: crumb('categories'),
+            lazy: async () => ({
+              Component: withPermission(
+                'catalog.view',
+                (await import('@/features/catalog/routes/categories-page')).CategoriesPage,
+              ),
+            }),
+          },
+          {
+            path: 'catalog/brands',
+            handle: crumb('brands'),
+            lazy: async () => ({
+              Component: withPermission(
+                'catalog.view',
+                (await import('@/features/catalog/routes/brands-page')).BrandsPage,
+              ),
             }),
           },
           {

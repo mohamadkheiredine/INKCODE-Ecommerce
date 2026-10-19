@@ -2,12 +2,14 @@ import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 import arAuth from '@/locales/ar/auth.json'
+import arCatalog from '@/locales/ar/catalog.json'
 import arCommon from '@/locales/ar/common.json'
 import arErrors from '@/locales/ar/errors.json'
 import arHome from '@/locales/ar/home.json'
 import arNotifications from '@/locales/ar/notifications.json'
 import arProfile from '@/locales/ar/profile.json'
 import enAuth from '@/locales/en/auth.json'
+import enCatalog from '@/locales/en/catalog.json'
 import enCommon from '@/locales/en/common.json'
 import enErrors from '@/locales/en/errors.json'
 import enHome from '@/locales/en/home.json'
@@ -29,6 +31,7 @@ export const resources = {
   en: {
     common: enCommon,
     auth: enAuth,
+    catalog: enCatalog,
     errors: enErrors,
     home: enHome,
     notifications: enNotifications,
@@ -37,6 +40,7 @@ export const resources = {
   ar: {
     common: arCommon,
     auth: arAuth,
+    catalog: arCatalog,
     errors: arErrors,
     home: arHome,
     notifications: arNotifications,
@@ -64,7 +68,7 @@ void i18n
     load: 'languageOnly',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'errors', 'home', 'notifications', 'profile'],
+    ns: ['common', 'auth', 'catalog', 'errors', 'home', 'notifications', 'profile'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],
