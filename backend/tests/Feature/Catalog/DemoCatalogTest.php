@@ -11,6 +11,9 @@ it('seeds demo Categories in two levels and demo Brands', function () {
     $this->getJson('/api/v1/categories?search=shirts')
         ->assertJsonPath('data.0.parent.name', 'Clothing');
     $this->getJson('/api/v1/brands')->assertJsonPath('meta.total', 6);
+    $this->getJson('/api/v1/attributes')
+        ->assertJsonPath('data.*.name', ['Color', 'Material', 'Size'])
+        ->assertJsonPath('data.2.values.*.code', ['XS', 'S', 'M', 'L', 'XL']);
 });
 
 it('keeps the same demo catalog when demo data is seeded twice', function () {
