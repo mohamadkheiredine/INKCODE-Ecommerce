@@ -1,0 +1,15 @@
+{
+  "eyebrow": "تم تسجيل الدخول",
+  "title": "أهلاً، {{name}}",
+  "subtitle": "أنت الآن في لوحة إدارة إنككود كوميرس.",
+  "role": "الدور",
+  "email": "البريد الإلكتروني",
+  "access": "الصلاحيات",
+  "permissionCount_zero": "لا صلاحيات",
+  "permissionCount_one": "صلاحية واحدة",
+  "permissionCount_two": "صلاحيتان",
+  "permissionCount_few": "{{count}} صلاحيات",
+  "permissionCount_many": "{{count}} صلاحية",
+  "permissionCount_other": "{{count}} صلاحية",
+  "today": "اليوم {{date}}"
+}

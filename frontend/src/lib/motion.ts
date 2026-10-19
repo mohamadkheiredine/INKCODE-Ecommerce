@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import type { RefObject } from 'react'
+import { type RefObject, useSyncExternalStore } from 'react'
 
 gsap.registerPlugin(useGSAP)
 
@@ -29,5 +29,22 @@ export function useEntranceAnimation(scope: RefObject<HTMLElement | null>, steps
       return () => mm.revert()
     },
     { scope },
+  )
+}
+
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+
+function subscribeToReducedMotion(onChange: () => void): () => void {
+  const query = window.matchMedia(REDUCED_MOTION_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+
+/** Whether the User asked their system for less motion; follows the setting live. */
+export function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeToReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => false,
   )
 }

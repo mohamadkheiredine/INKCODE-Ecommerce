@@ -32,13 +32,37 @@
   "actions": {
     "retry": "حاول مجدداً",
     "signOut": "تسجيل الخروج",
-    "goHome": "الذهاب إلى الصفحة الرئيسية"
+    "goHome": "الذهاب إلى الصفحة الرئيسية",
+    "profile": "الملف الشخصي"
   },
   "states": {
     "loading": "جارٍ التحميل…",
     "errorTitle": "حدث خطأ ما",
     "errorDescription": "تعذّر تحميل هذه الصفحة. تحقّق من اتصالك وحاول مجدداً.",
     "notFoundTitle": "الصفحة غير موجودة",
-    "notFoundDescription": "هذه الصفحة غير موجودة أو تم نقلها."
+    "notFoundDescription": "هذه الصفحة غير موجودة أو تم نقلها.",
+    "noRole": "بلا دور"
+  },
+  "pages": {
+    "home": "الرئيسية",
+    "profile": "الملف الشخصي",
+    "notFound": "الصفحة غير موجودة"
+  },
+  "navGroups": {
+    "dashboard": "لوحة التحكم",
+    "sales": "المبيعات",
+    "catalog": "الكتالوج",
+    "operations": "العمليات",
+    "promotions": "العروض",
+    "insights": "التحليلات",
+    "admin": "الإدارة"
+  },
+  "shell": {
+    "mainNavigation": "التنقل الرئيسي",
+    "breadcrumbs": "مسار التنقل",
+    "skipToContent": "تخطَّ إلى المحتوى",
+    "toggleSidebar": "إظهار الشريط الجانبي أو إخفاؤه",
+    "userMenu": "فتح قائمة المستخدم",
+    "loadingPage": "جارٍ تحميل الصفحة…"
   }
 }

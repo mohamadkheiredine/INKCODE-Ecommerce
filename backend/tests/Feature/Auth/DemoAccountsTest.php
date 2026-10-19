@@ -42,3 +42,20 @@ it('creates no demo accounts and hides the list outside demo mode', function () 
     $this->postJson('/api/v1/auth/login', ['email' => 'admin@inkcode.test', 'password' => 'password'])
         ->assertUnprocessable();
 });
+
+it('brings demo accounts back to their documented password, English and light when seeded again', function () {
+    seedStore(demoMode: true);
+    $this->postJson('/api/v1/auth/login', ['email' => 'support@inkcode.test', 'password' => 'password'])->assertOk();
+    $this->patchJson('/api/v1/auth/me/preferences', ['locale' => 'ar', 'theme' => 'dark'])->assertOk();
+    $this->putJson('/api/v1/auth/me/password', [
+        'current_password' => 'password',
+        'password' => 'Changed-in-review-1',
+        'password_confirmation' => 'Changed-in-review-1',
+    ])->assertNoContent();
+
+    seedStore(demoMode: true);
+
+    signInFromNewBrowser('support@inkcode.test', 'password')
+        ->assertOk()
+        ->assertJsonPath('data.preferences', ['locale' => 'en', 'theme' => 'light']);
+});

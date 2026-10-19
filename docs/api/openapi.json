@@ -77,6 +77,78 @@
                 }
             }
         },
+        "/auth/me/password": {
+            "put": {
+                "operationId": "auth.me.password",
+                "tags": [
+                    "Password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChangePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/auth/me/preferences": {
+            "patch": {
+                "operationId": "auth.me.preferences",
+                "tags": [
+                    "Preferences"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePreferencesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CurrentUserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CurrentUserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "operationId": "roles.index",
@@ -194,6 +266,27 @@
     },
     "components": {
         "schemas": {
+            "ChangePasswordRequest": {
+                "type": "object",
+                "description": "A User replacing their own password: they must know the current one, and the new\none must meet the minimum strength ({@see Password::defaults()}).",
+                "properties": {
+                    "current_password": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "current_password",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "ChangePasswordRequest"
+            },
             "CurrentUserResource": {
                 "type": "object",
                 "properties": {
@@ -262,6 +355,15 @@
                 ],
                 "title": "DemoAccountResource"
             },
+            "Locale": {
+                "type": "string",
+                "description": "The interface languages. Arabic is read right to left.\n",
+                "enum": [
+                    "en",
+                    "ar"
+                ],
+                "title": "Locale"
+            },
             "RoleResource": {
                 "type": "object",
                 "properties": {
@@ -302,6 +404,27 @@
                     "password"
                 ],
                 "title": "SignInRequest"
+            },
+            "Theme": {
+                "type": "string",
+                "enum": [
+                    "light",
+                    "dark"
+                ],
+                "title": "Theme"
+            },
+            "UpdatePreferencesRequest": {
+                "type": "object",
+                "description": "The signed-in User's own language and theme. Every User may change their own, so\nbeing signed in is the only requirement.",
+                "properties": {
+                    "locale": {
+                        "$ref": "#/components/schemas/Locale"
+                    },
+                    "theme": {
+                        "$ref": "#/components/schemas/Theme"
+                    }
+                },
+                "title": "UpdatePreferencesRequest"
             }
         },
         "responses": {

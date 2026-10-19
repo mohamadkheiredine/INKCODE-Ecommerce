@@ -3,12 +3,23 @@
   "project": {
     "name": "inkcode-commerce-frontend",
     "productType": null,
-    "stack": ["react", "shadcn", "tailwind-v4", "vite"]
+    "stack": [
+      "react",
+      "shadcn",
+      "tailwind-v4",
+      "vite"
+    ]
   },
   "sources": {
-    "tokens": ["src/index.css"],
-    "components": ["src/components/ui"],
-    "assets": ["src/assets"],
+    "tokens": [
+      "src/index.css"
+    ],
+    "components": [
+      "src/components/ui"
+    ],
+    "assets": [
+      "src/assets"
+    ],
     "instructions": []
   },
   "design": {
@@ -82,6 +93,18 @@
         "value": "var(--destructive)",
         "source": "src/index.css"
       },
+      "--color-success": {
+        "value": "var(--success)",
+        "source": "src/index.css"
+      },
+      "--color-warning": {
+        "value": "var(--warning)",
+        "source": "src/index.css"
+      },
+      "--color-info": {
+        "value": "var(--info)",
+        "source": "src/index.css"
+      },
       "--color-accent-foreground": {
         "value": "var(--accent-foreground)",
         "source": "src/index.css"
@@ -114,6 +137,18 @@
         "value": "var(--primary)",
         "source": "src/index.css"
       },
+      "--color-brand-from": {
+        "value": "var(--brand-from)",
+        "source": "src/index.css"
+      },
+      "--color-brand-to": {
+        "value": "var(--brand-to)",
+        "source": "src/index.css"
+      },
+      "--color-brand-foreground": {
+        "value": "var(--brand-foreground)",
+        "source": "src/index.css"
+      },
       "--color-popover-foreground": {
         "value": "var(--popover-foreground)",
         "source": "src/index.css"
@@ -139,121 +174,125 @@
         "source": "src/index.css"
       },
       "--background": {
-        "value": "oklch(0.145 0 0)",
+        "value": "oklch(0.165 0.03 274)",
         "source": "src/index.css"
       },
       "--foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.955 0.008 286)",
         "source": "src/index.css"
       },
       "--card-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.955 0.008 286)",
         "source": "src/index.css"
       },
       "--popover-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.955 0.008 286)",
         "source": "src/index.css"
       },
       "--primary": {
-        "value": "oklch(0.922 0 0)",
+        "value": "oklch(0.62 0.2 280)",
         "source": "src/index.css"
       },
       "--primary-foreground": {
-        "value": "oklch(0.205 0 0)",
+        "value": "oklch(0.99 0.004 286)",
         "source": "src/index.css"
       },
       "--secondary": {
-        "value": "oklch(0.269 0 0)",
+        "value": "oklch(0.255 0.04 275)",
         "source": "src/index.css"
       },
       "--secondary-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.92 0.02 286)",
         "source": "src/index.css"
       },
       "--muted": {
-        "value": "oklch(0.269 0 0)",
+        "value": "oklch(0.245 0.035 275)",
         "source": "src/index.css"
       },
       "--muted-foreground": {
-        "value": "oklch(0.708 0 0)",
+        "value": "oklch(0.72 0.03 282)",
         "source": "src/index.css"
       },
       "--accent": {
-        "value": "oklch(0.269 0 0)",
+        "value": "oklch(0.28 0.06 280)",
         "source": "src/index.css"
       },
       "--accent-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.9 0.06 286)",
         "source": "src/index.css"
       },
       "--destructive": {
-        "value": "oklch(0.704 0.191 22.216)",
+        "value": "oklch(0.68 0.19 22)",
         "source": "src/index.css"
       },
       "--border": {
-        "value": "oklch(1 0 0 / 10%)",
+        "value": "oklch(1 0 0 / 9%)",
         "source": "src/index.css"
       },
       "--ring": {
-        "value": "oklch(0.556 0 0)",
+        "value": "oklch(0.65 0.19 280)",
+        "source": "src/index.css"
+      },
+      "--brand-foreground": {
+        "value": "oklch(1 0 0)",
         "source": "src/index.css"
       },
       "--chart-1": {
-        "value": "oklch(0.87 0 0)",
+        "value": "oklch(0.68 0.19 285)",
         "source": "src/index.css"
       },
       "--chart-2": {
-        "value": "oklch(0.556 0 0)",
+        "value": "oklch(0.7 0.14 252)",
         "source": "src/index.css"
       },
       "--chart-3": {
-        "value": "oklch(0.439 0 0)",
+        "value": "oklch(0.74 0.14 160)",
         "source": "src/index.css"
       },
       "--chart-4": {
-        "value": "oklch(0.371 0 0)",
+        "value": "oklch(0.8 0.14 72)",
         "source": "src/index.css"
       },
       "--chart-5": {
-        "value": "oklch(0.269 0 0)",
+        "value": "oklch(0.7 0.19 18)",
         "source": "src/index.css"
       },
       "--sidebar-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.88 0.02 286)",
         "source": "src/index.css"
       },
       "--sidebar-primary": {
-        "value": "oklch(0.488 0.243 264.376)",
+        "value": "oklch(0.62 0.2 280)",
         "source": "src/index.css"
       },
       "--sidebar-primary-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.99 0.004 286)",
         "source": "src/index.css"
       },
       "--sidebar-accent": {
-        "value": "oklch(0.269 0 0)",
+        "value": "oklch(0.27 0.055 280)",
         "source": "src/index.css"
       },
       "--sidebar-accent-foreground": {
-        "value": "oklch(0.985 0 0)",
+        "value": "oklch(0.92 0.05 286)",
         "source": "src/index.css"
       },
       "--sidebar-border": {
-        "value": "oklch(1 0 0 / 10%)",
+        "value": "oklch(1 0 0 / 8%)",
         "source": "src/index.css"
       },
       "--sidebar-ring": {
-        "value": "oklch(0.556 0 0)",
+        "value": "oklch(0.65 0.19 280)",
         "source": "src/index.css"
       }
     },
     "typography": {
-      "--font-heading": {
-        "value": "var(--font-sans)",
+      "--font-sans": {
+        "value": "'Inter Variable', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif",
         "source": "src/index.css"
       },
-      "--font-sans": {
-        "value": "'Geist Variable', sans-serif",
+      "--font-heading": {
+        "value": "var(--font-sans)",
         "source": "src/index.css"
       }
     },
@@ -288,7 +327,7 @@
         "source": "src/index.css"
       },
       "--radius": {
-        "value": "0.625rem",
+        "value": "0.75rem",
         "source": "src/index.css"
       }
     },
@@ -379,5 +418,5 @@
       "source": "package.json"
     }
   ],
-  "generatedAt": "2026-10-19T14:19:09.287Z"
+  "generatedAt": "2026-10-19T15:46:22.198Z"
 }

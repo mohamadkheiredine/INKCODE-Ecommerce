@@ -1,0 +1,46 @@
+{
+  "description": "Who you are, your preferences and your password.",
+  "preferences": {
+    "title": "Preferences",
+    "description": "Saved to your profile, so they follow you to any device.",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "saved": "Preferences saved.",
+    "notSaved": "Your choice applies here, but we couldn't save it to your profile."
+  },
+  "password": {
+    "title": "Change password",
+    "description": "Changing your password signs you out on your other devices.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "show": "Show passwords",
+    "hide": "Hide passwords",
+    "submit": "Change password",
+    "submitting": "Changing password…",
+    "changed": "Password changed. You've been signed out on your other devices.",
+    "rules": {
+      "title": "Your new password needs",
+      "length": "At least 10 characters",
+      "case": "Upper- and lower-case letters",
+      "number": "At least one number",
+      "met": "Met",
+      "notMet": "Not met yet"
+    },
+    "validation": {
+      "currentRequired": "Enter your current password.",
+      "newRequired": "Enter a new password.",
+      "tooWeak": "Choose a password that meets every rule.",
+      "tooLong": "Use 72 characters or fewer.",
+      "sameAsCurrent": "Choose a password different from your current one.",
+      "confirmRequired": "Enter the new password again.",
+      "confirmMismatch": "The passwords don't match."
+    }
+  },
+  "identity": {
+    "role": "Role",
+    "email": "Email"
+  }
+}

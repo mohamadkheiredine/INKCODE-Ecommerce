@@ -1,5 +1,5 @@
-import type { Theme } from '@/components/theme/theme-context'
-import type { Language } from '@/lib/i18n'
+import type { Preferences } from '@/components/preferences/use-apply-preferences'
+import type { Permission } from '@/lib/permissions'
 
 export const ROLES = [
   'admin',
@@ -19,8 +19,8 @@ export type CurrentUser = {
   email: string
   role: RoleKey | null
   /** Only used to hide UI; the API checks every request itself. */
-  permissions: string[]
-  preferences: { locale: Language; theme: Theme }
+  permissions: Permission[]
+  preferences: Preferences
 }
 
 export type DemoAccount = {
