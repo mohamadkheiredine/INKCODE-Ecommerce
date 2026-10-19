@@ -10,8 +10,11 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] MySQL 8.4 via Docker Compose, separate `inkcode_testing` database
 - [x] Sanctum installed, API under `/api/v1`, JSON errors for API routes
 - [x] Tooling: Pest, Larastan, Pint, Vitest, Playwright, oxlint, Prettier, CI
-- [ ] Login / logout / current user (Sanctum SPA cookies, CSRF), rate-limited login
-- [ ] Consistent API error envelope and pagination format
+- [x] Sign in / sign out / current User (Sanctum SPA cookies, CSRF), rate-limited per email and per IP (ticket 01, #6)
+- [x] Seven Roles and the permission matrix, seeded idempotently; exactly one Role per User; 403 for every other Role (#6)
+- [x] Demo accounts (one per Role) and one-click sign-in, only in demo mode (#6)
+- [x] Consistent API error envelope (`message`, `code`, `errors`), localized in English and Arabic (#6)
+- [ ] Shared pagination and list query format (ticket 04)
 - [ ] Design tokens: light + dark themes, typography for Latin + Arabic
 - [ ] i18n (English LTR / Arabic RTL) with runtime switching, all strings translated
 - [ ] App shell: collapsible sidebar, breadcrumbs, global search (command palette), notifications, user menu, quick actions
