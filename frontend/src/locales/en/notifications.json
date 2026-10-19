@@ -1,0 +1,25 @@
+{
+  "title": "Notifications",
+  "bell": "Notifications",
+  "bellWithUnread_one": "Notifications, {{count}} unread",
+  "bellWithUnread_other": "Notifications, {{count}} unread",
+  "unreadCount_one": "{{count}} new",
+  "unreadCount_other": "{{count}} new",
+  "unread": "Unread",
+  "loading": "Loading notifications…",
+  "markAsRead": "Mark as read",
+  "markAllAsRead": "Mark all as read",
+  "allMarkedAsRead": "All notifications marked as read.",
+  "markAsReadFailed": "Couldn't mark your notifications as read. Try again.",
+  "showOlder": "Show older",
+  "loadingOlder": "Loading older notifications…",
+  "empty": {
+    "title": "You're all caught up",
+    "description": "Notifications about stock, Orders, payments and Returns will appear here.",
+    "action": "Check again"
+  },
+  "error": {
+    "title": "Couldn't load your notifications",
+    "description": "Check your connection and try again."
+  }
+}
