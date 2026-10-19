@@ -47,6 +47,14 @@ Start MySQL first: `docker compose up -d mysql` (Docker Desktop must be running)
 
 Run both `check` commands before every commit. CI runs the same checks on GitHub.
 
+To run the real GitHub workflow locally (useful while GitHub Actions is blocked), use [`act`](https://github.com/nektos/act) with Docker. Stop the dev MySQL first (`docker stop inkcode-mysql`) because the CI service also binds port 3306, then run:
+
+```bash
+act push -W .github/workflows/ci.yml --rm -P ubuntu-latest=catthehacker/ubuntu:act-latest --container-architecture linux/amd64 --env DB_HOST=host.docker.internal
+```
+
+Afterwards, remove leftover `act-CI-*` containers and bring MySQL back with `docker compose up -d --force-recreate mysql`. A plain `docker start` can come back without its port mapping; the data volume is kept either way. `DB_HOST=host.docker.internal` is only needed under `act`. On GitHub's runners the workflow reaches MySQL on `127.0.0.1`.
+
 ## Library versions: always check current docs
 
 Several dependencies are new majors that postdate most training data. Look up their current docs with the Context7 MCP before writing code against them: **Laravel 13**, **spatie/laravel-permission 8**, **Scramble 0.13**, **Pest 4**, **React 19**, **React Router 8**, **TanStack Query 5**, **TanStack Table 9**, **Vite 8**, **Vitest 5**, **TypeScript 7** (no `baseUrl`; `strict` is on), **Tailwind CSS 4**, **shadcn/ui 4** (`radix-nova` style, `cn` package), **Zod 4**, **i18next 26**, **GSAP 3.15**, **Lenis 1.3**.
