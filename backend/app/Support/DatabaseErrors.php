@@ -54,6 +54,19 @@ final class DatabaseErrors
      */
     public static function refuseDuplicateSlug(Closure $save): mixed
     {
+        return self::refuseDuplicate($save, 'slug', __('validation.unique', ['attribute' => 'slug']));
+    }
+
+    /**
+     * Runs a save; a duplicate unique value from a simultaneous save answers 422 on `$field`.
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $save
+     * @return T
+     */
+    public static function refuseDuplicate(Closure $save, string $field, string $message): mixed
+    {
         try {
             return $save();
         } catch (QueryException $exception) {
@@ -61,7 +74,7 @@ final class DatabaseErrors
                 throw $exception;
             }
 
-            throw ValidationException::withMessages(['slug' => __('validation.unique', ['attribute' => 'slug'])]);
+            throw ValidationException::withMessages([$field => $message]);
         }
     }
 }
