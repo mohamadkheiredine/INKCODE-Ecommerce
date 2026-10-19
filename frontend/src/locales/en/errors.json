@@ -1,0 +1,10 @@
+{
+  "network_error": "Can't reach the server. Check your connection and try again.",
+  "server_error": "Something went wrong on our side. Please try again.",
+  "unauthenticated": "Your session has ended. Please sign in again.",
+  "forbidden": "You are not allowed to perform this action.",
+  "not_found": "We couldn't find what you were looking for.",
+  "csrf_token_mismatch": "Your session expired. Refresh the page and try again.",
+  "too_many_requests": "Too many attempts. Please wait a moment and try again.",
+  "unknown": "Something went wrong. Please try again."
+}

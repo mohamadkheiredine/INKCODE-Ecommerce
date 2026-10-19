@@ -1,10 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>INKCODE Commerce</title>
+    <meta name="description" content="Inkcode Commerce: the e-commerce management dashboard." />
+    <title>Inkcode Commerce</title>
+    <script>
+      // Apply the saved theme and language before the first paint, so there is no flash.
+      try {
+        if (localStorage.getItem('inkcode.theme') === 'dark') {
+          document.documentElement.classList.add('dark')
+          document.documentElement.style.colorScheme = 'dark'
+        }
+        if (localStorage.getItem('inkcode.language') === 'ar') {
+          document.documentElement.lang = 'ar'
+          document.documentElement.dir = 'rtl'
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
