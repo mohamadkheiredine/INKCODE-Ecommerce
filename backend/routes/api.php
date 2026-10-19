@@ -13,6 +13,9 @@ use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
+use App\Http\Controllers\Settings\StoreLogoController;
+use App\Http\Controllers\Settings\StoreProfileController;
+use App\Http\Controllers\Settings\StoreSettingsController;
 use Illuminate\Support\Facades\Route;
 
 // Every route in this file is served under /api/v1 (see bootstrap/app.php).
@@ -49,6 +52,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/brands/{brand}/logo', [BrandLogoController::class, 'destroy'])
         ->can('update', 'brand')
         ->name('brands.logo.destroy');
+
+    // Settings: only the Admin (settings.manage) sees or changes them all.
+    Route::get('/settings', [StoreSettingsController::class, 'show'])
+        ->can(Permission::SettingsManage->value)
+        ->name('settings.show');
+    Route::put('/settings', [StoreSettingsController::class, 'update'])->name('settings.update');
+    Route::post('/settings/logo', [StoreLogoController::class, 'store'])->name('settings.logo.store');
+    Route::delete('/settings/logo', [StoreLogoController::class, 'destroy'])
+        ->can(Permission::SettingsManage->value)
+        ->name('settings.logo.destroy');
+
+    // The public part of the settings (name, logo, Store currency): every signed-in User.
+    Route::get('/store', [StoreProfileController::class, 'show'])->name('store.show');
 
     Route::get('/roles', [RoleController::class, 'index'])
         ->can(Permission::UsersManage->value)
