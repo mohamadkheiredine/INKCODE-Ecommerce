@@ -101,7 +101,11 @@ Request flow: route → thin controller → **Form Request** (validation + `auth
 The UI is 25% of the score: aim for a premium, consistent SaaS admin, not a template.
 
 - Load the `frontend-design` skill before designing or building any screen.
-- Components: shadcn/ui first. For richer pieces use **21st.dev** (its MCP server when connected, or the CLI: `npx @21st-dev/cli@latest search "<query>"`, then `get <id>` / `add <user>/<slug>`), or **React Bits** (`npx shadcn@latest add https://reactbits.dev/r/<Component>-TS-TW`). Adapt copied code: i18n strings, logical RTL classes, project tokens.
+- Components: shadcn/ui first, then **21st.dev**, then **React Bits** (`npx shadcn@latest add https://reactbits.dev/r/<Component>-TS-TW`). Adapt anything copied in: i18n strings, logical RTL classes, project tokens.
+- **21st.dev**, signed in as the user via `21st login`:
+  - Skills (user-level): `21st-ui-explore` to compare directions before a new screen, `21st-ui-build` to build a screen in the project's style, `21st-ui-review` to audit a finished screen, `21st-cli-use` to search and install catalog components, `21st-ai` for AI sketches (costs credits; ask first).
+  - CLI: `npx @21st-dev/cli@latest search "<query>"`, `get <id>`, `add <user>/<slug>`. Search is free. **Installs are capped at 2 per day**, so prefer `get <id>` and adapt the code by hand.
+  - MCP server `21st` (root `.mcp.json`) needs the `API_KEY_21ST` environment variable on the machine. Never write the key into a committed file.
 - Motion: GSAP through `useGSAP` (scoped, auto-cleanup), with `gsap.matchMedia()` and `prefers-reduced-motion`. Lenis is mounted once at the root, driven by `gsap.ticker`. Put `data-lenis-prevent` on inner scroll areas (tables, dialogs, sheets). Keep admin motion subtle (0.2–0.6s, `power2.out`).
 - Check every screen in light and dark, English and Arabic, at phone, tablet and desktop widths.
 

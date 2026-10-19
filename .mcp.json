@@ -2,7 +2,17 @@
   "mcpServers": {
     "laravel-boost": {
       "command": "php",
-      "args": ["backend/artisan", "boost:mcp"]
+      "args": [
+        "backend/artisan",
+        "boost:mcp"
+      ]
+    },
+    "21st": {
+      "type": "http",
+      "url": "https://21st.dev/api/mcp",
+      "headers": {
+        "x-api-key": "${API_KEY_21ST}"
+      }
     }
   }
 }

@@ -15,7 +15,8 @@
 - **Context7 MCP**: current library documentation (Laravel 13, React Router 8, TanStack Table 9, shadcn/ui 4 and others).
 - **Laravel Boost** (dev-only): MCP server with version-matched Laravel docs search and read-only database schema/query tools, plus Laravel coding guidelines for the agent.
 - **Skills**: `frontend-design`, `clean-code`, mattpocock skills (`tdd`, `improve-codebase-architecture`, `code-review`, `retro`, etc.), `security-review`.
-- _(add others as they are used, e.g. 21st.dev Magic MCP, React Bits, Playwright MCP)_
+- **21st.dev** (CLI, agent skills and MCP server): UI inspiration and component code, always adapted to the project's tokens, i18n and RTL rules.
+- _(add others as they are used, e.g. React Bits, Playwright MCP)_
 
 ## What I implemented personally or reviewed and corrected
 

@@ -3,5 +3,5 @@
   "enabledPlugins": {
     "mattpocock-skills@claude-plugins-official": true
   },
-  "enabledMcpjsonServers": ["laravel-boost"]
+  "enabledMcpjsonServers": ["laravel-boost", "21st"]
 }
