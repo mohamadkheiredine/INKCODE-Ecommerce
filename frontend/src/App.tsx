@@ -1,8 +1,17 @@
-// Placeholder until the app shell (Phase 1) replaces it.
+import { useState } from 'react'
+import { createBrowserRouter, RouterProvider } from 'react-router'
+import { AppProviders } from '@/app/providers'
+import { routes } from '@/app/routes'
+import { createAppQueryClient } from '@/app/query-client'
+
+const router = createBrowserRouter(routes)
+
 export default function App() {
+  const [queryClient] = useState(createAppQueryClient)
+
   return (
-    <main className="grid min-h-svh place-items-center bg-background text-foreground">
-      <h1 className="text-3xl font-semibold tracking-tight">INKCODE Commerce</h1>
-    </main>
+    <AppProviders queryClient={queryClient}>
+      <RouterProvider router={router} />
+    </AppProviders>
   )
 }
