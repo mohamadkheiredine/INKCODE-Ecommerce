@@ -1,0 +1,15 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local agent scratch space and security scan output
+.scratch/
+strix_runs/
+
+# Never commit real secrets
+.env
+.env.*
+!.env.example
