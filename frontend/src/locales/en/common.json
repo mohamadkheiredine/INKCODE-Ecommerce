@@ -54,7 +54,10 @@
     "profile": "Profile",
     "notFound": "Page not found",
     "categories": "Categories",
-    "brands": "Brands"
+    "brands": "Brands",
+    "shippingZones": "Shipping zones",
+    "shippingZone": "Shipping zone",
+    "carriers": "Carriers"
   },
   "navGroups": {
     "dashboard": "Dashboard",
