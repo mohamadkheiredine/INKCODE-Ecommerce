@@ -5,6 +5,9 @@ namespace App\Enums;
 /**
  * What a notification is about. Stored in the `type` column and sent to the SPA, which
  * picks the icon from it; the message text comes from `lang/{en,ar}/notifications.php`.
+ *
+ * Every stored type comes from a case here (InAppNotification::type()), so a new type
+ * adds a case and its two messages together. Never remove a case: stored rows use it.
  */
 enum NotificationType: string
 {

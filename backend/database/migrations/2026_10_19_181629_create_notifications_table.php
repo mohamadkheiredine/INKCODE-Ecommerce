@@ -15,7 +15,9 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('type', 64);
-            $table->morphs('notifiable');
+            // Not morphs(): its own index would duplicate the leading columns of the two below.
+            $table->string('notifiable_type');
+            $table->unsignedBigInteger('notifiable_id');
             $table->json('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
