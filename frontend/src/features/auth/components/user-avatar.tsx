@@ -1,15 +1,5 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { cn } from '@/lib/utils'
-
-/** Up to two capital initials ("Ahmed Ali" → "AA"). */
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
+import { cn, initials } from '@/lib/utils'
 
 type UserAvatarProps = { name: string; className?: string; fallbackClassName?: string }
 
