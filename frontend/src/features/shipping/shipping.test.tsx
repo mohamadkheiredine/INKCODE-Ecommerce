@@ -182,7 +182,7 @@ describe('a Shipping zone page', () => {
       within(table)
         .getAllByRole('row')
         .slice(1)
-        .map((row) => row.cells[0]!.textContent),
+        .map((row) => (row as HTMLTableRowElement).cells[0]!.textContent),
     ).toEqual(['Standard', 'Express', 'Overnight'])
     expect(within(table).getByText('Inactive')).toBeInTheDocument()
 

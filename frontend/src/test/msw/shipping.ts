@@ -61,7 +61,7 @@ const placeKey = (country: string, city: string | null) => `${country}/${city?.t
  * another zone covers, and the quote (city first, then country, else a message).
  */
 export function shippingZoneStore(initial: ShippingZone[] = []) {
-  const zones = initial.map((zone) => ({ ...zone, methods: zone.methods ?? [] }))
+  const zones: ShippingZone[] = initial.map((zone) => ({ ...zone, methods: zone.methods ?? [] }))
   const bodies: unknown[] = []
 
   const withCounts = (zone: ShippingZone) => ({
