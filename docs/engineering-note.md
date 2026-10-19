@@ -38,6 +38,7 @@
 - **Skills**: `frontend-design`, `clean-code`, mattpocock skills (`tdd`, `improve-codebase-architecture`, `code-review`, `retro`, etc.), `security-review`.
 - **21st.dev** (CLI, agent skills and MCP server): UI inspiration and component code, always adapted to the project's tokens, i18n and RTL rules.
 - **21st.dev review** (`21st review`): automated UI audit of every changed screen (it caught a removed focus outline on the main landmark).
+- **Parallel Claude Code sessions:** later tickets were built at the same time, one session per ticket in its own git worktree. Each worktree runs in a "slot" with its own MySQL databases and dev-server ports (`scripts/use-slot.mjs`), so one session's Pest run or e2e seeding never wipes another's. Branches merge one at a time, after every gate passes on the merged code.
 - _(add others as they are used, e.g. React Bits, Playwright MCP)_
 
 ## What I implemented personally or reviewed and corrected
