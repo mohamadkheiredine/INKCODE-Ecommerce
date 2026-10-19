@@ -8,6 +8,8 @@ import path from 'node:path'
 export default function globalSetup(): void {
   const backend = path.resolve(import.meta.dirname, '../../backend')
   execFileSync('php', ['artisan', 'migrate', '--force'], { cwd: backend, stdio: 'inherit' })
+  // Uploaded files (Brand logos) are served from public/storage.
+  execFileSync('php', ['artisan', 'storage:link', '--force'], { cwd: backend, stdio: 'ignore' })
   execFileSync('php', ['artisan', 'db:seed', '--force'], {
     cwd: backend,
     stdio: 'inherit',

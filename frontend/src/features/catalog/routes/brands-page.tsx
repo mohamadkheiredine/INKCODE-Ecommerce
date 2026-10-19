@@ -59,10 +59,10 @@ export function BrandsPage() {
           <div className="flex min-w-48 items-center gap-3">
             <BrandLogo name={row.original.name} src={row.original.logo_url} />
             <div className="flex flex-col gap-0.5">
-              <span data-name className="font-medium text-foreground">
+              <span data-name dir="auto" className="self-start font-medium text-foreground">
                 {row.original.name}
               </span>
-              <span className="text-xs text-muted-foreground" dir="ltr">
+              <span className="self-start text-xs text-muted-foreground" dir="ltr">
                 {row.original.slug}
               </span>
             </div>

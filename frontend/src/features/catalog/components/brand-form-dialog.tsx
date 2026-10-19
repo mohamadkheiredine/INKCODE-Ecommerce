@@ -164,7 +164,7 @@ function LogoField({
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel htmlFor="brand-logo">{t('brands.logo')}</FieldLabel>
           <div className="flex items-center gap-4">
-            <BrandLogo name={name || '?'} src={shown} className="size-16 rounded-2xl text-base" />
+            <BrandLogo name={name} src={shown} className="size-16 rounded-2xl text-base" />
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"

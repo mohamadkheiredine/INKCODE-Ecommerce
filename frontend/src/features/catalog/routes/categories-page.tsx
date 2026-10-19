@@ -57,10 +57,10 @@ export function CategoriesPage() {
         meta: { sortField: 'name' },
         cell: ({ row }) => (
           <div className="flex min-w-40 flex-col gap-0.5">
-            <span data-name className="font-medium text-foreground">
+            <span data-name dir="auto" className="self-start font-medium text-foreground">
               {row.original.name}
             </span>
-            <span className="text-xs text-muted-foreground" dir="ltr">
+            <span className="self-start text-xs text-muted-foreground" dir="ltr">
               {row.original.slug}
             </span>
           </div>
@@ -71,7 +71,7 @@ export function CategoriesPage() {
         header: t('categories.parentColumn'),
         cell: ({ row }) =>
           row.original.parent ? (
-            <span>{row.original.parent.name}</span>
+            <span dir="auto">{row.original.parent.name}</span>
           ) : (
             <Badge variant="secondary">{t('categories.topLevel')}</Badge>
           ),

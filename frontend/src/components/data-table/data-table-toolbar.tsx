@@ -116,7 +116,7 @@ export function DataTableFilter({
       aria-label={label}
       value={list.query.filters[name] ?? ''}
       onChange={(event) => list.setFilter(name, event.target.value || null)}
-      className="sm:w-44"
+      className="min-w-40"
       size="default"
     >
       <NativeSelectOption value="">{allLabel}</NativeSelectOption>

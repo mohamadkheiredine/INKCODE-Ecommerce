@@ -1,3 +1,4 @@
+import { ImageIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn, initials } from '@/lib/utils'
 
@@ -27,8 +28,10 @@ export function BrandLogo({
           className="size-full bg-background object-contain p-1"
           loading="lazy"
         />
-      ) : (
+      ) : initials(name) ? (
         <span aria-hidden="true">{initials(name)}</span>
+      ) : (
+        <ImageIcon className="size-1/3" aria-hidden="true" />
       )}
     </span>
   )
