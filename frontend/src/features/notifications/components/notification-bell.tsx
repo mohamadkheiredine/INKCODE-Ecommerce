@@ -11,6 +11,7 @@ import { useDirection } from '@/components/ui/direction'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
+  useForgetOlderNotifications,
   useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
   useNotifications,
@@ -33,6 +34,7 @@ export function NotificationBell() {
   const notifications = useNotifications()
   const markAsRead = useMarkNotificationAsRead()
   const markAllAsRead = useMarkAllNotificationsAsRead()
+  const forgetOlderNotifications = useForgetOlderNotifications()
 
   const unread = notifications.data?.pages[0]?.meta.unread_count ?? 0
   const items = notifications.data?.pages.flatMap((page) => page.data) ?? []
@@ -43,9 +45,14 @@ export function NotificationBell() {
   const handleMarkAsRead = (notification: AppNotification) =>
     markAsRead.mutate(notification.id, { onError: reportFailure })
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    if (!isOpen) forgetOlderNotifications()
+  }
+
   const handleOpen = (notification: AppNotification) => {
     if (notification.read_at === null) handleMarkAsRead(notification)
-    setOpen(false)
+    handleOpenChange(false)
   }
 
   const handleMarkAllAsRead = () =>
@@ -55,7 +62,7 @@ export function NotificationBell() {
     })
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           type="button"

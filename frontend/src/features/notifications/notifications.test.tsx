@@ -181,6 +181,26 @@ describe('The notifications bell', () => {
     expect(within(panel).queryByRole('button', { name: 'Show older' })).not.toBeInTheDocument()
   })
 
+  it('goes back to the latest page when the panel closes, so each check stays one request', async () => {
+    signedInAs(adminUser)
+    const inbox = notificationInbox(Array.from({ length: 12 }, () => aNotification()))
+    const { user } = renderApp('/')
+
+    await user.click(await bell('Notifications, 12 unread'))
+    let panel = await screen.findByRole('dialog', { name: 'Notifications' })
+    await user.click(await within(panel).findByRole('button', { name: 'Show older' }))
+    await waitFor(() => expect(within(panel).getAllByRole('listitem')).toHaveLength(12))
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+    const before = inbox.listRequests()
+    setTabVisibility('visible')
+    await waitFor(() => expect(inbox.listRequests()).toBe(before + 1))
+    await user.click(await bell('Notifications, 12 unread'))
+    panel = await screen.findByRole('dialog', { name: 'Notifications' })
+    expect(within(panel).getAllByRole('listitem')).toHaveLength(10)
+  })
+
   it('caps the badge at 9+', async () => {
     signedInAs(adminUser)
     notificationInbox(Array.from({ length: 12 }, () => aNotification()))
