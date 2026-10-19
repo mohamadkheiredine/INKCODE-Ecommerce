@@ -14,13 +14,14 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Seven Roles and the permission matrix, seeded idempotently; exactly one Role per User; 403 for every other Role (#6)
 - [x] Demo accounts (one per Role) and one-click sign-in, only in demo mode (#6)
 - [x] Consistent API error envelope (`message`, `code`, `errors`), localized in English and Arabic (#6)
+- [x] Profile: change own password (current password, minimum strength, other sessions signed out), language and theme kept on the User (#7)
 - [ ] Shared pagination and list query format (ticket 04)
-- [ ] Design tokens: light + dark themes, typography for Latin + Arabic
-- [ ] i18n (English LTR / Arabic RTL) with runtime switching, all strings translated
-- [ ] App shell: collapsible sidebar, breadcrumbs, global search (command palette), notifications, user menu, quick actions
-- [ ] Shared states: loading skeletons, empty states with actions, error states, toasts, form validation
-- [ ] Responsive: desktop / tablet / mobile navigation
-- [ ] Motion: GSAP (`useGSAP`) + Lenis, respecting `prefers-reduced-motion`
+- [x] Design tokens: light + dark themes, typography for Latin + Arabic (#7)
+- [x] i18n (English LTR / Arabic RTL) with runtime switching, all strings translated; Western digits in both (#7)
+- [ ] App shell: collapsible sidebar, breadcrumbs, user menu, language/theme kept on the User (#7); global search, notifications, quick actions to come
+- [x] Shared states: loading skeletons, empty states with actions, error states, toasts, form validation (#7)
+- [x] Responsive: desktop / tablet / mobile navigation (sidebar, icon rail, drawer) (#7)
+- [x] Motion: GSAP (`useGSAP`) + Lenis on the GSAP ticker, respecting `prefers-reduced-motion` (#7)
 
 ## Phase 2: Catalog, customers, inventory, orders
 

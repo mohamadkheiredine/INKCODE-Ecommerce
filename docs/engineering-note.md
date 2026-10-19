@@ -15,6 +15,11 @@
 - **One error envelope:** every `/api` error is `{ message, code, errors? }` with a stable `code`. Framework default texts (which can leak routes or model classes) are replaced by translated messages, while deliberate reasons such as a Policy's `Response::deny('…')` pass through. Messages follow the SPA's language (`Accept-Language`).
 - **Sign-in protection:** failed attempts are limited per email+IP (5/min) and per IP across all emails (20/min); deactivated Users and Users without a Role are refused only after the password is verified, so nothing is revealed to guessers.
 - **Session expiry in the SPA:** any 401 from any request re-checks the current User, and returning to the tab always re-checks it; the route guard then sends the User to sign-in and back to the page they were on.
+- **One sidebar registry:** each module registers one entry (page, group, route, icon, permission) in `src/app/navigation.ts`; a pure `visibleNavigation()` filters it by the User's permissions and drops empty groups. A module adds its entry only when it works, so the menu never shows placeholders.
+- **Preferences live on the User:** language and theme are saved through `PATCH /auth/me/preferences` and applied whenever a session starts in a browser (at sign-in, and when a remembered session loads), so they follow the User to any device. The account wins over whatever that browser used before.
+- **Changing a password ends the User's other sessions:** Sanctum's `AuthenticateSession` compares the password hash on every request, and `logoutOtherDevices()` re-issues only this device's "keep me signed in" cookie. A shared `Password::defaults()` sets the minimum strength (10+ characters, mixed case, a number) for every password a User chooses; attempts are limited to 5 per minute.
+- **Formatting:** `Intl` with `en` and `ar-u-nu-latn`, so Arabic shows Arabic month names with Western digits; money arrives as decimal strings and is never turned into a float.
+- **Motion:** GSAP entrances through `useGSAP` + `gsap.matchMedia()`; Lenis is mounted once at the root on `gsap.ticker`, paused while a dialog or sheet locks the page, and not mounted at all under reduced motion.
 - _(add: order state machine, idempotency, stock service as they land)_
 
 ## AI tools used
@@ -24,6 +29,7 @@
 - **Laravel Boost** (dev-only): MCP server with version-matched Laravel docs search and read-only database schema/query tools, plus Laravel coding guidelines for the agent.
 - **Skills**: `frontend-design`, `clean-code`, mattpocock skills (`tdd`, `improve-codebase-architecture`, `code-review`, `retro`, etc.), `security-review`.
 - **21st.dev** (CLI, agent skills and MCP server): UI inspiration and component code, always adapted to the project's tokens, i18n and RTL rules.
+- **21st.dev review** (`21st review`): automated UI audit of every changed screen (it caught a removed focus outline on the main landmark).
 - _(add others as they are used, e.g. React Bits, Playwright MCP)_
 
 ## What I implemented personally or reviewed and corrected
@@ -41,9 +47,21 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
 - Browser verification found a console error from `next-themes` (a `<script>` tag rejected by React 19); it was replaced by a small theme provider plus a pre-paint script.
 - MSW 3 renamed `onUnhandledRequest` to `onUnhandledFrame`; the old option was silently ignored, so "fail on unmocked requests" was off. Found by the type checker and fixed.
 
+**Ticket 02 (app shell, design system, profile): problems caught by review and fixed before merging**
+
+- A multi-device Pest test first passed for the wrong reason: Laravel's test client only sends cookies on JSON requests after `withCredentials()`, and the in-memory session carried data from one simulated browser to the next. The `asBrowser()` helper now isolates each browser, and a deliberately broken implementation was used to prove the test fails when it should.
+- I suspected sessions could survive a password change if they had made no request since signing in, and added code to close the gap. Reading Laravel 13's `SessionGuard::login()` showed it already records the password hash, so that code was removed again.
+- After switching to Arabic, the "Preferences saved" toast still appeared in English, because the callback held the translation function from before the switch. It now reads the current language at the moment it shows.
+- A Playwright journey found that success toasts covered the header's user menu; toasts now sit in the bottom corner on the reading side.
+- The visual pass found the full sidebar squeezing tablet screens, header separators sitting at the top, and the email in the profile card hugging the wrong edge in Arabic. All three were fixed.
+- The two-axis code review found the word "account" in copy and names (the glossary says "User"/"profile"), duplicated avatar and preference-saving code, phones losing the breadcrumb trail, and header switches saving without a confirming toast (story 31). All were fixed.
+- The frontend for this ticket was written before its tests, which goes against the TDD workflow. To compensate, the shell tests were checked by breaking the implementation on purpose (removing "apply saved preferences" and "save the language") and confirming the tests fail.
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_
 
 - Locally, `php artisan serve` handles one request at a time on Windows, so Playwright runs one browser at a time there; CI and the Docker stack can run in parallel.
 - Ending an active session when an Admin deactivates a User arrives with Users & Roles administration (#25).
+- Profile changes (preferences, password) write audit entries once the audit trail exists (#9).
+- `npm audit` reports 7 high advisories, all inside the `shadcn` CLI's development-only dependencies (`braces` via `fast-glob`); nothing from them ships in the SPA, and the suggested fix is a downgrade, so they are left until the CLI updates.

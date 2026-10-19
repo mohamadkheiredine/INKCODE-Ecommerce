@@ -156,10 +156,12 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
 
 - Repository structure, Docker MySQL, Laravel API foundation (`/api/v1`, Sanctum, permissions, OpenAPI), React SPA foundation (Tailwind, shadcn/ui with RTL, routing/data/form/i18n/animation libraries), test tooling and CI.
 - **Staff sign-in with Roles (#6):** sign in and out with session cookies and CSRF, rate limiting, the seven Roles and their permission matrix, demo accounts, the shared JSON error format, English/Arabic and light/dark sign-in screens.
+- **App shell, design system and profile (#7):** a sidebar built from one permission-aware registry (icon rail on tablets, drawer on phones), breadcrumbs, a header with language and theme switches and a user menu; English ↔ Arabic mirrors the layout with Western digits; language and theme are kept on the User and follow them to any device; a profile page to change the password (current password, minimum strength, other sessions signed out); shared skeleton, empty, error and toast patterns; GSAP entrances and Lenis smooth scrolling, all off under reduced motion.
 
 ### Incomplete / assumptions
 
-- The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket.
+- The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
+- Profile changes (preferences, password) will write audit entries once the audit trail exists (#9).
 - A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.
 - Payments use a mock gateway adapter. No live payment provider is integrated (per the brief).
