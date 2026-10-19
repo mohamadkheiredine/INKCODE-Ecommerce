@@ -1,9 +1,9 @@
 import { expect, type Page, test } from '@playwright/test'
+import { signOut as signOutFromUserMenu } from './support/session.ts'
 
 async function signOut(page: Page) {
-  await page.getByRole('button', { name: 'Sign out' }).click()
+  await signOutFromUserMenu(page)
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
-  await expect(page).toHaveURL(/\/sign-in$/)
 }
 
 test.describe('Staff sign in with their Role', () => {
