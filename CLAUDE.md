@@ -142,4 +142,16 @@ For each feature or module:
 
 ## Agent skills
 
-mattpocock skills are enabled for this project in `.claude/settings.json`. Issue tracker, triage labels and domain docs get configured by `/setup-matt-pocock-skills`, which only the user can run. It writes `docs/agents/*` and fills in this section.
+mattpocock skills are enabled for this project in `.claude/settings.json`.
+
+### Issue tracker
+
+GitHub Issues on `mohamadkheiredine/INKCODE-Ecommerce`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `GLOSSARY.md` (created lazily) + `docs/adr/`. See `docs/agents/domain.md`.
