@@ -8,6 +8,10 @@ use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Catalog\BrandController;
 use App\Http\Controllers\Catalog\BrandLogoController;
 use App\Http\Controllers\Catalog\CategoryController;
+use App\Http\Controllers\Customers\CustomerAddressController;
+use App\Http\Controllers\Customers\CustomerController;
+use App\Http\Controllers\Customers\CustomerNoteController;
+use App\Http\Controllers\Customers\TagController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
@@ -49,6 +53,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/brands/{brand}/logo', [BrandLogoController::class, 'destroy'])
         ->can('update', 'brand')
         ->name('brands.logo.destroy');
+
+    // Customers: Roles with customers.view look; Policies let only customers.manage change a
+    // Customer, their addresses, Tags and notes.
+    Route::get('/customer-tags', [TagController::class, 'index'])->name('customer-tags.index');
+    Route::apiResource('customers', CustomerController::class)
+        ->middlewareFor('show', 'can:view,customer')
+        ->middlewareFor('destroy', 'can:delete,customer');
+    Route::apiResource('customers.addresses', CustomerAddressController::class)
+        ->only(['store', 'update', 'destroy'])
+        ->scoped()
+        ->middlewareFor('destroy', 'can:update,customer');
+    Route::apiResource('customers.notes', CustomerNoteController::class)->only(['index', 'store']);
 
     Route::get('/roles', [RoleController::class, 'index'])
         ->can(Permission::UsersManage->value)
