@@ -5,6 +5,7 @@ namespace App\Actions\Catalog;
 use App\Models\Brand;
 use App\Services\AuditTrail;
 use App\Support\DatabaseErrors;
+use App\Support\LogoFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,7 +29,7 @@ final class DeleteBrand
         );
 
         if ($brand->logo_path !== null) {
-            Storage::disk(Brand::LOGO_DISK)->delete($brand->logo_path);
+            Storage::disk(LogoFile::DISK)->delete($brand->logo_path);
         }
     }
 }
