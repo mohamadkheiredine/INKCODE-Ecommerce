@@ -3,6 +3,11 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+// The SPA talks to the API on its own origin: in development Vite forwards these
+// paths to Laravel; a production host must do the same, or set VITE_API_URL (docs/adr/0002).
+const apiTarget = process.env.API_PROXY_TARGET ?? 'http://localhost:8000'
+const apiPaths = ['/api', '/sanctum', '/docs', '/storage']
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -14,5 +19,6 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    proxy: Object.fromEntries(apiPaths.map((p) => [p, { target: apiTarget, changeOrigin: false }])),
   },
 })
