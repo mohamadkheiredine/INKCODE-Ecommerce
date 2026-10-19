@@ -54,7 +54,8 @@
     "profile": "Profile",
     "notFound": "Page not found",
     "categories": "Categories",
-    "brands": "Brands"
+    "brands": "Brands",
+    "settings": "Settings"
   },
   "navGroups": {
     "dashboard": "Dashboard",
@@ -71,7 +72,8 @@
     "skipToContent": "Skip to content",
     "toggleSidebar": "Toggle sidebar",
     "userMenu": "Open the user menu",
-    "loadingPage": "Loading the page…"
+    "loadingPage": "Loading the page…",
+    "storeCurrency": "Prices in {{code}}"
   },
   "dataTable": {
     "sortBy": "Sort by {{column}}",

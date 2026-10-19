@@ -8,6 +8,7 @@ import arErrors from '@/locales/ar/errors.json'
 import arHome from '@/locales/ar/home.json'
 import arNotifications from '@/locales/ar/notifications.json'
 import arProfile from '@/locales/ar/profile.json'
+import arSettings from '@/locales/ar/settings.json'
 import enAuth from '@/locales/en/auth.json'
 import enCatalog from '@/locales/en/catalog.json'
 import enCommon from '@/locales/en/common.json'
@@ -15,6 +16,7 @@ import enErrors from '@/locales/en/errors.json'
 import enHome from '@/locales/en/home.json'
 import enNotifications from '@/locales/en/notifications.json'
 import enProfile from '@/locales/en/profile.json'
+import enSettings from '@/locales/en/settings.json'
 import { setApiLanguage } from './api/client'
 
 export const LANGUAGES = ['en', 'ar'] as const
@@ -36,6 +38,7 @@ export const resources = {
     home: enHome,
     notifications: enNotifications,
     profile: enProfile,
+    settings: enSettings,
   },
   ar: {
     common: arCommon,
@@ -45,6 +48,7 @@ export const resources = {
     home: arHome,
     notifications: arNotifications,
     profile: arProfile,
+    settings: arSettings,
   },
 } as const
 
@@ -68,7 +72,7 @@ void i18n
     load: 'languageOnly',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'errors', 'home', 'notifications', 'profile'],
+    ns: ['common', 'auth', 'catalog', 'errors', 'home', 'notifications', 'profile', 'settings'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],

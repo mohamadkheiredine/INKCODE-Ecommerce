@@ -54,7 +54,8 @@
     "profile": "الملف الشخصي",
     "notFound": "الصفحة غير موجودة",
     "categories": "الفئات",
-    "brands": "العلامات التجارية"
+    "brands": "العلامات التجارية",
+    "settings": "الإعدادات"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",
@@ -71,7 +72,8 @@
     "skipToContent": "تخطَّ إلى المحتوى",
     "toggleSidebar": "إظهار الشريط الجانبي أو إخفاؤه",
     "userMenu": "فتح قائمة المستخدم",
-    "loadingPage": "جارٍ تحميل الصفحة…"
+    "loadingPage": "جارٍ تحميل الصفحة…",
+    "storeCurrency": "الأسعار بعملة {{code}}"
   },
   "dataTable": {
     "sortBy": "رتّب حسب {{column}}",
