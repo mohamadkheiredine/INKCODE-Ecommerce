@@ -4,6 +4,7 @@ namespace App\Actions\Catalog;
 
 use App\Models\Brand;
 use App\Services\AuditTrail;
+use App\Support\DatabaseErrors;
 use App\Support\UniqueSlug;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,7 @@ final class CreateBrand
      */
     public function handle(array $values): Brand
     {
-        return DB::transaction(function () use ($values): Brand {
+        return DatabaseErrors::refuseDuplicateSlug(fn (): Brand => DB::transaction(function () use ($values): Brand {
             $brand = Brand::query()->create([
                 ...$values,
                 'slug' => $values['slug'] ?? UniqueSlug::from($values['name'], Brand::query(), 'brand'),
@@ -28,6 +29,6 @@ final class CreateBrand
             $this->auditTrail->created($brand);
 
             return $brand;
-        });
+        }));
     }
 }

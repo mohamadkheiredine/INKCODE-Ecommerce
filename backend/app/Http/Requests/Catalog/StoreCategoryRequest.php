@@ -7,11 +7,11 @@ use App\Support\Slug;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 /**
  * A new Category: a name, an optional slug (generated from the name when left out),
- * an optional top-level parent and an optional description.
+ * an optional parent and an optional description. Whether the parent may hold children
+ * is a business rule, checked under lock by CategoryHierarchy.
  */
 class StoreCategoryRequest extends FormRequest
 {
@@ -53,23 +53,6 @@ class StoreCategoryRequest extends FormRequest
     }
 
     /**
-     * Categories go two levels deep at most: the parent must be a top-level Category.
-     *
-     * @return array<int, callable(Validator): void>
-     */
-    public function after(): array
-    {
-        return [
-            function (Validator $validator): void {
-                $parent = $this->chosenParent($validator);
-                if ($parent !== null && ! $parent->isTopLevel()) {
-                    $validator->errors()->add('parent_id', __('catalog.categories.parent_is_child', ['name' => $parent->name]));
-                }
-            },
-        ];
-    }
-
-    /**
      * The Category being edited; none while creating one.
      */
     public function category(): ?Category
@@ -77,18 +60,6 @@ class StoreCategoryRequest extends FormRequest
         $category = $this->route('category');
 
         return $category instanceof Category ? $category : null;
-    }
-
-    /**
-     * The chosen parent, once its id has passed validation.
-     */
-    protected function chosenParent(Validator $validator): ?Category
-    {
-        if (! $this->filled('parent_id') || $validator->errors()->has('parent_id')) {
-            return null;
-        }
-
-        return Category::query()->find($this->integer('parent_id'));
     }
 
     /**

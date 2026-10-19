@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ListQuery } from '@/lib/list-query'
 import { brandKeys, brandsApi } from '../api/brands-api'
-import type { Brand, BrandInput } from '../types'
+import type { Brand, BrandInput, LogoChange } from '../types'
 
 /** A page of Brands; the previous page stays on screen while the next one loads. */
 export function useBrands(query: ListQuery) {
@@ -11,9 +11,6 @@ export function useBrands(query: ListQuery) {
     placeholderData: keepPreviousData,
   })
 }
-
-/** What happens to the logo when a Brand is saved. */
-export type LogoChange = { kind: 'keep' } | { kind: 'replace'; file: File } | { kind: 'remove' }
 
 type SaveBrand = { id: number | null; input: BrandInput; logo: LogoChange }
 

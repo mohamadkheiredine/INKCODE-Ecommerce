@@ -48,6 +48,15 @@ class Category extends Model implements Auditable
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    /**
+     * What every Category answer shows besides its own fields: its parent and how many
+     * children it has.
+     */
+    public function loadForDisplay(): static
+    {
+        return $this->load('parent:id,name,slug')->loadCount('children');
+    }
+
     public function isTopLevel(): bool
     {
         return $this->parent_id === null;

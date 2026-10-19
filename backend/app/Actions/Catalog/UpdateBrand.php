@@ -4,6 +4,7 @@ namespace App\Actions\Catalog;
 
 use App\Models\Brand;
 use App\Services\AuditTrail;
+use App\Support\DatabaseErrors;
 use App\Support\UniqueSlug;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,7 @@ final class UpdateBrand
      */
     public function handle(Brand $brand, array $values): Brand
     {
-        return DB::transaction(function () use ($brand, $values): Brand {
+        return DatabaseErrors::refuseDuplicateSlug(fn (): Brand => DB::transaction(function () use ($brand, $values): Brand {
             $before = $brand->auditValues();
 
             $brand->update([
@@ -30,6 +31,6 @@ final class UpdateBrand
             $this->auditTrail->updated($brand, $before);
 
             return $brand;
-        });
+        }));
     }
 }

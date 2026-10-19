@@ -109,7 +109,7 @@ function BrandForm({ brand, onDone }: { brand: Brand | null; onDone: () => void 
             name="name"
             idPrefix="brand"
             label={t('fields.name')}
-            maxLength={121}
+            maxLength={120}
             autoComplete="off"
           />
           <TextField
@@ -118,7 +118,7 @@ function BrandForm({ brand, onDone }: { brand: Brand | null; onDone: () => void 
             idPrefix="brand"
             label={t('fields.slug')}
             description={t('fields.slugHint')}
-            maxLength={141}
+            maxLength={140}
             autoComplete="off"
             dir="ltr"
             className="text-start"

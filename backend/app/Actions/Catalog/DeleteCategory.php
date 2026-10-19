@@ -5,14 +5,13 @@ namespace App\Actions\Catalog;
 use App\Exceptions\BusinessRuleViolation;
 use App\Models\Category;
 use App\Services\AuditTrail;
-use App\Support\ForeignKeys;
-use Illuminate\Database\QueryException;
+use App\Support\DatabaseErrors;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Deletes a Category nothing depends on. A parent with children is refused, and so is a
- * Category still referenced by other records (the Products of ticket #10): the database
- * refuses those deletes through restricting foreign keys, which become a clear 409 here.
+ * Category still referenced by other records (the Products of ticket #10, through
+ * restricting foreign keys): both answer 409 with a clear message.
  */
 final class DeleteCategory
 {
@@ -20,8 +19,8 @@ final class DeleteCategory
 
     public function handle(Category $category): void
     {
-        try {
-            DB::transaction(function () use ($category): void {
+        DatabaseErrors::refuseDeleteInUse(
+            fn () => DB::transaction(function () use ($category): void {
                 $locked = Category::query()->lockForUpdate()->findOrFail($category->id);
 
                 if ($locked->children()->exists()) {
@@ -33,13 +32,8 @@ final class DeleteCategory
 
                 $locked->delete();
                 $this->auditTrail->deleted($locked);
-            });
-        } catch (QueryException $exception) {
-            if (! ForeignKeys::isRestrictViolation($exception)) {
-                throw $exception;
-            }
-
-            throw new BusinessRuleViolation('in_use', __('catalog.categories.in_use', ['name' => $category->name]));
-        }
+            }),
+            __('catalog.categories.in_use', ['name' => $category->name]),
+        );
     }
 }

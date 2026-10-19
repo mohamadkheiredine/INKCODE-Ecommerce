@@ -13,11 +13,10 @@ export function useCategories(query: ListQuery) {
 }
 
 /** The top-level Categories a Category can be placed under. */
-export function useParentCategories(enabled: boolean) {
+export function useParentCategories() {
   return useQuery({
     queryKey: categoryKeys.parents(),
     queryFn: () => categoriesApi.topLevel(),
-    enabled,
   })
 }
 

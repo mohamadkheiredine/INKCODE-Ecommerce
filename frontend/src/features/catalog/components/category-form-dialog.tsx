@@ -66,7 +66,7 @@ export function CategoryFormDialog({ open, category, onOpenChange }: CategoryFor
 function CategoryForm({ category, onDone }: { category: Category | null; onDone: () => void }) {
   const { t } = useTranslation('catalog')
   const save = useSaveCategory()
-  const parents = useParentCategories(true)
+  const parents = useParentCategories()
   const [formError, setFormError] = useState<string | null>(null)
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
@@ -110,7 +110,7 @@ function CategoryForm({ category, onDone }: { category: Category | null; onDone:
             name="name"
             idPrefix="category"
             label={t('fields.name')}
-            maxLength={121}
+            maxLength={120}
             autoComplete="off"
           />
           <TextField
@@ -119,7 +119,7 @@ function CategoryForm({ category, onDone }: { category: Category | null; onDone:
             idPrefix="category"
             label={t('fields.slug')}
             description={t('fields.slugHint')}
-            maxLength={141}
+            maxLength={140}
             autoComplete="off"
             dir="ltr"
             className="text-start"
@@ -142,7 +142,7 @@ function CategoryForm({ category, onDone }: { category: Category | null; onDone:
             name="description"
             idPrefix="category"
             label={t('fields.description')}
-            maxLength={2001}
+            maxLength={2000}
           />
         </FieldGroup>
         <DialogFooter>

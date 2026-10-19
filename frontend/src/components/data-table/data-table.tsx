@@ -1,6 +1,6 @@
 import { type RowData, useTable } from '@tanstack/react-table'
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, type LucideIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EmptyState } from '@/components/feedback/empty-state'
 import { ErrorState } from '@/components/feedback/error-state'
@@ -65,6 +65,14 @@ export function DataTable<TData extends RowData>({
     data: page?.data ?? [],
     getRowId: (row) => getRowId(row),
   })
+
+  // A page past the end (the last row was deleted, or an old link): show the last page.
+  const lastPage = page?.meta.last_page
+  const { page: currentPage } = list.query
+  const { setPage } = list
+  useEffect(() => {
+    if (lastPage && currentPage > lastPage) setPage(lastPage)
+  }, [lastPage, currentPage, setPage])
 
   if (isPending) return <TableSkeleton columns={columns.length} label={loadingLabel} />
   if (isError || !page) return <ErrorState onRetry={onRetry} retrying={isFetching} />

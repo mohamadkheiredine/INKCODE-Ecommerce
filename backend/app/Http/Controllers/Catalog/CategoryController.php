@@ -35,7 +35,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category): CategoryResource
     {
-        return new CategoryResource($category->load('parent:id,name,slug')->loadCount('children'));
+        return new CategoryResource($category->loadForDisplay());
     }
 
     public function update(UpdateCategoryRequest $request, Category $category, UpdateCategory $updateCategory): CategoryResource

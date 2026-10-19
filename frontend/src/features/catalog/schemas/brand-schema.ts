@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { Brand, BrandInput } from '../types'
-import type { LogoChange } from '../hooks/use-brands'
+import type { Brand, BrandInput, LogoChange } from '../types'
+
 import { optionalSlug, requiredName } from './slug'
 
 /** What the API accepts as a logo (StoreBrandLogoRequest): PNG, JPEG or WebP, up to 1 MB. */

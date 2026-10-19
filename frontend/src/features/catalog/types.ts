@@ -32,3 +32,6 @@ export type BrandInput = {
   name: string
   slug: string
 }
+
+/** What happens to a Brand's logo when the Brand is saved. */
+export type LogoChange = { kind: 'keep' } | { kind: 'replace'; file: File } | { kind: 'remove' }
