@@ -3,6 +3,9 @@
 Technical assessment for INKCODE: a real, working e-commerce admin platform. React SPA (static build) + Laravel REST API + MySQL. Every screen must be connected to real `/api/v1` endpoints and persistent MySQL data; nothing is mocked or hard-coded.
 
 - What to build, tracked by phase: [docs/requirements.md](docs/requirements.md)
+- How every feature must behave (agreed with the user, binding): [docs/spec.md](docs/spec.md)
+- Domain language: [GLOSSARY.md](GLOSSARY.md). Use these exact terms in code, UI copy, tests, commits and tickets.
+- **Deadline: submit by Wednesday 21 October 2026.** Work is driven by tickets (GitHub Issues from `/to-tickets`). Announce each quality checkpoint with "⏸ CHECKPOINT" (end of 19 Oct, end of 20 Oct, before submission).
 - What to hand in: [docs/SUBMISSION.md](docs/SUBMISSION.md). Remind the user of it whenever they talk about submitting.
 - Decisions: [docs/adr/](docs/adr/) · Engineering note (required deliverable): [docs/engineering-note.md](docs/engineering-note.md)
 
