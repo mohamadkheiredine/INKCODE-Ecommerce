@@ -5,11 +5,13 @@ import arAuth from '@/locales/ar/auth.json'
 import arCommon from '@/locales/ar/common.json'
 import arErrors from '@/locales/ar/errors.json'
 import arHome from '@/locales/ar/home.json'
+import arNotifications from '@/locales/ar/notifications.json'
 import arProfile from '@/locales/ar/profile.json'
 import enAuth from '@/locales/en/auth.json'
 import enCommon from '@/locales/en/common.json'
 import enErrors from '@/locales/en/errors.json'
 import enHome from '@/locales/en/home.json'
+import enNotifications from '@/locales/en/notifications.json'
 import enProfile from '@/locales/en/profile.json'
 import { setApiLanguage } from './api/client'
 
@@ -24,8 +26,22 @@ export function asLanguage(value: string | undefined): Language {
 export const LANGUAGE_STORAGE_KEY = 'inkcode.language'
 
 export const resources = {
-  en: { common: enCommon, auth: enAuth, errors: enErrors, home: enHome, profile: enProfile },
-  ar: { common: arCommon, auth: arAuth, errors: arErrors, home: arHome, profile: arProfile },
+  en: {
+    common: enCommon,
+    auth: enAuth,
+    errors: enErrors,
+    home: enHome,
+    notifications: enNotifications,
+    profile: enProfile,
+  },
+  ar: {
+    common: arCommon,
+    auth: arAuth,
+    errors: arErrors,
+    home: arHome,
+    notifications: arNotifications,
+    profile: arProfile,
+  },
 } as const
 
 /** Mirrors the active language onto <html> and the API client. */
@@ -48,7 +64,7 @@ void i18n
     load: 'languageOnly',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'errors', 'home', 'profile'],
+    ns: ['common', 'auth', 'errors', 'home', 'notifications', 'profile'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],

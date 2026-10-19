@@ -1,0 +1,33 @@
+{
+  "title": "الإشعارات",
+  "bell": "الإشعارات",
+  "bellWithUnread_zero": "الإشعارات، {{count}} غير مقروء",
+  "bellWithUnread_one": "الإشعارات، {{count}} غير مقروء",
+  "bellWithUnread_two": "الإشعارات، {{count}} غير مقروءين",
+  "bellWithUnread_few": "الإشعارات، {{count}} غير مقروءة",
+  "bellWithUnread_many": "الإشعارات، {{count}} غير مقروء",
+  "bellWithUnread_other": "الإشعارات، {{count}} غير مقروء",
+  "unreadCount_zero": "{{count}} جديد",
+  "unreadCount_one": "{{count}} جديد",
+  "unreadCount_two": "{{count}} جديدان",
+  "unreadCount_few": "{{count}} جديدة",
+  "unreadCount_many": "{{count}} جديداً",
+  "unreadCount_other": "{{count}} جديد",
+  "unread": "غير مقروء",
+  "loading": "جارٍ تحميل الإشعارات…",
+  "markAsRead": "تعليم كمقروء",
+  "markAllAsRead": "تعليم الكل كمقروء",
+  "allMarkedAsRead": "تم تعليم جميع الإشعارات كمقروءة.",
+  "markAsReadFailed": "تعذّر تعليم الإشعارات كمقروءة. حاول مرة أخرى.",
+  "showOlder": "عرض الأقدم",
+  "loadingOlder": "جارٍ تحميل الإشعارات الأقدم…",
+  "empty": {
+    "title": "لا جديد لديك",
+    "description": "ستظهر هنا الإشعارات المتعلقة بالمخزون والطلبات والمدفوعات والمرتجعات.",
+    "action": "التحقق مجدداً"
+  },
+  "error": {
+    "title": "تعذّر تحميل الإشعارات",
+    "description": "تحقق من اتصالك وحاول مرة أخرى."
+  }
+}

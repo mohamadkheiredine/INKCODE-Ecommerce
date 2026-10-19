@@ -13,6 +13,18 @@ describe('Formatting numbers, money and dates', () => {
     expect(format.dateTime(october19)).not.toMatch(/[٠-٩]/)
   })
 
+  it('says how long ago something happened, in the largest whole unit', () => {
+    const en = createFormatters('en')
+    const ar = createFormatters('ar')
+
+    expect(en.relativeTime('2026-10-19T09:29:50', october19)).toBe('now')
+    expect(en.relativeTime('2026-10-19T09:25:00', october19)).toBe('5 minutes ago')
+    expect(en.relativeTime('2026-10-19T06:00:00', october19)).toBe('3 hours ago')
+    expect(en.relativeTime('2026-10-18T09:00:00', october19)).toBe('yesterday')
+    expect(en.relativeTime('2026-10-05T09:00:00', october19)).toBe('2 weeks ago')
+    expect(ar.relativeTime('2026-10-19T09:25:00', october19)).toBe('قبل 5 دقائق')
+  })
+
   it('formats English the usual way', () => {
     const format = createFormatters('en')
 

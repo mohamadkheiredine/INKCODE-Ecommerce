@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useSidebar } from '@/components/ui/sidebar'
 import type { CurrentUser } from '@/features/auth/types'
+import { NotificationBell } from '@/features/notifications/components/notification-bell'
 import { useSavePreferences } from '@/features/profile/hooks/use-profile'
 import { Breadcrumbs } from './breadcrumbs'
 import { UserMenu } from './user-menu'
 
-/** Sidebar toggle and breadcrumbs, then the language and theme switches and the user menu. */
+/** Sidebar toggle and breadcrumbs, then the language and theme switches, the notifications bell and the user menu. */
 export function AppHeader({ user }: { user: CurrentUser }) {
   const { t } = useTranslation()
   const { toggleSidebar } = useSidebar()
@@ -37,6 +38,7 @@ export function AppHeader({ user }: { user: CurrentUser }) {
         {/* The switch applies at once; keeping it on the profile follows. */}
         <LanguageSwitcher onChange={(locale) => savePreferences({ locale })} />
         <ThemeToggle onChange={(theme) => savePreferences({ theme })} />
+        <NotificationBell />
         <Separator
           orientation="vertical"
           className="mx-1 data-[orientation=vertical]:h-5 data-[orientation=vertical]:self-center"

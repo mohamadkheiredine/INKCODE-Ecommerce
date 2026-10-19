@@ -20,6 +20,11 @@
 - **Changing a password ends the User's other sessions:** Sanctum's `AuthenticateSession` compares the password hash on every request, and `logoutOtherDevices()` re-issues only this device's "keep me signed in" cookie. A shared `Password::defaults()` sets the minimum strength (10+ characters, mixed case, a number) for every password a User chooses; attempts are limited to 5 per minute.
 - **Formatting:** `Intl` with `en` and `ar-u-nu-latn`, so Arabic shows Arabic month names with Western digits; money arrives as decimal strings and is never turned into a float.
 - **Motion:** GSAP entrances through `useGSAP` + `gsap.matchMedia()`; Lenis is mounted once at the root on `gsap.ticker`, paused while a dialog or sheet locks the page, and not mounted at all under reduced motion.
+- **Notifications store values, not text:** each notification is a Laravel database notification whose `type` is a stable `NotificationType` enum value (not a class name). It keeps the values its message needs and a link to its record, and the API writes the message in the language of the request. A User who switches to Arabic reads every earlier notification in Arabic too. The SPA caches the list per language.
+- **A User's notifications are theirs alone:** every lookup goes through the signed-in User's own notifications, so another User's notification answers 404, not 403, and its existence is never revealed. Every Role has a bell, so no Role is refused. The Pest suite checks each Role is allowed and that cross-User reads and marks fail.
+- **Polling without waste:** the bell asks for the latest page every 30 s only while the tab is visible (TanStack Query pauses the interval in hidden tabs) and catches up as soon as the User returns. Closing the bell forgets pages loaded with "Show older", because an infinite query refetches every page it holds.
+- **Where events come from:** this ticket builds the mechanism, the bell and a welcome greeting for demo accounts. The four events in the spec arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21). Each adds one `InAppNotification` subclass, one enum case and its two messages.
+- **Read state is not audited:** marking a notification as read changes only the User's own reading state, not a store record, so it will not write audit entries when the audit trail lands (#9). The spec's audit log covers creating, updating, deleting and changing the status of records.
 - _(add: order state machine, idempotency, stock service as they land)_
 
 ## AI tools used
@@ -56,6 +61,16 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
 - The visual pass found the full sidebar squeezing tablet screens, header separators sitting at the top, and the email in the profile card hugging the wrong edge in Arabic. All three were fixed.
 - The two-axis code review found the word "account" in copy and names (the glossary says "User"/"profile"), duplicated avatar and preference-saving code, phones losing the breadcrumb trail, and header switches saving without a confirming toast (story 31). All were fixed.
 - The frontend for this ticket was written before its tests, which goes against the TDD workflow. To compensate, the shell tests were checked by breaking the implementation on purpose (removing "apply saved preferences" and "save the language") and confirming the tests fail.
+
+**Ticket 03 (notifications bell): how it was built, and what review caught**
+
+- Built test-first in vertical slices: one failing Pest test per rule (list, own only, language, paging, unread count, mark one, mark all, every Role, guests, demo welcome), then the Vitest + MSW bell tests before the bell existed. The migration, translations and the e2e journeys were written alongside the code, not before it.
+- Every important test was checked by breaking the code on purpose: listing or counting everyone's notifications, marking another User's, marking all for everyone, oldest first, overwriting the first read time, no polling, polling in hidden tabs, one cache for both languages, no refresh after marking, and opening without marking. Each broke exactly the test that names the rule. The first attempt at three of these mutants was invalid (the shell ate the class name's backslashes, so the tests failed for the wrong reason); they were redone and checked.
+- Two tests first passed or failed for the wrong reason. The polling tests started counting before the first request had arrived. The tab-visibility helper fired an event that didn't bubble to `window`, where TanStack Query listens, and restoring visibility after each test made the previous test's app refetch into the next test. All three were fixed.
+- Laravel's architecture preset rejected custom controller actions (`markAsRead`), so marking one and marking all became their own resource controllers.
+- The two-axis code review found: `morphs()` adding an index the two composite indexes already cover (removed); "Show older" pages being refetched on every 30 s check (now forgotten when the bell closes, with a test); and the language fallback reimplemented instead of `asLanguage()` (reused). It also flagged that a stored type with no enum case would break the list. Types can only be written from enum cases, so the enum now documents that cases are never removed.
+- The visual pass found the Arabic welcome using the Latin product name; it now uses the Arabic one, like the rest of the Arabic interface.
+- The security review found no vulnerabilities. `21st review` found nothing, and the free daily 21st component-code quota was used up, so the bell is built from the project's own shadcn primitives.
 
 ## Known limitations
 
