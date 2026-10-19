@@ -25,6 +25,9 @@
 - **Polling without waste:** the bell asks for the latest page every 30 s only while the tab is visible (TanStack Query pauses the interval in hidden tabs) and catches up as soon as the User returns. Closing the bell forgets pages loaded with "Show older", because an infinite query refetches every page it holds.
 - **Where events come from:** this ticket builds the mechanism, the bell and a welcome greeting for demo accounts. The four events in the spec arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21). Each adds one `InAppNotification` subclass, one enum case and its two messages.
 - **Read state is not audited:** marking a notification as read changes only the User's own reading state, not a store record, so it will not write audit entries when the audit trail lands (#9). The spec's audit log covers creating, updating, deleting and changing the status of records.
+- **One audit trail, written explicitly** ([ADR 0007](adr/0007-explicit-audit-trail-and-one-list-convention.md)): each action calls `AuditTrail` inside its own transaction, so an entry exists exactly when the change does. Updates record only the values that changed, and nothing at all when nothing changed. Hidden attributes such as passwords are never recorded, and entries can't be edited or deleted. Model observers were rejected because they also fire for seeders and can't describe actions that aren't saves.
+- **One list convention** (ADR 0007): `search`, `filter[...]`, `sort`/`-sort`, `page` and `per_page`. Each list's Form Request declares what it allows, and an unknown sort or filter gets a 422 that names the allowed ones, so a typo never silently returns everything. The search treats `%` and `_` as plain characters, and the id breaks ties so rows never jump between pages. The SPA keeps the same parameters in its URL.
+- **Refusals with their own codes:** `BusinessRuleViolation` carries a stable code (`category_has_children`, `in_use`) through the shared error envelope. Deletes that other rows still reference are refused by restricting foreign keys and come back as a 409.
 - _(add: order state machine, idempotency, stock service as they land)_
 
 ## AI tools used
@@ -73,11 +76,41 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
 - The visual pass found the Arabic welcome using the Latin product name; it now uses the Arabic one, like the rest of the Arabic interface.
 - The security review found no vulnerabilities. `21st review` found nothing, and the free daily 21st component-code quota was used up, so the bell is built from the project's own shadcn primitives.
 
+**Ticket 04 (Categories, Brands, shared list/form/audit): how it was built, and what review caught**
+
+- **The backend was built test-first, one slice at a time:** list, create with audit, show/update/delete, Brands with logos, then the profile audit entries.
+- **Not everything was test-first.** `ListRequest`/`ListParameters` and the frontend's shared list, table and form code were written just ahead of their tests. To compensate, their tests were checked by breaking the code on purpose:
+  - no `LIKE` escaping, no tie-breaker, no query string on links;
+  - a filter that keeps the page, a search that pushes history, sort not kept in the URL;
+  - server errors never placed on fields, controls shown to every Role, no route guard, no logo size check.
+  
+  Each mutant failed the test named for its rule.
+- **Some tests and mutants were invalid at first:**
+  - The first tie-breaker test passed without the tie-breaker, because MySQL returns indexed rows in key order anyway. It now sorts by an unindexed count.
+  - One frontend mutant was invalid: it caused a syntax error, so every test failed for the wrong reason. It was redone.
+  - Two tests were too weak: the filter test started on page 1, and the search test never checked that history was replaced. Both were tightened.
+- **The two-axis code review found:**
+  - The two-level rule ran in the Form Request, outside the transaction, so a concurrent move and add-child could create a third level. It now runs in the actions with the rows locked.
+  - A duplicate slug from two saves at once returned a 500. It is now a 422.
+  - Nothing clamped a page past the last one. Such a page now shows the last page.
+  - The same eager-load was copied into four places. It is now one model method.
+  - New domain terms were missing from the glossary.
+- **The visual pass (Playwright screenshots, both themes, both languages, three widths) found:**
+  - Latin names and slugs sat on the wrong side in Arabic, and initials like "&C" appeared. Names now use `dir="auto"`.
+  - A filter label was cut off on tablets.
+- **Two test setups needed workarounds:**
+  - Node's form-data parser refuses jsdom's `File`, so the MSW logo mock reads the multipart body as text.
+  - The Vite dev server kept a stale import after a file was renamed, which showed up as a blank page in Playwright.
+- **Reviews and audits:** `21st review` found nothing. `composer audit` was clean, and `npm audit` showed only the 7 known shadcn-CLI dev advisories. The security review was done inline:
+  - upload type, size and generated file names, with SVG refused;
+  - allow-listed sort columns and escaped `LIKE` terms;
+  - Policies on every write, and no mass-assignable `logo_path`.
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_
 
 - Locally, `php artisan serve` handles one request at a time on Windows, so Playwright runs one browser at a time there; CI and the Docker stack can run in parallel.
 - Ending an active session when an Admin deactivates a User arrives with Users & Roles administration (#25).
-- Profile changes (preferences, password) write audit entries once the audit trail exists (#9).
+- Refusing to delete a Category or Brand that Products use relies on restricting foreign keys from the Products table (#10); the 409 path has no backend test until then.
 - `npm audit` reports 7 high advisories, all inside the `shadcn` CLI's development-only dependencies (`braces` via `fast-glob`); nothing from them ships in the SPA, and the suggested fix is a downgrade, so they are left until the CLI updates.

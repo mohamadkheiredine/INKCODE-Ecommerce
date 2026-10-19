@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AuditAction;
 use App\Enums\Role;
 
 it('keeps the language and theme a User chooses on their account', function () {
@@ -13,6 +14,29 @@ it('keeps the language and theme a User chooses on their account', function () {
 
     $this->getJson('/api/v1/auth/me')
         ->assertJsonPath('data.preferences', ['locale' => 'ar', 'theme' => 'dark']);
+});
+
+it('records the changed preference in the audit trail', function () {
+    $user = userWithRole(Role::Sales, ['name' => 'Lina Saleh']);
+
+    $this->actingAs($user)
+        ->patchJson('/api/v1/auth/me/preferences', ['locale' => 'ar', 'theme' => 'light'])
+        ->assertOk();
+
+    $entry = auditTrailOf('user', $user->id)->sole();
+    expect($entry->action)->toBe(AuditAction::Updated)
+        ->and($entry->user_id)->toBe($user->id)
+        ->and($entry->record_label)->toBe('Lina Saleh')
+        ->and($entry->before)->toBe(['locale' => 'en'])
+        ->and($entry->after)->toBe(['locale' => 'ar']);
+});
+
+it('records nothing when the preferences are already the saved ones', function () {
+    $user = userWithRole(Role::Sales);
+
+    $this->actingAs($user)->patchJson('/api/v1/auth/me/preferences', ['locale' => 'en'])->assertOk();
+
+    expect(auditTrailOf('user', $user->id))->toBeEmpty();
 });
 
 it('applies the saved preferences on the next sign-in, from any device', function () {

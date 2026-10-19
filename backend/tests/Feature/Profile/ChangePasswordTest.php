@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Profile\ChangePassword;
+use App\Enums\AuditAction;
 use App\Enums\Role;
 
 /**
@@ -26,6 +27,29 @@ it('replaces the password once the User confirms their current one', function ()
 
     signInFromNewBrowser('lina@inkcode.test', 'Temporary-pass-1')->assertUnprocessable();
     signInFromNewBrowser('lina@inkcode.test', 'My-new-Secret-42')->assertOk();
+});
+
+it('records the password change in the audit trail, without any password', function () {
+    $user = userWithRole(Role::Sales, ['name' => 'Lina Saleh', 'password' => 'Temporary-pass-1']);
+
+    $this->actingAs($user)->putJson('/api/v1/auth/me/password', passwordChange())->assertNoContent();
+
+    $entry = auditTrailOf('user', $user->id)->sole();
+    expect($entry->action)->toBe(AuditAction::PasswordChanged)
+        ->and($entry->user_id)->toBe($user->id)
+        ->and($entry->record_label)->toBe('Lina Saleh')
+        ->and($entry->before)->toBeNull()
+        ->and($entry->after)->toBeNull();
+});
+
+it('records nothing when the password change is refused', function () {
+    $user = userWithRole(Role::Sales, ['password' => 'Temporary-pass-1']);
+
+    $this->actingAs($user)
+        ->putJson('/api/v1/auth/me/password', passwordChange(['current_password' => 'wrong-password']))
+        ->assertUnprocessable();
+
+    expect(auditTrailOf('user', $user->id))->toBeEmpty();
 });
 
 it('signs the User out on their other devices but keeps this one signed in', function () {

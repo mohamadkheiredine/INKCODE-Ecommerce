@@ -15,7 +15,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Demo accounts (one per Role) and one-click sign-in, only in demo mode (#6)
 - [x] Consistent API error envelope (`message`, `code`, `errors`), localized in English and Arabic (#6)
 - [x] Profile: change own password (current password, minimum strength, other sessions signed out), language and theme kept on the User (#7)
-- [ ] Shared pagination and list query format (ticket 04)
+- [x] Shared pagination and list query format: `search`, `filter[...]`, `sort`, `page`, `per_page`; `data` + `meta` + `links`; list state kept in the URL (#9)
 - [x] Design tokens: light + dark themes, typography for Latin + Arabic (#7)
 - [x] i18n (English LTR / Arabic RTL) with runtime switching, all strings translated; Western digits in both (#7)
 - [ ] App shell: collapsible sidebar, breadcrumbs, user menu, language/theme kept on the User (#7), notifications bell (#8); global search and quick actions to come
@@ -25,7 +25,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 
 ## Phase 2: Catalog, customers, inventory, orders
 
-- [ ] Products CRUD: images, categories, brands, SKU, price, cost, SEO fields, tags, status
+- [ ] Products CRUD: images, categories, brands, SKU, price, cost, SEO fields, tags, status (Categories in two levels and Brands with logos are done, #9)
 - [ ] Variant editor (size / color / other attributes), each variant with its own SKU, price, stock
 - [ ] Server-side filtering, sorting, pagination, bulk actions (TanStack Table)
 - [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters
@@ -59,7 +59,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Every KPI and report computed from database records, never hard-coded
 - [ ] Roles: Admin, Operations, Inventory, Sales, Support, Finance, Viewer, with granular permissions enforced by Policies
 - [x] In-app notifications: a bell with the unread count, newest first, mark one or all as read, link to the record, 30 s polling paused in hidden tabs, messages in English and Arabic (#8). Events arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21)
-- [ ] Searchable audit log (#9)
+- [ ] Searchable audit log: every change is recorded with User, action, record and before/after values (#9); the log viewer comes with #26
 - [ ] Settings: store profile, tax, currency, localization, basic configuration
 
 ## Phase 5: Testing, polish, deployment

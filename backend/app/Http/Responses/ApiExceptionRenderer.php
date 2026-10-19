@@ -2,6 +2,7 @@
 
 namespace App\Http\Responses;
 
+use App\Exceptions\BusinessRuleViolation;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Throwable;
 /**
  * Renders every exception raised under /api as the one JSON error envelope:
  * `message`, a stable machine-readable `code`, and `errors` for validation failures.
+ * A {@see BusinessRuleViolation} brings its own code (`category_has_children`, …).
  */
 final class ApiExceptionRenderer
 {
@@ -61,6 +63,7 @@ final class ApiExceptionRenderer
         return match (true) {
             $e instanceof ValidationException => $this->respond(422, $e->getMessage(), $e->errors()),
             $e instanceof AuthenticationException => $this->respond(401, __('errors.unauthenticated')),
+            $e instanceof BusinessRuleViolation => $this->respond($e->getStatusCode(), $e->getMessage(), code: $e->errorCode),
             $e instanceof HttpExceptionInterface => $this->respond(
                 $e->getStatusCode(),
                 $this->messageFor($e),
@@ -74,9 +77,9 @@ final class ApiExceptionRenderer
      * @param  array<string, array<int, string>>|null  $errors
      * @param  array<string, string>  $headers
      */
-    private function respond(int $status, string $message, ?array $errors = null, array $headers = []): JsonResponse
+    private function respond(int $status, string $message, ?array $errors = null, array $headers = [], ?string $code = null): JsonResponse
     {
-        $body = ['message' => $message, 'code' => self::CODES[$status] ?? ($status >= 500 ? 'server_error' : 'http_error')];
+        $body = ['message' => $message, 'code' => $code ?? self::CODES[$status] ?? ($status >= 500 ? 'server_error' : 'http_error')];
 
         if ($errors !== null) {
             $body['errors'] = $errors;

@@ -33,7 +33,11 @@
     "retry": "حاول مجدداً",
     "signOut": "تسجيل الخروج",
     "goHome": "الذهاب إلى الصفحة الرئيسية",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "cancel": "إلغاء",
+    "saveChanges": "حفظ التغييرات"
   },
   "states": {
     "loading": "جارٍ التحميل…",
@@ -41,12 +45,16 @@
     "errorDescription": "تعذّر تحميل هذه الصفحة. تحقّق من اتصالك وحاول مجدداً.",
     "notFoundTitle": "الصفحة غير موجودة",
     "notFoundDescription": "هذه الصفحة غير موجودة أو تم نقلها.",
+    "forbiddenTitle": "لا يمكنك فتح هذه الصفحة",
+    "forbiddenDescription": "لا يشمل دورك هذا الجزء من المتجر. اطلب من المسؤول إن كنت تحتاجه.",
     "noRole": "بلا دور"
   },
   "pages": {
     "home": "الرئيسية",
     "profile": "الملف الشخصي",
-    "notFound": "الصفحة غير موجودة"
+    "notFound": "الصفحة غير موجودة",
+    "categories": "الفئات",
+    "brands": "العلامات التجارية"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",
@@ -64,5 +72,23 @@
     "toggleSidebar": "إظهار الشريط الجانبي أو إخفاؤه",
     "userMenu": "فتح قائمة المستخدم",
     "loadingPage": "جارٍ تحميل الصفحة…"
+  },
+  "dataTable": {
+    "sortBy": "رتّب حسب {{column}}",
+    "actions": "الإجراءات",
+    "actionsFor": "إجراءات {{name}}",
+    "showing": "عرض {{from}}–{{to}} من {{total}}",
+    "rowsPerPage": "صفوف في الصفحة",
+    "pagination": "الصفحات",
+    "previousPage": "الصفحة السابقة",
+    "nextPage": "الصفحة التالية",
+    "page": "الصفحة {{page}}",
+    "clearFilters": "مسح عوامل التصفية",
+    "clearSearch": "مسح البحث",
+    "noMatchesTitle": "لا توجد نتائج مطابقة في {{items}}",
+    "noMatchesDescription": "جرّب بحثاً آخر، أو امسح عوامل التصفية لرؤية كل شيء."
+  },
+  "confirmDelete": {
+    "title": "حذف {{name}}؟"
   }
 }

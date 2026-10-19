@@ -5,6 +5,9 @@ use App\Http\Controllers\Access\RoleController;
 use App\Http\Controllers\Auth\CurrentUserController;
 use App\Http\Controllers\Auth\DemoAccountController;
 use App\Http\Controllers\Auth\SessionController;
+use App\Http\Controllers\Catalog\BrandController;
+use App\Http\Controllers\Catalog\BrandLogoController;
+use App\Http\Controllers\Catalog\CategoryController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
@@ -33,6 +36,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/{notification}/read', [ReadNotificationController::class, 'store'])
         ->whereUuid('notification')
         ->name('notifications.read');
+
+    // Catalog: every Role may look (catalog.view); Policies let only catalog.manage change.
+    // Actions with a Form Request authorize there; the others through these Policy checks.
+    Route::apiResource('categories', CategoryController::class)
+        ->middlewareFor('show', 'can:view,category')
+        ->middlewareFor('destroy', 'can:delete,category');
+    Route::apiResource('brands', BrandController::class)
+        ->middlewareFor('show', 'can:view,brand')
+        ->middlewareFor('destroy', 'can:delete,brand');
+    Route::post('/brands/{brand}/logo', [BrandLogoController::class, 'store'])->name('brands.logo.store');
+    Route::delete('/brands/{brand}/logo', [BrandLogoController::class, 'destroy'])
+        ->can('update', 'brand')
+        ->name('brands.logo.destroy');
 
     Route::get('/roles', [RoleController::class, 'index'])
         ->can(Permission::UsersManage->value)

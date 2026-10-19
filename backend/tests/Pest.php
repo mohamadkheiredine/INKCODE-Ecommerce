@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\Role;
+use App\Models\AuditEntry;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -38,6 +40,31 @@ pest()->extend(TestCase::class)
 function userWithRole(Role $role, array $attributes = []): User
 {
     return User::factory()->withRole($role)->create($attributes);
+}
+
+/**
+ * Every Role that only looks at the catalog: everyone but Admin and Operations.
+ *
+ * @return list<Role>
+ */
+function rolesThatMayNotManageTheCatalog(): array
+{
+    return [Role::Inventory, Role::Sales, Role::Support, Role::Finance, Role::Viewer];
+}
+
+/**
+ * The audit entries recorded for one record, oldest first. (The audit log's own API
+ * arrives with the audit viewer, #26.)
+ *
+ * @return Collection<int, AuditEntry>
+ */
+function auditTrailOf(string $recordType, int $recordId): Collection
+{
+    return AuditEntry::query()
+        ->where('record_type', $recordType)
+        ->where('record_id', $recordId)
+        ->orderBy('id')
+        ->get();
 }
 
 /**
