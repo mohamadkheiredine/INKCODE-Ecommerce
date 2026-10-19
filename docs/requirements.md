@@ -18,7 +18,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Shared pagination and list query format (ticket 04)
 - [x] Design tokens: light + dark themes, typography for Latin + Arabic (#7)
 - [x] i18n (English LTR / Arabic RTL) with runtime switching, all strings translated; Western digits in both (#7)
-- [ ] App shell: collapsible sidebar, breadcrumbs, user menu, language/theme kept on the User (#7); global search, notifications, quick actions to come
+- [ ] App shell: collapsible sidebar, breadcrumbs, user menu, language/theme kept on the User (#7), notifications bell (#8); global search and quick actions to come
 - [x] Shared states: loading skeletons, empty states with actions, error states, toasts, form validation (#7)
 - [x] Responsive: desktop / tablet / mobile navigation (sidebar, icon rail, drawer) (#7)
 - [x] Motion: GSAP (`useGSAP`) + Lenis on the GSAP ticker, respecting `prefers-reduced-motion` (#7)
@@ -58,7 +58,8 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Reports: sales, customers, products, categories, returns, inventory, with date filters, comparisons, CSV/Excel export
 - [ ] Every KPI and report computed from database records, never hard-coded
 - [ ] Roles: Admin, Operations, Inventory, Sales, Support, Finance, Viewer, with granular permissions enforced by Policies
-- [ ] Notifications, searchable audit log
+- [x] In-app notifications: a bell with the unread count, newest first, mark one or all as read, link to the record, 30 s polling paused in hidden tabs, messages in English and Arabic (#8). Events arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21)
+- [ ] Searchable audit log (#9)
 - [ ] Settings: store profile, tax, currency, localization, basic configuration
 
 ## Phase 5: Testing, polish, deployment
