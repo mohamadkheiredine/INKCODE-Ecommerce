@@ -12,6 +12,10 @@ _Avoid_: Admin, account, employee, operator
 One of seven fixed permission sets (Admin, Operations, Inventory, Sales, Support, Finance, Viewer); every User has exactly one.
 _Avoid_: Group, profile, user type
 
+**Demo account**:
+A local-only User, one per Role, created only when demo data is seeded, so reviewers can sign in with one click.
+_Avoid_: Test user, sample login
+
 **Customer**:
 A person the store sells to; a record kept by Users, never someone who signs in.
 _Avoid_: Client, buyer, user, account

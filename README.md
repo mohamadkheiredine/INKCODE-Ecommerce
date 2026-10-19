@@ -59,13 +59,47 @@ composer dev          # http://localhost:8000
 ```bash
 cd frontend
 npm ci
-cp .env.example .env.local   # VITE_API_URL=http://localhost:8000
+cp .env.example .env.local   # VITE_API_URL stays empty: the dev server forwards /api to Laravel
 npm run dev                  # http://localhost:5173
 ```
 
-### Demo access
+### 4. Open the app
 
-Seeded demo accounts (one per role) will be listed here once the seeders land. They are **local-only** credentials.
+Open **http://localhost:5173** and sign in with one of the [demo accounts](#demo-accounts); the sign-in page has a one-click button for each Role.
+
+## Running the project (after the first install)
+
+You need three things running: the database, the API and the SPA. Open Docker Desktop, then from the project folder run each command in its **own terminal** (the servers keep running until you press `Ctrl+C`):
+
+```bash
+docker compose up -d mysql                  # 1. MySQL 8.4 on port 3306
+php backend/artisan serve --port=8000       # 2. Laravel API on http://localhost:8000
+npm --prefix frontend run dev               # 3. React SPA on http://localhost:5173
+```
+
+Then open **http://localhost:5173**.
+
+- New database tables or demo data after pulling changes: `php backend/artisan migrate --seed`
+- Start over with fresh demo data: `php backend/artisan migrate:fresh --seed`
+- Browse the data with any MySQL client (DBeaver, HeidiSQL, TablePlus): host `127.0.0.1`, port `3306`, database `inkcode`, user `inkcode`, password `secret` (local-only). Leave `inkcode_testing` alone: the test suite wipes it on every run.
+
+### Demo accounts
+
+With `DEMO_MODE=true` (the default in `backend/.env.example`), seeding creates one demo account per Role, and the sign-in page shows one-click buttons for them. These are **local-only test credentials**: never enable demo mode in production.
+
+All demo accounts use the password **`password`**.
+
+| Role | Email | What this Role can do |
+|---|---|---|
+| Admin | `admin@inkcode.test` | Everything, including Users & Roles, settings and the audit log |
+| Operations | `operations@inkcode.test` | Catalog, Orders (create, edit, move through the flow, cancel, assign), Shipments, shipping setup |
+| Inventory | `inventory@inkcode.test` | Warehouses, stock, Receipts, Adjustments, Transfers, receiving and restocking Returns |
+| Sales | `sales@inkcode.test` | Customers, Orders (create, edit, cancel, assign), Coupons |
+| Support | `support@inkcode.test` | Customers, requesting and approving Returns |
+| Finance | `finance@inkcode.test` | Payments, Refunds, reports and exports |
+| Viewer | `viewer@inkcode.test` | Read-only access to everything except the audit log |
+
+Every permission is checked by the API on each request; the interface only hides what a Role cannot use. The full matrix is in `backend/app/Enums/Role.php`.
 
 ## Testing
 
@@ -121,9 +155,11 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
 ### Done
 
 - Repository structure, Docker MySQL, Laravel API foundation (`/api/v1`, Sanctum, permissions, OpenAPI), React SPA foundation (Tailwind, shadcn/ui with RTL, routing/data/form/i18n/animation libraries), test tooling and CI.
+- **Staff sign-in with Roles (#6):** sign in and out with session cookies and CSRF, rate limiting, the seven Roles and their permission matrix, demo accounts, the shared JSON error format, English/Arabic and light/dark sign-in screens.
 
 ### Incomplete / assumptions
 
-- All feature modules (Phases 1–5 in [docs/requirements.md](docs/requirements.md)) are not yet implemented.
+- The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket.
+- A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.
 - Payments use a mock gateway adapter. No live payment provider is integrated (per the brief).

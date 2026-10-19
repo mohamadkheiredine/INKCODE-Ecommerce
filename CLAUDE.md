@@ -93,10 +93,22 @@ Request flow: route → thin controller → **Form Request** (validation + `auth
 - Errors: one JSON shape for every error (`message`, `errors` for validation, a stable `code`). Correct HTTP status (401, 403, 404, 409 for invalid transitions or conflicts, 422).
 - Migrations: foreign keys, unique constraints, indexes on filter/sort columns. Seeders are deterministic and internally consistent.
 - Tests: Pest feature tests for every endpoint and business rule (happy path, validation, 403 for each role, edge cases), including concurrency tests for stock. Arch tests live in `tests/Unit/ArchTest.php`.
+- Established in ticket 01 and reused from then on:
+  - **Errors:** `app/Http/Responses/ApiExceptionRenderer.php` builds the envelope. For a deliberate business refusal, throw an HTTP exception or use `Response::deny('reason')`; the reason reaches the SPA. Messages live in `lang/{en,ar}/*.php` and follow `Accept-Language`.
+  - **Access:** `App\Enums\Permission` lists every permission and `App\Enums\Role::permissions()` is the only matrix. Add new permissions there; `RolesAndPermissionsSeeder` syncs them. Protect routes with `->can(Permission::X->value)` or Policies.
+  - **Tests:** `userWithRole(Role::X)` creates a User; `seedStore(demoMode: true)` seeds like a review environment. `TestCase` already sends the SPA's `Origin` header, so Sanctum starts a session as it does for the real frontend.
 
 ## Frontend conventions (React)
 
-- Feature folders: `src/features/<module>/{api,components,hooks,routes,schemas}`. Shared UI in `src/components`, the API client and helpers in `src/lib`.
+- Feature folders: `src/features/<module>/{api,components,hooks,routes,schemas}`, plus `types.ts` (and small module-only helpers) at the feature root. Shared UI in `src/components`, the API client and helpers in `src/lib`, app wiring (routes, providers, query client) in `src/app`.
+- Reuse what exists before adding anything new:
+  - `ErrorState` (error with retry), `PageSkeleton`, and `InlineSpinner` for spinners inside labelled buttons.
+  - `Logo`, `LanguageSwitcher`, `ThemeToggle`.
+  - `useEntranceAnimation` (`src/lib/motion.ts`).
+  - `ApiError` with `.fieldError(name)`.
+  - `useTheme` from `src/components/theme/theme-context`; don't use next-themes, which is removed because its script tag breaks React 19.
+- Session expiry is handled once, in `src/app/query-client.ts`: any 401 re-checks the current User, and the route guard then redirects to sign-in. Screens don't handle 401 themselves.
+- Tests: `renderApp(path)` (`src/test/render-app.tsx`) renders the real routes with MSW. Default handlers model a signed-out visitor outside demo mode; override per test with `server.use(...)`. Playwright e2e runs against the real API: one worker locally (PHP's dev server is single-threaded on Windows), 10 s assertion timeout.
 - Data: TanStack Query for all server state (query-key factories per feature). Axios client with `withCredentials` + `withXSRFToken` against `VITE_API_URL`. No `fetch` calls scattered in components.
 - Tables: TanStack Table in manual mode (server-side sort/filter/pagination), one reusable data-table component.
 - Forms: React Hook Form + Zod schemas (`@hookform/resolvers` 5.x). Show server 422 errors on the matching fields.
@@ -117,7 +129,9 @@ The UI is 25% of the score: aim for a premium, consistent SaaS admin, not a temp
   - Skills (user-level): `21st-ui-explore` to compare directions before a new screen, `21st-ui-build` to build a screen in the project's style, `21st-ui-review` to audit a finished screen, `21st-cli-use` to search and install catalog components, `21st-ai` for AI sketches (costs credits; ask first).
   - CLI: `npx @21st-dev/cli@latest search "<query>"`, `get <id>`, `add <user>/<slug>`. Search is free. **Installs are capped at 2 per day**, so prefer `get <id>` and adapt the code by hand.
   - MCP server `21st` (root `.mcp.json`) needs the `API_KEY_21ST` environment variable on the machine. Never write the key into a committed file.
-- Motion: GSAP through `useGSAP` (scoped, auto-cleanup), with `gsap.matchMedia()` and `prefers-reduced-motion`. Lenis is mounted once at the root, driven by `gsap.ticker`. Put `data-lenis-prevent` on inner scroll areas (tables, dialogs, sheets). Keep admin motion subtle (0.2–0.6s, `power2.out`).
+- Motion: GSAP through `useGSAP` (scoped, auto-cleanup), with `gsap.matchMedia()` and `prefers-reduced-motion`; use `useEntranceAnimation` rather than writing GSAP blocks by hand. Lenis is mounted once at the root (ticket 02), driven by `gsap.ticker`. Put `data-lenis-prevent` on inner scroll areas (tables, dialogs, sheets). Keep admin motion subtle (0.2–0.6s, `power2.out`).
+- Colors: only theme tokens. On the brand gradient use `text-brand-foreground` / `bg-brand-foreground/NN`, never `text-white` or `bg-black`.
+- The Claude browser pane delivers no animation frames while it is hidden, so GSAP entrances look frozen there. Judge visuals from Playwright screenshots instead.
 - Check every screen in light and dark, English and Arabic, at phone, tablet and desktop widths.
 
 ## Per-feature workflow (definition of done)
