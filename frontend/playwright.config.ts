@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
+import { devServers } from './dev-servers.ts'
+
+// This checkout's own servers: a worktree slot (CLAUDE.md) moves them off 8000/5173, so its
+// tests never reuse, or seed against, another checkout's API and database.
+const { spaUrl, apiPort, apiUrl } = devServers()
 
 // End-to-end tests drive the real SPA against the real Laravel API and MySQL.
 // Start MySQL first (`docker compose up -d mysql`); both servers are started here when not running.
@@ -14,7 +19,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:5173',
+    baseURL: process.env.E2E_BASE_URL ?? spaUrl,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -24,14 +29,14 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'php artisan serve --port=8000',
+      command: `php artisan serve --port=${apiPort}`,
       cwd: '../backend',
-      url: 'http://localhost:8000/up',
+      url: `${apiUrl}/up`,
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'npm run dev',
-      url: 'http://localhost:5173',
+      url: spaUrl,
       reuseExistingServer: !process.env.CI,
     },
   ],
