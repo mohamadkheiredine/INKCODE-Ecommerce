@@ -37,7 +37,10 @@ export function RolesPage() {
             <caption className="sr-only">{t('common:pages.roles')}</caption>
             <thead className="bg-muted/50">
               <tr>
-                <th scope="col" className="sticky start-0 bg-muted px-4 py-3 text-start font-medium">
+                <th
+                  scope="col"
+                  className="sticky start-0 bg-muted px-4 py-3 text-start font-medium"
+                >
                   {t('matrix.permission')}
                 </th>
                 {roles.data.map((role) => (

@@ -155,7 +155,11 @@ export function UsersPage() {
 
   return (
     <div ref={container} className="flex flex-col gap-6">
-      <PageHeader title={t('common:pages.users')} description={t('description')} actions={newButton} />
+      <PageHeader
+        title={t('common:pages.users')}
+        description={t('description')}
+        actions={newButton}
+      />
       <div className="js-reveal flex flex-col gap-4">
         <DataTableToolbar list={list}>
           <DataTableSearch list={list} label={t('search')} />

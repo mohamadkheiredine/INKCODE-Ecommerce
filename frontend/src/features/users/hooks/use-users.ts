@@ -29,8 +29,7 @@ export function useSaveUser() {
 export function useSetUserActive() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, active }: { id: number; active: boolean }) =>
-      usersApi.setActive(id, active),
+    mutationFn: ({ id, active }: { id: number; active: boolean }) => usersApi.setActive(id, active),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all }),
   })
 }

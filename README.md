@@ -187,10 +187,14 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Picking 3 Colors × 4 Sizes generates 12 Variants. Each gets a readable, unique SKU (`CLASSIC-TEE-RED-M`) and the base price. Generating again only adds the missing combinations and keeps existing Variants. SKU, price, Average cost and Low-stock threshold are edited in place, and a taken SKU is refused under its field.
   - The list searches by name or SKU, filters by status, Category (a top-level one includes its children), Brand and price range, sorts by name, price and date, and supports bulk activate, archive and delete-where-allowed.
 
+- **Audit log (#26):**
+  - The Admin searches every recorded change by record name and filters by record type, action, User and date range; each entry opens a side-by-side view of the values before and after, and links to the record's page where it has one. Entries are read-only.
+  - The demo store comes with a two-week history of its setup by the demo Users.
+
 ### Incomplete / assumptions
 
 - The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
-- Marking a notification as read is the User's own reading state and is not audited. The audit log viewer arrives with #26. Categories and Brands that Products use cannot be deleted (restricting foreign keys).
+- Marking a notification as read is the User's own reading state and is not audited. Categories and Brands that Products use cannot be deleted (restricting foreign keys).
 - A Product or Variant that appears on an Order can only be archived, never deleted. This holds once Order lines reference Variants with a restricting foreign key (#16). Stock per Warehouse arrives with #11, and a Variant's empty Low-stock threshold follows the store default from Settings (#15).
 - A Customer's Order history and Lifetime value join the profile with Orders (#16, #17) and Payments (#19); Segments and the activity/value filters come with #22. Refusing to delete a Customer who has Orders relies on the restricting foreign key Orders add in #16.
 - Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.

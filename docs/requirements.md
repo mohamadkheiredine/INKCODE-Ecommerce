@@ -61,7 +61,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Every KPI and report computed from database records, never hard-coded
 - [x] Roles: Admin, Operations, Inventory, Sales, Support, Finance, Viewer, with granular permissions enforced by Policies; Users & Roles administration (#25): create a User with a Role and a temporary password, edit, change Role, deactivate (sessions end at once) and reactivate, no self-demotion and never without an active Admin, audited; read-only Roles & permissions matrix; the Viewer is refused every changing endpoint
 - [x] In-app notifications: a bell with the unread count, newest first, mark one or all as read, link to the record, 30 s polling paused in hidden tabs, messages in English and Arabic (#8). Events arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21)
-- [ ] Searchable audit log: every change is recorded with User, action, record and before/after values (#9); the log viewer comes with #26
+- [x] Searchable audit log: every change is recorded with User, action, record and before/after values (#9); the Admin searches and filters it by User, record type, record, action and date and compares the values before and after (#26)
 - [x] Settings: store profile and logo, Store currency (code + symbol), VAT rate, Deduction stage, Return window, default Low-stock threshold, default language and theme for new Users; typed, cached, audited, Admin-only to change, public store profile for every User (#15)
 
 ## Phase 5: Testing, polish, deployment

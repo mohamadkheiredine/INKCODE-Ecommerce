@@ -4,6 +4,8 @@ use App\Enums\Permission;
 use App\Http\Controllers\Access\RoleController;
 use App\Http\Controllers\Access\UserActivationController;
 use App\Http\Controllers\Access\UserController;
+use App\Http\Controllers\Audit\AuditAuthorController;
+use App\Http\Controllers\Audit\AuditEntryController;
 use App\Http\Controllers\Auth\CurrentUserController;
 use App\Http\Controllers\Auth\DemoAccountController;
 use App\Http\Controllers\Auth\SessionController;
@@ -131,6 +133,12 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
 
     // The public part of the settings (name, logo, Store currency): every signed-in User.
     Route::get('/store', [StoreProfileController::class, 'show'])->name('store.show');
+
+    // The audit log: read-only (entries are written by App\Services\AuditTrail alone).
+    Route::get('/audit-entries', [AuditEntryController::class, 'index'])->name('audit-entries.index');
+    Route::get('/audit-entries/users', [AuditAuthorController::class, 'index'])
+        ->can(Permission::AuditView->value)
+        ->name('audit-entries.users');
 
     // Users & Roles: only the Admin (users.manage). Deactivating never deletes a User.
     Route::get('/roles', [RoleController::class, 'index'])

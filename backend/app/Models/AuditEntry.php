@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enums\AuditAction;
 use App\Services\AuditTrail;
+use Database\Factories\AuditEntryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -28,6 +30,9 @@ use LogicException;
 #[Fillable(['user_id', 'action', 'record_type', 'record_id', 'record_label', 'before', 'after'])]
 class AuditEntry extends Model
 {
+    /** @use HasFactory<AuditEntryFactory> */
+    use HasFactory;
+
     public const UPDATED_AT = null;
 
     /**

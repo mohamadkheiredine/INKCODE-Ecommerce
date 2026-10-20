@@ -26,7 +26,8 @@ describe('the Users list', () => {
     const { user, router } = await open('/users')
 
     const karim = (await screen.findByText('Karim Nassar')).closest('tr')!
-    expect(within(karim).getByText('Support')).toBeInTheDocument()
+    // The Role shows in its column, and under the name on phones.
+    expect(within(karim).getAllByText('Support')).not.toHaveLength(0)
     expect(within(karim).getByText('Deactivated')).toBeInTheDocument()
     // The Admin can't deactivate themselves, so their own row offers no such button.
     const me = screen.getByText('(you)').closest('tr')!
