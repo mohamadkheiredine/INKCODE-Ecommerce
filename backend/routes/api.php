@@ -17,6 +17,10 @@ use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
+use App\Http\Controllers\Shipping\CarrierController;
+use App\Http\Controllers\Shipping\ShippingMethodController;
+use App\Http\Controllers\Shipping\ShippingQuoteController;
+use App\Http\Controllers\Shipping\ShippingZoneController;
 use Illuminate\Support\Facades\Route;
 
 // Every route in this file is served under /api/v1 (see bootstrap/app.php).
@@ -65,6 +69,21 @@ Route::middleware('auth:sanctum')->group(function () {
         ->scoped()
         ->middlewareFor('destroy', 'can:update,customer');
     Route::apiResource('customers.notes', CustomerNoteController::class)->only(['index', 'store']);
+
+    // Shipping: Roles that see Orders may look; Policies let only shipping.manage change.
+    // The quote is for Roles that create Orders (QuoteShippingRequest).
+    Route::get('/shipping/quote', [ShippingQuoteController::class, 'show'])->name('shipping.quote');
+    Route::apiResource('shipping-zones', ShippingZoneController::class)
+        ->middlewareFor('show', 'can:view,shipping_zone')
+        ->middlewareFor('destroy', 'can:delete,shipping_zone');
+    Route::post('/shipping-zones/{shipping_zone}/methods', [ShippingMethodController::class, 'store'])->name('shipping-zones.methods.store');
+    Route::put('/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'update'])->name('shipping-methods.update');
+    Route::delete('/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'destroy'])
+        ->can('delete', 'shipping_method')
+        ->name('shipping-methods.destroy');
+    Route::apiResource('carriers', CarrierController::class)
+        ->middlewareFor('show', 'can:view,carrier')
+        ->middlewareFor('destroy', 'can:delete,carrier');
 
     Route::get('/roles', [RoleController::class, 'index'])
         ->can(Permission::UsersManage->value)

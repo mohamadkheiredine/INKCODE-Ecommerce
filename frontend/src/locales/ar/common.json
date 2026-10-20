@@ -56,7 +56,10 @@
     "categories": "الفئات",
     "brands": "العلامات التجارية",
     "customers": "العملاء",
-    "customer": "العميل"
+    "customer": "العميل",
+    "shippingZones": "مناطق الشحن",
+    "shippingZone": "منطقة الشحن",
+    "carriers": "شركات الشحن"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

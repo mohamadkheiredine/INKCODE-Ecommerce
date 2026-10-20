@@ -87,6 +87,43 @@ export const routes: RouteObject[] = [
             ],
           },
           {
+            path: 'shipping/zones',
+            handle: crumb('shippingZones'),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: withPermission(
+                    'orders.view',
+                    (await import('@/features/shipping/routes/shipping-zones-page'))
+                      .ShippingZonesPage,
+                  ),
+                }),
+              },
+              {
+                path: ':zoneId',
+                handle: crumb('shippingZone'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'orders.view',
+                    (await import('@/features/shipping/routes/shipping-zone-page'))
+                      .ShippingZonePage,
+                  ),
+                }),
+              },
+            ],
+          },
+          {
+            path: 'shipping/carriers',
+            handle: crumb('carriers'),
+            lazy: async () => ({
+              Component: withPermission(
+                'orders.view',
+                (await import('@/features/shipping/routes/carriers-page')).CarriersPage,
+              ),
+            }),
+          },
+          {
             path: '*',
             handle: crumb('notFound'),
             lazy: async () => ({ Component: (await import('./not-found-page')).NotFoundPage }),

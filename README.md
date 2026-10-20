@@ -170,6 +170,11 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Several addresses per Customer, always with exactly one default billing and one default shipping address: the first address takes both, another can take either over, and removing a default hands it to the oldest remaining address. MySQL itself refuses a second default.
   - Tags are typed freely (or picked from existing ones) and created on save; internal notes are signed by their author and timestamped, and are never edited.
   - Admin, Sales and Support manage Customers; Operations, Finance and Viewer only look; Inventory has no access. Every change is audited. 300 demo Customers are seeded.
+- **Shipping zones, Shipping methods and Carriers (#14):**
+  - A Shipping zone covers whole countries or single cities; a place belongs to one zone only. Each zone has flat-price Shipping methods (price, estimated delivery days, active flag).
+  - Quoting an address checks the city first, then the country, and offers the zone's active methods cheapest first; an address no zone covers gets no methods and a clear message. The Shipping zones page has a "Check an address" card that asks the same quote Order creation will.
+  - Carriers have an optional tracking link template holding `{tracking_number}`, with a live example in the form.
+  - Roles that see Orders can look; only Admin and Operations change shipping, and every change is audited.
 
 ### Incomplete / assumptions
 

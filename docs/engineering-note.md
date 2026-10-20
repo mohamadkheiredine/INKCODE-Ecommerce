@@ -33,6 +33,9 @@
 - **Notes are append-only:** a note keeps its author (set to null if that User is ever removed, shown as "Former User") and its time. Notes are a record of what was said, so there is no edit or delete.
 - **Shared country list:** addresses store an ISO 3166-1 alpha-2 `country_code` validated by `AppSupportCountries` (shared with Shipping, #14); the SPA shows names in the interface language through `Intl.DisplayNames`, so nothing is translated by hand.
 - **Bulk demo seeding:** the 300 demo Customers are generated with a fixed Faker seed and inserted in a few bulk queries (about 1 s instead of a minute of row-by-row inserts through Docker on Windows).
+- **Shipping quote, city before country (#14):** a zone covers places, each a country or one city in it, stored as `shipping_zone_locations` with a generated `city_key` (trimmed, lower-case, `''` for the whole country). A unique index on `(country_code, city_key)` makes "one place, one zone" a database guarantee (a nullable `city` alone can't be unique in MySQL), and the quote is one indexed lookup: `city_key IN (city, '')` ordered so the city wins. `QuoteShipping` is the single entry point; Order creation (#16) calls it and takes the chosen method through `ShippingQuote::method()`, which refuses an inactive or other-zone method with 422 `shipping_method_unavailable`.
+- **Flat prices stay decimal:** `DECIMAL(10,2)` with `decimal:2` casts; the request normalises the typed price with `bcadd`, never through a float. The spec has no free-shipping threshold or per-weight rates, so quoting needs no arithmetic and takes only the address.
+- **Shipping is read by Order Roles, changed by shipping.manage:** Policies let anyone with `orders.view` read zones and Carriers (Shipments, #18, also need Carriers), the quote needs `orders.create` or `shipping.manage`, and every write needs `shipping.manage`. A simultaneous duplicate (name or place) caught by a unique index answers 422 on the right field through `DatabaseErrors::refuseDuplicateOnIndexes()`.
 - _(add: order state machine, idempotency, stock service as they land)_
 
 ## AI tools used
@@ -110,6 +113,7 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - upload type, size and generated file names, with SVG refused;
   - allow-listed sort columns and escaped `LIKE` terms;
   - Policies on every write, and no mass-assignable `logo_path`.
+- **Shipping (#14) review:** the quote was written test-first (city match, country match, no match, inactive methods hidden). The inline security review checked that tracking link templates must be http(s) addresses with the placeholder (`javascript:` is refused) and are only ever shown as text, that every write goes through a Policy, and that list sorts and filters are allow-listed. `composer audit` was clean; `npm audit` still shows only the known `braces` dev advisory. The visual pass (English/Arabic, light/dark, phone/desktop) found nothing to fix.
 
 - **Customers (#13), reviewed and corrected while building:**
   - The first demo seeder inserted row by row and took about a minute; it now builds rows in memory and inserts them in bulk.

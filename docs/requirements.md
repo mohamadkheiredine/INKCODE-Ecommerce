@@ -47,6 +47,8 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Mock payment gateway adapter (no live gateway) with idempotency keys
 - [ ] Coupons: percentage / fixed, validity dates, usage limits, eligible items, stacking rules
 - [ ] Shipping zones, carriers, rates, tracking references, shipment history, partial shipments
+  - [x] Shipping zones (countries or cities), flat-price Shipping methods, Carriers with tracking link templates, and the address quote (#14)
+  - [ ] Shipments: tracking numbers, status history, partial shipments (#18)
 - [ ] Returns: request → approval → physical receipt → restock decision → eligible refund (no automatic restock)
 - [ ] Refunds can never exceed the captured amount; partial refunds supported
 
