@@ -65,17 +65,14 @@
     "shippingZones": "Shipping zones",
     "shippingZone": "Shipping zone",
     "carriers": "Carriers",
-<<<<<<< HEAD
     "warehouses": "Warehouses",
     "stockLevels": "Stock levels",
     "stockMovements": "Stock movements",
     "receipts": "Receipts",
     "newReceipt": "Receive stock",
     "receipt": "Receipt",
-=======
     "users": "Users",
     "roles": "Roles & permissions",
->>>>>>> origin/main
     "auditLog": "Audit log"
   },
   "navGroups": {

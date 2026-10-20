@@ -7,11 +7,7 @@
     },
     "servers": [
         {
-<<<<<<< HEAD
             "url": "http://localhost:8001/api/v1"
-=======
-            "url": "http://localhost:8002/api/v1"
->>>>>>> origin/main
         }
     ],
     "paths": {
@@ -10028,32 +10024,14 @@
                 ],
                 "title": "StoreStoreLogoRequest"
             },
-<<<<<<< HEAD
-            "StoreWarehouseRequest": {
-                "type": "object",
-                "description": "A new Warehouse: a unique name, a unique short code (stored in capitals, for example\n\"BEY-01\") and an address. It starts active unless `is_active` says otherwise.",
-=======
             "StoreUserRequest": {
                 "type": "object",
                 "description": "A new User: name, email, one Role and a temporary password the Admin hands over. The\npassword meets the same strength as any other ({@see Password::defaults()}); the User\nchanges it in their profile.",
->>>>>>> origin/main
                 "properties": {
                     "name": {
                         "type": "string",
                         "maxLength": 120
                     },
-<<<<<<< HEAD
-                    "code": {
-                        "type": "string",
-                        "pattern": "^[A-Z0-9-]{2,16}$"
-                    },
-                    "address": {
-                        "type": "string",
-                        "maxLength": 255
-                    },
-                    "is_active": {
-                        "type": "boolean"
-=======
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -10067,24 +10045,43 @@
                     },
                     "password_confirmation": {
                         "type": "string"
->>>>>>> origin/main
                     }
                 },
                 "required": [
                     "name",
-<<<<<<< HEAD
-                    "code",
-                    "address"
-                ],
-                "title": "StoreWarehouseRequest"
-=======
                     "email",
                     "role",
                     "password",
                     "password_confirmation"
                 ],
                 "title": "StoreUserRequest"
->>>>>>> origin/main
+            },
+            "StoreWarehouseRequest": {
+                "type": "object",
+                "description": "A new Warehouse: a unique name, a unique short code (stored in capitals, for example\n\"BEY-01\") and an address. It starts active unless `is_active` says otherwise.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "code": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9-]{2,16}$"
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name",
+                    "code",
+                    "address"
+                ],
+                "title": "StoreWarehouseRequest"
             },
             "TagResource": {
                 "type": "object",
@@ -10798,7 +10795,6 @@
                 ],
                 "title": "UpdateVariantsRequest"
             },
-<<<<<<< HEAD
             "UpdateWarehouseRequest": {
                 "type": "object",
                 "description": "A Warehouse's new name, code, address and active state.",
@@ -10825,7 +10821,7 @@
                     "address"
                 ],
                 "title": "UpdateWarehouseRequest"
-=======
+            },
             "UserResource": {
                 "type": "object",
                 "properties": {
@@ -10870,7 +10866,6 @@
                     "updated_at"
                 ],
                 "title": "UserResource"
->>>>>>> origin/main
             },
             "VariantResource": {
                 "type": "object",
