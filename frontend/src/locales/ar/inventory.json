@@ -38,6 +38,8 @@
   },
   "movementTypes": {
     "receipt": "استلام",
+    "reservation": "حجز",
+    "release": "تحرير حجز",
     "adjustment": "تعديل",
     "transfer_out": "تحويل صادر",
     "transfer_in": "تحويل وارد"

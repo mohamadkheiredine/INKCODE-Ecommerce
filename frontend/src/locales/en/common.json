@@ -74,6 +74,9 @@
     "users": "Users",
     "roles": "Roles & permissions",
     "auditLog": "Audit log",
+    "orders": "Orders",
+    "newOrder": "New Order",
+    "order": "Order",
     "transfers": "Transfers"
   },
   "navGroups": {

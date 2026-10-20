@@ -4,7 +4,7 @@ All stock changes go through `App\Services\Stock`. `move($type, $source, list<St
 
 Locking the Variant first means a missing balance row can be created without an insert race. It also serializes Average cost re-weighting (ADR 0005). Rows that reference a Variant (Receipt lines, Order lines) must be inserted *after* `Stock` has locked it. Inserting them first takes shared foreign-key locks, and two transactions upgrading those locks deadlock. A real multi-process test (`tests/Concurrency`) caught this.
 
-Mutating endpoints accept an `Idempotency-Key` through the `idempotent` route middleware (`EnsureIdempotency`). The key row is claimed in the same transaction as the request's changes and stores the successful response. A retry replays that response, a retry that arrives during the first request waits on the key's row lock, a refused request leaves the key free, and a key reused with a different body gets 422.
+Mutating endpoints accept an `Idempotency-Key` through the `idempotent` route middleware (`EnsureIdempotency`). The key row is claimed in the same transaction as the request's changes and stores the successful response. A retry replays that response, a retry that arrives during the first request waits on the key's row lock, a refused request leaves the key free, and a key reused with a different body gets 409 `idempotency_key_reused` (changed from 422 with the Orders ticket, whose acceptance criteria treat it as a conflict with the first request).
 
 ## Consequences
 

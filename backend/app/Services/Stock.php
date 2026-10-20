@@ -138,6 +138,52 @@ final class Stock
         });
     }
 
+    /**
+     * Reserves the quantities in one Warehouse for an Order: every line or none. Unlike
+     * {@see move()}, which stops at the first shortfall, it checks every line under the
+     * locks first, so the refusal names each line that lacks Available stock.
+     *
+     * @param  array<int, int>  $quantities  units per Variant id
+     * @return list<StockMovement>
+     *
+     * @throws BusinessRuleViolation 409 `insufficient_stock` with `details.lines`
+     *                               (variant_id, sku, requested, available)
+     */
+    public function reserve(Model $source, int $warehouseId, array $quantities): array
+    {
+        return DB::transaction(function () use ($source, $warehouseId, $quantities): array {
+            $changes = array_map(
+                fn (int $variantId, int $quantity): StockChange => new StockChange($variantId, $warehouseId, reservedDelta: $quantity),
+                array_keys($quantities),
+                $quantities,
+            );
+            $this->lockVariants(array_keys($quantities));
+            $balances = $this->lockBalances($changes);
+
+            $shortages = [];
+            foreach ($quantities as $variantId => $quantity) {
+                $balance = $balances[$this->balanceKey($variantId, $warehouseId)];
+                if ($balance->on_hand - $balance->reserved < $quantity) {
+                    $shortages[] = [
+                        'variant_id' => $variantId,
+                        'sku' => $balance->variant->sku,
+                        'requested' => $quantity,
+                        'available' => $balance->on_hand - $balance->reserved,
+                    ];
+                }
+            }
+
+            if ($shortages !== []) {
+                throw new BusinessRuleViolation('insufficient_stock', __('orders.insufficient_stock', [
+                    'warehouse' => Warehouse::query()->findOrFail($warehouseId)->name,
+                    'lines' => implode(', ', array_map(fn (array $shortage): string => __('orders.insufficient_line', $shortage), $shortages)),
+                ]), details: ['lines' => $shortages]);
+            }
+
+            return $this->move(StockMovementType::Reservation, $source, $changes);
+        });
+    }
+
     private function reweightedCost(Variant $variant, int $onHand, ReceiptLine $line): string
     {
         if ($onHand <= 0) {

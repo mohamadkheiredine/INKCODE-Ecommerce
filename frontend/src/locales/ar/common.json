@@ -74,6 +74,9 @@
     "users": "المستخدمون",
     "roles": "الأدوار والصلاحيات",
     "auditLog": "سجل التدقيق",
+    "orders": "الطلبات",
+    "newOrder": "طلب جديد",
+    "order": "طلب",
     "transfers": "التحويلات"
   },
   "navGroups": {

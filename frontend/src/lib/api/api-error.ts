@@ -16,7 +16,15 @@ export type ApiErrorCode =
 
 export type FieldErrors = Record<string, string[]>
 
-type ErrorEnvelope = { message?: string; code?: string; errors?: FieldErrors }
+/** Extra facts some refusals carry (for example `lines` lacking stock). */
+export type ErrorDetails = Record<string, unknown>
+
+type ErrorEnvelope = {
+  message?: string
+  code?: string
+  errors?: FieldErrors
+  details?: ErrorDetails
+}
 
 /** Every failed API call surfaces as one of these, never as a raw Axios error. */
 export class ApiError extends Error {
@@ -24,6 +32,7 @@ export class ApiError extends Error {
   readonly code: ApiErrorCode
   readonly fieldErrors: FieldErrors
   readonly retryAfterSeconds: number | null
+  readonly details: ErrorDetails
 
   constructor(
     status: number,
@@ -31,6 +40,7 @@ export class ApiError extends Error {
     message: string,
     fieldErrors: FieldErrors = {},
     retryAfterSeconds: number | null = null,
+    details: ErrorDetails = {},
   ) {
     super(message)
     this.name = 'ApiError'
@@ -38,6 +48,7 @@ export class ApiError extends Error {
     this.code = code
     this.fieldErrors = fieldErrors
     this.retryAfterSeconds = retryAfterSeconds
+    this.details = details
   }
 
   /** First server message for a field, if the API rejected it. */
@@ -65,6 +76,7 @@ export function toApiError(error: unknown): ApiError {
       data?.message ?? error.message,
       data?.errors ?? {},
       Number.isFinite(retryAfter) ? retryAfter : null,
+      data?.details ?? {},
     )
   }
 

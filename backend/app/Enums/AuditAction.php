@@ -14,4 +14,7 @@ enum AuditAction: string
 
     /** A User's password was replaced; the trail never stores password values. */
     case PasswordChanged = 'password_changed';
+
+    /** A record moved to another status (an Order Confirmed, Cancelled…). */
+    case StatusChanged = 'status_changed';
 }

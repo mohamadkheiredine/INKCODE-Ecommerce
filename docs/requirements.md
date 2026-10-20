@@ -28,18 +28,18 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Products CRUD: images, categories, brands, SKU, price, cost, SEO fields, tags, status (#10; stock per Warehouse arrives with #11)
 - [x] Variant editor (size / color / other attributes), each variant with its own SKU, price, Average cost and Low-stock threshold (#10; stock per Warehouse with #11)
 - [x] Server-side filtering, sorting, pagination, bulk actions (TanStack Table) (#9 lists, #10 Products bulk activate / archive / delete)
-- [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters (list with search and Tag filter, profile, addresses with default billing and shipping, Tags and notes are done, #13; order history comes with #16/#17, Lifetime value and Segments with #22)
+- [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters (list with search and Tag filter, profile, addresses with default billing and shipping, Tags and notes are done, #13; order history on the profile is done, #16; Lifetime value and Segments with #22)
 - [x] Warehouses (3+): on-hand, reserved, available per variant per warehouse; stock per Variant per Warehouse on the Product page (#11)
 - [x] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation (#11: Stock movement ledger, Receipts with weighted Average cost, Stock value and low-stock filter; #12: Adjustments with a reason, two-step Transfers (Draft → In transit → Received, cancellable before sending), low-stock bell alerts sent once until stock recovers)
-- [ ] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice
-- [ ] Concurrency safe: no overselling under simultaneous orders (row locks + transactions)
-- [ ] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee
-- [ ] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice
-- [ ] Status flow enforced: Pending → Confirmed → Preparing → Ready for Shipping → Shipped → Delivered, plus valid cancellation paths
+- [ ] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice (reserve on Confirm and release on Cancel done, #16; deduction with Shipments, #18)
+- [x] Concurrency safe: no overselling under simultaneous orders (row locks + transactions; `php artisan demo:race` and its Pest test, #16)
+- [ ] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee (search, status/Warehouse/date filters, sorts and Customer done, #16; payment status #19, Assignee #17)
+- [ ] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice (lines, VAT, shipping, addresses, status history and notes done, #16; invoice #17, tracking #18)
+- [ ] Status flow enforced: Pending → Confirmed → Preparing → Ready for Shipping → Shipped → Delivered, plus valid cancellation paths (the flow lives in `OrderStatus`; Confirm and Cancel are wired, #16; the other moves #17)
 - [ ] Order, payment and shipment statuses kept separate
 - [ ] Orders locked against unauthorized edits once preparation starts
 - [ ] Partial fulfillment, partial cancellation
-- [ ] Order items store historical snapshots (name, SKU, price, attributes)
+- [x] Order items store historical snapshots (name, SKU, price, attributes, VAT rate and amount; #16)
 
 ## Phase 3: Payments, shipping, promotions, returns
 

@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api/v1"
+            "url": "http://localhost:8001/api/v1"
         }
     ],
     "paths": {
@@ -3490,6 +3490,659 @@
                 }
             }
         },
+        "/orders": {
+            "get": {
+                "operationId": "orders.index",
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "placed_at",
+                                "number",
+                                "total",
+                                "-placed_at",
+                                "-number",
+                                "-total",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/OrderStatus"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[warehouse]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ],
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[customer]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ],
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[from]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "filter[to]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OrderResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "orders.store",
+                "summary": "Safe to retry with an `Idempotency-Key` header",
+                "tags": [
+                    "Order"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines",
+                                                        "status_history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}": {
+            "get": {
+                "operationId": "orders.show",
+                "summary": "Authorized by the route (`can:view,order`)",
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines",
+                                                        "status_history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/cancel": {
+            "post": {
+                "operationId": "orders.cancel",
+                "summary": "Cancels the whole Order and releases any Reserved stock. Safe to retry with an\n`Idempotency-Key` header",
+                "tags": [
+                    "OrderCancellation"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines",
+                                                        "status_history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/confirm": {
+            "post": {
+                "operationId": "orders.confirm",
+                "summary": "Confirms a Pending Order and reserves its stock. Authorized by the route\n(`can:confirm,order`); safe to retry with an `Idempotency-Key` header",
+                "tags": [
+                    "OrderConfirmation"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines",
+                                                        "status_history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/quote": {
+            "post": {
+                "operationId": "orders.quote",
+                "summary": "Prices lines before the Order exists (VAT per line, shipping, total) and lists each\nactive Warehouse with the lines it lacks stock for. Nothing is saved",
+                "tags": [
+                    "OrderQuote"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "vat_rate": {
+                                                    "type": "string"
+                                                },
+                                                "items_total": {
+                                                    "type": "string"
+                                                },
+                                                "discount_total": {
+                                                    "type": "string"
+                                                },
+                                                "vat_total": {
+                                                    "type": "string"
+                                                },
+                                                "shipping_total": {
+                                                    "type": "string"
+                                                },
+                                                "total": {
+                                                    "type": "string"
+                                                },
+                                                "lines": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "variant_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "product_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "sku": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "string"
+                                                            },
+                                                            "quantity": {
+                                                                "type": "string"
+                                                            },
+                                                            "unit_price": {
+                                                                "type": "string"
+                                                            },
+                                                            "discount_amount": {
+                                                                "type": "string",
+                                                                "const": "0.00"
+                                                            },
+                                                            "taxable": {
+                                                                "type": "string"
+                                                            },
+                                                            "vat_rate": {
+                                                                "type": "string"
+                                                            },
+                                                            "vat_amount": {
+                                                                "type": "string"
+                                                            },
+                                                            "line_total": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "variant_id",
+                                                            "product_name",
+                                                            "sku",
+                                                            "options",
+                                                            "quantity",
+                                                            "unit_price",
+                                                            "discount_amount",
+                                                            "taxable",
+                                                            "vat_rate",
+                                                            "vat_amount",
+                                                            "line_total"
+                                                        ]
+                                                    }
+                                                },
+                                                "warehouses": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "vat_rate",
+                                                "items_total",
+                                                "discount_total",
+                                                "vat_total",
+                                                "shipping_total",
+                                                "total",
+                                                "lines",
+                                                "warehouses"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/auth/me/password": {
             "put": {
                 "operationId": "auth.me.password",
@@ -4739,6 +5392,58 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/sellable-variants": {
+            "get": {
+                "operationId": "orders.sellable-variants",
+                "summary": "The Variants the Order form can add: Active Products only, matched by SKU or Product\nname, with their price and Available stock across Warehouses",
+                "tags": [
+                    "SellableVariant"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 }
             }
@@ -8572,12 +9277,13 @@
             },
             "AuditAction": {
                 "type": "string",
-                "description": "What a User did to a record, as kept in the audit trail. Values are stored, so cases are added (status changes, Refunds\u2026) but never renamed or removed.\n| |\n|---|\n| `created` <br/>  |\n| `updated` <br/>  |\n| `deleted` <br/>  |\n| `password_changed` <br/> A User's password was replaced; the trail never stores password values. |",
+                "description": "What a User did to a record, as kept in the audit trail. Values are stored, so cases are added (status changes, Refunds\u2026) but never renamed or removed.\n| |\n|---|\n| `created` <br/>  |\n| `updated` <br/>  |\n| `deleted` <br/>  |\n| `password_changed` <br/> A User's password was replaced; the trail never stores password values. |\n| `status_changed` <br/> A record moved to another status (an Order Confirmed, Cancelled\u2026). |",
                 "enum": [
                     "created",
                     "updated",
                     "deleted",
-                    "password_changed"
+                    "password_changed",
+                    "status_changed"
                 ],
                 "title": "AuditAction"
             },
@@ -8688,6 +9394,20 @@
                     "updated_at"
                 ],
                 "title": "BrandResource"
+            },
+            "CancelOrderRequest": {
+                "type": "object",
+                "description": "Cancelling an Order, with an optional reason kept in its status history.",
+                "properties": {
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "title": "CancelOrderRequest"
             },
             "CarrierResource": {
                 "type": "object",
@@ -9113,6 +9833,243 @@
                 ],
                 "title": "NotificationResource"
             },
+            "OrderResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "placed_at": {
+                        "type": "string"
+                    },
+                    "customer": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "warehouse": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "shipping_method": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "billing_address": {
+                        "type": "object",
+                        "properties": {
+                            "recipient_name": {
+                                "type": "string"
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "country_code": {
+                                "type": "string"
+                            },
+                            "city": {
+                                "type": "string"
+                            },
+                            "line1": {
+                                "type": "string"
+                            },
+                            "line2": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "postal_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "recipient_name",
+                            "phone",
+                            "country_code",
+                            "city",
+                            "line1",
+                            "line2",
+                            "postal_code"
+                        ]
+                    },
+                    "shipping_address": {
+                        "type": "object",
+                        "properties": {
+                            "recipient_name": {
+                                "type": "string"
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "country_code": {
+                                "type": "string"
+                            },
+                            "city": {
+                                "type": "string"
+                            },
+                            "line1": {
+                                "type": "string"
+                            },
+                            "line2": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "postal_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "recipient_name",
+                            "phone",
+                            "country_code",
+                            "city",
+                            "line1",
+                            "line2",
+                            "postal_code"
+                        ]
+                    },
+                    "currency_code": {
+                        "type": "string"
+                    },
+                    "vat_rate": {
+                        "type": "string"
+                    },
+                    "items_total": {
+                        "type": "string"
+                    },
+                    "discount_total": {
+                        "type": "string"
+                    },
+                    "vat_total": {
+                        "type": "string"
+                    },
+                    "shipping_total": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "type": "string"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "user": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "units": {
+                        "type": "integer"
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "status_history": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "placed_at",
+                    "shipping_method",
+                    "billing_address",
+                    "shipping_address",
+                    "currency_code",
+                    "vat_rate",
+                    "items_total",
+                    "discount_total",
+                    "vat_total",
+                    "shipping_total",
+                    "total",
+                    "notes",
+                    "created_at"
+                ],
+                "title": "OrderResource"
+            },
+            "OrderStatus": {
+                "type": "string",
+                "description": "Where an Order is in its life. It moves forward one step at a time (Pending \u2192 Confirmed \u2192 Preparing \u2192 Ready for shipping \u2192 Shipped \u2192 Delivered) and may be Cancelled any time before it is Shipped. This enum is the one place the allowed moves are defined; actions ask {@see canMoveTo()} before changing a status.\n",
+                "enum": [
+                    "pending",
+                    "confirmed",
+                    "preparing",
+                    "ready_for_shipping",
+                    "shipped",
+                    "delivered",
+                    "cancelled"
+                ],
+                "title": "OrderStatus"
+            },
             "ProductBulkAction": {
                 "type": "string",
                 "description": "What the Products list can do to several Products at once.\n| |\n|---|\n| `activate` <br/>  |\n| `archive` <br/>  |\n| `delete` <br/> Deletes the Products that may be deleted and skips the ones on Orders. |",
@@ -9306,6 +10263,45 @@
                     "archived"
                 ],
                 "title": "ProductStatus"
+            },
+            "QuoteOrderRequest": {
+                "type": "object",
+                "description": "The lines of an Order being filled in, and optionally its Shipping method, to quote.\nOpen to Roles that create Orders.",
+                "properties": {
+                    "shipping_method_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "variant_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                }
+                            },
+                            "required": [
+                                "variant_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "lines"
+                ],
+                "title": "QuoteOrderRequest"
             },
             "ReceiptResource": {
                 "type": "object",
@@ -9854,9 +10850,11 @@
             },
             "StockMovementType": {
                 "type": "string",
-                "description": "Why a Stock movement happened. Values are stored, so cases are added but never renamed or removed. Each later ticket that changes stock adds its own case.\n| |\n|---|\n| `receipt` <br/> Stock arriving from a supplier (a Receipt): adds On-hand. |\n| `adjustment` <br/> A correction with a reason (count correction, damaged, lost, found): adds or removes On-hand. |\n| `transfer_out` <br/> A sent Transfer leaving its source Warehouse: removes On-hand. |\n| `transfer_in` <br/> A received Transfer arriving at its destination Warehouse: adds On-hand. |",
+                "description": "Why a Stock movement happened. Values are stored, so cases are added but never renamed or removed. Each later ticket that changes stock adds its own case.\n| |\n|---|\n| `receipt` <br/> Stock arriving from a supplier (a Receipt): adds On-hand. |\n| `reservation` <br/> An Order was Confirmed: its units are promised to it (adds Reserved). |\n| `release` <br/> An Order holding Reserved units was cancelled: they are free again (removes Reserved). |\n| `adjustment` <br/> A correction with a reason (count correction, damaged, lost, found): adds or removes On-hand. |\n| `transfer_out` <br/> A sent Transfer leaving its source Warehouse: removes On-hand. |\n| `transfer_in` <br/> A received Transfer arriving at its destination Warehouse: adds On-hand. |",
                 "enum": [
                     "receipt",
+                    "reservation",
+                    "release",
                     "adjustment",
                     "transfer_out",
                     "transfer_in"
@@ -10393,6 +11391,66 @@
                     "name"
                 ],
                 "title": "StoreCustomerRequest"
+            },
+            "StoreOrderRequest": {
+                "type": "object",
+                "description": "A new Order: the Customer, two of that Customer's addresses (billing and shipping), an\nactive Fulfilling warehouse, a Shipping method, optional notes, and one line per Variant\nof an Active Product. Whether the method delivers to the shipping address is checked\nwhen the Order is priced. It is safe to retry with an `Idempotency-Key`.",
+                "properties": {
+                    "customer_id": {
+                        "type": "integer"
+                    },
+                    "billing_address_id": {
+                        "type": "integer"
+                    },
+                    "shipping_address_id": {
+                        "type": "integer"
+                    },
+                    "warehouse_id": {
+                        "type": "integer"
+                    },
+                    "shipping_method_id": {
+                        "type": "integer"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "variant_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                }
+                            },
+                            "required": [
+                                "variant_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "customer_id",
+                    "billing_address_id",
+                    "shipping_address_id",
+                    "warehouse_id",
+                    "shipping_method_id",
+                    "lines"
+                ],
+                "title": "StoreOrderRequest"
             },
             "StoreProductImagesRequest": {
                 "type": "object",

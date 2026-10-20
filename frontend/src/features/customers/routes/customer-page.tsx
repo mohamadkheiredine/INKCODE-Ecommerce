@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useCan } from '@/features/auth/hooks/use-can'
+import { CustomerOrdersCard } from '@/features/orders/components/customer-orders-card'
 import { isApiError } from '@/lib/api/api-error'
 import { useFormatters } from '@/lib/format'
 import { apiErrorMessage } from '@/lib/forms'
@@ -25,8 +26,8 @@ import { useCustomer, useDeleteCustomer } from '../hooks/use-customers'
 import type { CustomerProfile } from '../types'
 
 /**
- * A Customer's profile: contact details and Tags, addresses, and notes. Order history
- * and Lifetime value join this page with the Orders and Payments modules.
+ * A Customer's profile: contact details and Tags, Order history, addresses, and notes.
+ * Lifetime value joins this page with the Payments module.
  */
 export function CustomerPage() {
   const { t } = useTranslation('customers')
@@ -57,7 +58,9 @@ export function CustomerPage() {
 
 function Profile({ customer }: { customer: CustomerProfile }) {
   const { t } = useTranslation('customers')
-  const canManage = useCan()('customers.manage')
+  const can = useCan()
+  const canManage = can('customers.manage')
+  const canSeeOrders = can('orders.view')
   const { date } = useFormatters()
   const navigate = useNavigate()
   const deleteCustomer = useDeleteCustomer()
@@ -155,7 +158,8 @@ function Profile({ customer }: { customer: CustomerProfile }) {
       </Card>
 
       <div className="grid items-start gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3">
+        <div className="flex flex-col gap-6 lg:col-span-3">
+          {canSeeOrders && <CustomerOrdersCard customerId={customer.id} />}
           <AddressesCard customer={customer} canManage={canManage} />
         </div>
         <div className="lg:col-span-2">

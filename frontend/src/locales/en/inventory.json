@@ -38,6 +38,8 @@
   },
   "movementTypes": {
     "receipt": "Receipt",
+    "reservation": "Reservation",
+    "release": "Release",
     "adjustment": "Adjustment",
     "transfer_out": "Transfer out",
     "transfer_in": "Transfer in"

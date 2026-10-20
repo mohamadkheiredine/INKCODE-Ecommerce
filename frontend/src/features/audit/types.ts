@@ -1,5 +1,11 @@
 /** What a User did to a record, mirroring `App\Enums\AuditAction`. */
-export const AUDIT_ACTIONS = ['created', 'updated', 'deleted', 'password_changed'] as const
+export const AUDIT_ACTIONS = [
+  'created',
+  'updated',
+  'deleted',
+  'password_changed',
+  'status_changed',
+] as const
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]
 
 /** A record's values as the audit trail kept them: only the fields that changed. */

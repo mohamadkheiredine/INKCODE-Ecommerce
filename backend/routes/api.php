@@ -32,6 +32,11 @@ use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
+use App\Http\Controllers\Orders\OrderCancellationController;
+use App\Http\Controllers\Orders\OrderConfirmationController;
+use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\Orders\OrderQuoteController;
+use App\Http\Controllers\Orders\SellableVariantController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
 use App\Http\Controllers\Settings\StoreLogoController;
@@ -152,6 +157,22 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
             ->middleware(['can:update,transfer', 'idempotent'])
             ->name("transfers.$step");
     }
+
+    // Orders: Roles with orders.view look; OrderPolicy decides who creates, confirms and
+    // cancels. Every change is safe to retry with an Idempotency-Key.
+    Route::post('/orders/quote', [OrderQuoteController::class, 'store'])->name('orders.quote');
+    Route::get('/orders/sellable-variants', [SellableVariantController::class, 'index'])->name('orders.sellable-variants');
+    Route::apiResource('orders', OrderController::class)
+        ->only(['index', 'store', 'show'])
+        ->middlewareFor('show', 'can:view,order')
+        ->middlewareFor('store', 'idempotent');
+    Route::post('/orders/{order}/confirm', [OrderConfirmationController::class, 'store'])
+        ->can('confirm', 'order')
+        ->middleware('idempotent')
+        ->name('orders.confirm');
+    Route::post('/orders/{order}/cancel', [OrderCancellationController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.cancel');
 
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])

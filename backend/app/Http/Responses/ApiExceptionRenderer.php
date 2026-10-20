@@ -13,7 +13,8 @@ use Throwable;
 /**
  * Renders every exception raised under /api as the one JSON error envelope:
  * `message`, a stable machine-readable `code`, and `errors` for validation failures.
- * A {@see BusinessRuleViolation} brings its own code (`category_has_children`, …).
+ * A {@see BusinessRuleViolation} brings its own code (`category_has_children`, …) and
+ * any `details`.
  */
 final class ApiExceptionRenderer
 {
@@ -63,7 +64,7 @@ final class ApiExceptionRenderer
         return match (true) {
             $e instanceof ValidationException => $this->respond(422, $e->getMessage(), $e->errors()),
             $e instanceof AuthenticationException => $this->respond(401, __('errors.unauthenticated')),
-            $e instanceof BusinessRuleViolation => $this->respond($e->getStatusCode(), $e->getMessage(), code: $e->errorCode),
+            $e instanceof BusinessRuleViolation => $this->respond($e->getStatusCode(), $e->getMessage(), code: $e->errorCode, details: $e->details),
             $e instanceof HttpExceptionInterface => $this->respond(
                 $e->getStatusCode(),
                 $this->messageFor($e),
@@ -76,13 +77,17 @@ final class ApiExceptionRenderer
     /**
      * @param  array<string, array<int, string>>|null  $errors
      * @param  array<string, string>  $headers
+     * @param  array<string, mixed>  $details
      */
-    private function respond(int $status, string $message, ?array $errors = null, array $headers = [], ?string $code = null): JsonResponse
+    private function respond(int $status, string $message, ?array $errors = null, array $headers = [], ?string $code = null, array $details = []): JsonResponse
     {
         $body = ['message' => $message, 'code' => $code ?? self::CODES[$status] ?? ($status >= 500 ? 'server_error' : 'http_error')];
 
         if ($errors !== null) {
             $body['errors'] = $errors;
+        }
+        if ($details !== []) {
+            $body['details'] = $details;
         }
 
         return new JsonResponse($body, $status, $headers);
