@@ -55,6 +55,8 @@
     "notFound": "Page not found",
     "categories": "Categories",
     "brands": "Brands",
+    "customers": "Customers",
+    "customer": "Customer",
     "shippingZones": "Shipping zones",
     "shippingZone": "Shipping zone",
     "carriers": "Carriers"

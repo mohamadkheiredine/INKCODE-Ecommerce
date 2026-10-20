@@ -1,11 +1,10 @@
 import { useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { intlLocale } from './format'
+import { useFormatters } from './format'
 
 /**
- * The countries an address can be in, as ISO 3166-1 alpha-2 codes, mirroring
- * `App\Support\Countries`. Names are never stored: each code is shown in the interface
- * language through `Intl.DisplayNames`.
+ * The countries an address can be in, as ISO 3166-1 alpha-2 codes: the same list as the
+ * API's `App\Support\Countries`. Only codes are stored; names come from `Intl` in the
+ * interface language.
  */
 // prettier-ignore
 export const COUNTRY_CODES = [
@@ -27,36 +26,18 @@ export const COUNTRY_CODES = [
   'VN', 'VU', 'WF', 'WS', 'YE', 'YT', 'ZA', 'ZM', 'ZW',
 ] as const
 
-export type CountryCode = (typeof COUNTRY_CODES)[number]
-
-export function isCountryCode(value: string): value is CountryCode {
-  return (COUNTRY_CODES as readonly string[]).includes(value)
+/** The country's name in a locale ("LB" → "Lebanon" / "لبنان"), or the code if unknown. */
+export function countryName(code: string, locale: string): string {
+  return new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code
 }
 
-export type CountryNames = {
-  /** "Lebanon" / "لبنان"; the code itself if the browser does not know it. */
-  name: (code: string) => string
-  /** Every country, sorted by its name in the interface language. */
-  options: { code: CountryCode; name: string }[]
-}
-
-export function createCountryNames(language: string | undefined): CountryNames {
-  const locale = intlLocale(language)
-  const names = new Intl.DisplayNames([locale], { type: 'region', fallback: 'code' })
-  const name = (code: string) => names.of(code) ?? code
-  const collator = new Intl.Collator(locale)
-
-  return {
-    name,
-    options: COUNTRY_CODES.map((code) => ({ code, name: name(code) })).sort((a, b) =>
-      collator.compare(a.name, b.name),
-    ),
-  }
-}
-
-/** Country names for the active interface language; they update when the language switches. */
-export function useCountryNames(): CountryNames {
-  const { i18n } = useTranslation()
-  const language = i18n.resolvedLanguage
-  return useMemo(() => createCountryNames(language), [language])
+/** Every country as a select option, sorted by its name in the interface language. */
+export function useCountryOptions(): { value: string; label: string }[] {
+  const { locale } = useFormatters()
+  return useMemo(() => {
+    const collator = new Intl.Collator(locale)
+    return COUNTRY_CODES.map((code) => ({ value: code, label: countryName(code, locale) })).sort(
+      (a, b) => collator.compare(a.label, b.label),
+    )
+  }, [locale])
 }

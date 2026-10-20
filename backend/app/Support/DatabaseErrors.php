@@ -54,6 +54,20 @@ final class DatabaseErrors
      */
     public static function refuseDuplicateSlug(Closure $save): mixed
     {
+        return self::refuseDuplicate($save, 'slug');
+    }
+
+    /**
+     * Runs a save; a duplicate value from a simultaneous save answers 422 on `$field`, the
+     * one unique field the save can collide on.
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $save
+     * @return T
+     */
+    public static function refuseDuplicate(Closure $save, string $field): mixed
+    {
         try {
             return $save();
         } catch (QueryException $exception) {
@@ -61,13 +75,13 @@ final class DatabaseErrors
                 throw $exception;
             }
 
-            throw ValidationException::withMessages(['slug' => __('validation.unique', ['attribute' => 'slug'])]);
+            throw ValidationException::withMessages([$field => __('validation.unique', ['attribute' => $field])]);
         }
     }
 
     /**
-     * Runs a save; a duplicate on one of the named unique indexes, from a simultaneous
-     * save, answers 422 on that index's field with its message.
+     * Runs a save that can collide on several unique indexes; a duplicate on one of them,
+     * from a simultaneous save, answers 422 on that index's field with its message.
      *
      * @template T
      *
@@ -75,7 +89,7 @@ final class DatabaseErrors
      * @param  array<string, array{string, string}>  $fieldsByIndex  index name => [field, message]
      * @return T
      */
-    public static function refuseDuplicate(Closure $save, array $fieldsByIndex): mixed
+    public static function refuseDuplicateOnIndexes(Closure $save, array $fieldsByIndex): mixed
     {
         try {
             return $save();

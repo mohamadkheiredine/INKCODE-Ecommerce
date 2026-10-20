@@ -21,7 +21,7 @@ final class SaveShippingZone
      */
     public function handle(?ShippingZone $zone, array $values): ShippingZone
     {
-        return DatabaseErrors::refuseDuplicate(fn (): ShippingZone => DB::transaction(function () use ($zone, $values): ShippingZone {
+        return DatabaseErrors::refuseDuplicateOnIndexes(fn (): ShippingZone => DB::transaction(function () use ($zone, $values): ShippingZone {
             $before = $zone?->auditValues();
             $zone ??= new ShippingZone;
 

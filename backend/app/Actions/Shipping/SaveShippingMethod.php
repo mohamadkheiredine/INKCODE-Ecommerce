@@ -33,8 +33,6 @@ final class SaveShippingMethod
             $this->auditTrail->updated($method, $before);
 
             return $method;
-        }), [
-            'shipping_methods_shipping_zone_id_name_unique' => ['name', __('validation.unique', ['attribute' => 'name'])],
-        ]);
+        }), 'name');
     }
 }

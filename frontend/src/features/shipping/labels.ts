@@ -1,16 +1,19 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCountryNames } from '@/lib/countries'
+import { countryName } from '@/lib/countries'
+import { useFormatters } from '@/lib/format'
 import type { ZoneLocation } from './types'
 
 /** "Lebanon" for a whole country, "Beirut, Lebanon" for a city, in the interface language. */
 export function usePlaceName(): (location: ZoneLocation) => string {
   const { t } = useTranslation('shipping')
-  const { name } = useCountryNames()
+  const { locale } = useFormatters()
   return useCallback(
-    ({ country_code, city }: ZoneLocation) =>
-      city === null ? name(country_code) : t('zones.cityIn', { city, country: name(country_code) }),
-    [t, name],
+    ({ country_code, city }: ZoneLocation) => {
+      const country = countryName(country_code, locale)
+      return city === null ? country : t('zones.cityIn', { city, country })
+    },
+    [t, locale],
   )
 }
 

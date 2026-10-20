@@ -32,8 +32,6 @@ final class SaveCarrier
             $this->auditTrail->updated($carrier, $before);
 
             return $carrier;
-        }), [
-            'carriers_name_unique' => ['name', __('validation.unique', ['attribute' => 'name'])],
-        ]);
+        }), 'name');
     }
 }
