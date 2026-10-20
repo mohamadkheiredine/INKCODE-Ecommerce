@@ -65,6 +65,8 @@
     "shippingZones": "Shipping zones",
     "shippingZone": "Shipping zone",
     "carriers": "Carriers",
+    "users": "Users",
+    "roles": "Roles & permissions",
     "auditLog": "Audit log"
   },
   "navGroups": {

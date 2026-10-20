@@ -2,6 +2,8 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\Access\RoleController;
+use App\Http\Controllers\Access\UserActivationController;
+use App\Http\Controllers\Access\UserController;
 use App\Http\Controllers\Audit\AuditAuthorController;
 use App\Http\Controllers\Audit\AuditEntryController;
 use App\Http\Controllers\Auth\CurrentUserController;
@@ -33,6 +35,7 @@ use App\Http\Controllers\Shipping\CarrierController;
 use App\Http\Controllers\Shipping\ShippingMethodController;
 use App\Http\Controllers\Shipping\ShippingQuoteController;
 use App\Http\Controllers\Shipping\ShippingZoneController;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Support\Facades\Route;
 
 // Every route in this file is served under /api/v1 (see bootstrap/app.php).
@@ -40,7 +43,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/login', [SessionController::class, 'store'])->name('auth.login');
 Route::get('/auth/demo-accounts', [DemoAccountController::class, 'index'])->name('auth.demo-accounts');
 
-Route::middleware('auth:sanctum')->group(function () {
+// EnsureUserIsActive: a User an Admin deactivates is signed out on their next request.
+Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function () {
     Route::get('/auth/me', [CurrentUserController::class, 'show'])->name('auth.me');
     Route::post('/auth/logout', [SessionController::class, 'destroy'])->name('auth.logout');
 
@@ -136,7 +140,17 @@ Route::middleware('auth:sanctum')->group(function () {
         ->can(Permission::AuditView->value)
         ->name('audit-entries.users');
 
+    // Users & Roles: only the Admin (users.manage). Deactivating never deletes a User.
     Route::get('/roles', [RoleController::class, 'index'])
         ->can(Permission::UsersManage->value)
         ->name('roles.index');
+    Route::apiResource('users', UserController::class)
+        ->except('destroy')
+        ->middlewareFor('show', 'can:view,user');
+    Route::post('/users/{user}/deactivate', [UserActivationController::class, 'deactivate'])
+        ->can('update', 'user')
+        ->name('users.deactivate');
+    Route::post('/users/{user}/reactivate', [UserActivationController::class, 'reactivate'])
+        ->can('update', 'user')
+        ->name('users.reactivate');
 });

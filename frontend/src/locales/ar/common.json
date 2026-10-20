@@ -65,6 +65,8 @@
     "shippingZones": "مناطق الشحن",
     "shippingZone": "منطقة الشحن",
     "carriers": "شركات الشحن",
+    "users": "المستخدمون",
+    "roles": "الأدوار والصلاحيات",
     "auditLog": "سجل التدقيق"
   },
   "navGroups": {
