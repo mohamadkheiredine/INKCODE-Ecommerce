@@ -13,6 +13,7 @@ import arNotifications from '@/locales/ar/notifications.json'
 import arProfile from '@/locales/ar/profile.json'
 import arSettings from '@/locales/ar/settings.json'
 import arShipping from '@/locales/ar/shipping.json'
+import arUsers from '@/locales/ar/users.json'
 import enAudit from '@/locales/en/audit.json'
 import enAuth from '@/locales/en/auth.json'
 import enCatalog from '@/locales/en/catalog.json'
@@ -25,6 +26,7 @@ import enNotifications from '@/locales/en/notifications.json'
 import enProfile from '@/locales/en/profile.json'
 import enSettings from '@/locales/en/settings.json'
 import enShipping from '@/locales/en/shipping.json'
+import enUsers from '@/locales/en/users.json'
 import { setApiLanguage } from './api/client'
 
 export const LANGUAGES = ['en', 'ar'] as const
@@ -51,6 +53,7 @@ export const resources = {
     profile: enProfile,
     settings: enSettings,
     shipping: enShipping,
+    users: enUsers,
   },
   ar: {
     common: arCommon,
@@ -65,6 +68,7 @@ export const resources = {
     profile: arProfile,
     settings: arSettings,
     shipping: arShipping,
+    users: arUsers,
   },
 } as const
 
@@ -100,6 +104,7 @@ void i18n
       'profile',
       'settings',
       'shipping',
+      'users',
     ],
     interpolation: { escapeValue: false },
     detection: {

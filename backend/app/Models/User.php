@@ -34,7 +34,9 @@ use Spatie\Permission\Traits\HasRoles;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements Auditable
 {
-    use Audited;
+    use Audited {
+        auditValues as private attributeAuditValues;
+    }
 
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -51,6 +53,7 @@ class User extends Authenticatable implements Auditable
     protected $attributes = [
         'locale' => 'en',
         'theme' => 'light',
+        'is_active' => true,
     ];
 
     /**
@@ -77,6 +80,16 @@ class User extends Authenticatable implements Auditable
     protected function auditExcept(): array
     {
         return ['email_verified_at'];
+    }
+
+    /**
+     * The audited attributes plus the User's Role, so a Role change is in the trail.
+     *
+     * @return array<string, mixed>
+     */
+    public function auditValues(): array
+    {
+        return [...$this->attributeAuditValues(), 'role' => $this->role()?->value];
     }
 
     /**

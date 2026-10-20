@@ -245,6 +245,26 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'users',
+            handle: crumb('users'),
+            lazy: async () => ({
+              Component: withPermission(
+                'users.manage',
+                (await import('@/features/users/routes/users-page')).UsersPage,
+              ),
+            }),
+          },
+          {
+            path: 'roles',
+            handle: crumb('roles'),
+            lazy: async () => ({
+              Component: withPermission(
+                'users.manage',
+                (await import('@/features/users/routes/roles-page')).RolesPage,
+              ),
+            }),
+          },
+          {
             path: 'audit-log',
             handle: crumb('auditLog'),
             lazy: async () => ({
