@@ -142,6 +142,15 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - The idempotency middleware first rolled back twice when it replayed an answer, wiping the outer transaction; a test caught it and the flow was restructured.
   - Security pass (inline): every route authorizes through a Form Request, a Policy or a route `can`; stock on the Product page is only sent to Roles with `inventory.view`; idempotency keys are scoped per User and bound to the request body.
 
+- **Orders (#16), decisions and corrections:**
+  - Pricing lives in one service (`OrderPricing`, BCMath): VAT per line on the line amount, rounded half up per line, untaxed shipping. A test proves per-line rounding (two $2.50 lines at 5% carry $0.13 each, $0.26 in total, not $0.25). The live quote endpoint calls the same service, so the form never computes money itself.
+  - Order numbers come from a per-year counter row locked until the Order commits, so numbers are unique and gap-free.
+  - Status changes go through one action (`MoveOrderStatus`) that locks the Order row and asks `OrderStatus::canMoveTo()`; confirming twice or cancelling a Cancelled Order is a 409. Reserving checks every line under the Variant and balance locks first, so a refusal names each line that lacks stock (`details.lines`), and nothing is reserved.
+  - `php artisan demo:race` starts separate PHP processes that confirm 20 Orders for 5 units at the same moment; a Pest test runs it and checks exactly 5 succeed and balances equal their movements.
+  - A key reused with a different body is now 409 (it was 422), as the ticket asks; ADR 0008 is updated.
+  - Corrected in review: MySQL's JSON type reorders object keys, so line options are rebuilt in reading order; the Order form's search hook was first called inside a callback (rules of hooks) and an address effect depended on an unstable callback.
+  - Security pass (inline): every route authorizes (Form Request, Policy or route `can`); addresses must belong to the chosen Customer; only Active Products can be ordered; the Shipping method must deliver to the shipping address; `LIKE` terms are escaped; confirm, cancel and create take an `Idempotency-Key`.
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_
