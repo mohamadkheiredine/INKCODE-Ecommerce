@@ -28,6 +28,10 @@ _Avoid_: Tier, cohort, group
 A free label a User puts on a Customer (for example "wholesale").
 _Avoid_: Label, category
 
+**Default address**:
+The address a Customer's Orders are billed to (default billing) or shipped to (default shipping) unless another is chosen; a Customer with addresses always has exactly one of each, possibly the same address.
+_Avoid_: Primary address, main address
+
 **Lifetime value**:
 The Revenue of a Customer's Counted orders minus that Customer's Refunds.
 _Avoid_: LTV (in the interface), total spent, customer value
