@@ -25,9 +25,9 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 
 ## Phase 2: Catalog, customers, inventory, orders
 
-- [ ] Products CRUD: images, categories, brands, SKU, price, cost, SEO fields, tags, status (Categories in two levels and Brands with logos are done, #9)
-- [ ] Variant editor (size / color / other attributes), each variant with its own SKU, price, stock
-- [ ] Server-side filtering, sorting, pagination, bulk actions (TanStack Table)
+- [x] Products CRUD: images, categories, brands, SKU, price, cost, SEO fields, tags, status (#10; stock per Warehouse arrives with #11)
+- [x] Variant editor (size / color / other attributes), each variant with its own SKU, price, Average cost and Low-stock threshold (#10; stock per Warehouse with #11)
+- [x] Server-side filtering, sorting, pagination, bulk actions (TanStack Table) (#9 lists, #10 Products bulk activate / archive / delete)
 - [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters
 - [ ] Warehouses (3+): on-hand, reserved, available per variant per warehouse
 - [ ] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation

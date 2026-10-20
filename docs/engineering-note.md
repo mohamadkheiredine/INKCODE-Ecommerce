@@ -28,6 +28,11 @@
 - **One audit trail, written explicitly** ([ADR 0007](adr/0007-explicit-audit-trail-and-one-list-convention.md)): each action calls `AuditTrail` inside its own transaction, so an entry exists exactly when the change does. Updates record only the values that changed, and nothing at all when nothing changed. Hidden attributes such as passwords are never recorded, and entries can't be edited or deleted. Model observers were rejected because they also fire for seeders and can't describe actions that aren't saves.
 - **One list convention** (ADR 0007): `search`, `filter[...]`, `sort`/`-sort`, `page` and `per_page`. Each list's Form Request declares what it allows, and an unknown sort or filter gets a 422 that names the allowed ones, so a typo never silently returns everything. The search treats `%` and `_` as plain characters, and the id breaks ties so rows never jump between pages. The SPA keeps the same parameters in its URL.
 - **Refusals with their own codes:** `BusinessRuleViolation` carries a stable code (`category_has_children`, `in_use`) through the shared error envelope. Deletes that other rows still reference are refused by restricting foreign keys and come back as a 409.
+- **Variants are generated, never typed in** (#10): `GenerateVariants` builds every combination of one chosen value per Attribute and creates only the missing ones. Existing Variants and their data are never touched. It locks the Product row, and a unique `(product_id, combination_key)` index (the sorted value ids) backs that up, so two simultaneous generations can't create a combination twice. All of a Product's Variants differ by the same Attributes, so values of other Attributes are refused with a clear 422 until its Variants are deleted.
+- **SKUs:** built from the Product name and the value codes (`CLASSIC-TEE-RED-M`), with `-2`, `-3`… appended when one is taken. SKUs are unique across the store and editable. Saving several Variants at once lets two of them swap SKUs: changing rows are first parked on `#id`, a value the SKU pattern can't produce, so the unique index never sees a duplicate. The same trick lets Attribute values swap names and codes.
+- **Money as DECIMAL strings:** prices are `DECIMAL(12,2)` and Average cost is `DECIMAL(14,4)` (so re-weighting on Receipts in #11 doesn't drift). They travel as strings end to end. The price filter compares in SQL with `CAST(? AS DECIMAL)`, never as floats. A Product's list price is its lowest Variant price (its base price while it has none), and both the price filter and the sort use it.
+- **Deleting what was sold:** Variants cascade from their Product, and Order lines (#16) must reference Variants with `restrictOnDelete()`. Deleting a Product that was ever ordered then fails in the database and comes back as 409 `in_use` ("archive it instead"). Bulk delete skips those Products and reports why.
+- **Snapshot-friendly Variants:** `Variant::options()` returns the combination as `[{attribute, value}]`, ready for Order lines to copy along with SKU, name, price and the taxable flag.
 - _(add: order state machine, idempotency, stock service as they land)_
 
 ## AI tools used
@@ -105,6 +110,11 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - upload type, size and generated file names, with SVG refused;
   - allow-listed sort columns and escaped `LIKE` terms;
   - Policies on every write, and no mass-assignable `logo_path`.
+- **Products (#10), caught in review:**
+  - The pivot table first used a non-conventional name, so Eloquent looked for `attribute_value_variant`. It was renamed to Laravel's convention instead of overriding it.
+  - The Variant builder and the Variants table shared a React key and remounted together.
+  - Arabic plurals needed all six forms (zero, one, two, few, many, other).
+  - Security, checked inline: image type and size limits with SVG refused; files stored under generated names and removed only after the change is saved; the price filter uses bound parameters; scoped route bindings, so another Product's Variant or image answers 404; Policies on every write, including bulk actions.
 
 ## Known limitations
 
