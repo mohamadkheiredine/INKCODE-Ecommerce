@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar'
 import { useCurrentUser } from '@/features/auth/hooks/use-auth'
 import type { CurrentUser } from '@/features/auth/types'
 import { useApplySavedPreferences } from '@/features/profile/hooks/use-profile'
+import { StoreCurrencyProvider } from '@/features/settings/components/store-currency-provider'
 import { AppHeader } from './app-header'
 import { AppSidebar } from './app-sidebar'
 
@@ -30,25 +31,27 @@ function Shell({ user }: { user: CurrentUser }) {
   useApplySavedPreferences(user)
 
   return (
-    <SidebarProvider defaultOpen={sidebarStartsOpen()}>
-      <a
-        href="#main-content"
-        className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:start-4 focus:top-3"
-      >
-        {t('shell.skipToContent')}
-      </a>
-      <AppSidebar />
-      <div className="relative flex min-w-0 flex-1 flex-col bg-background">
-        <AppHeader user={user} />
-        <RouteProgress />
-        <main id="main-content" tabIndex={-1} className="flex-1">
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <Outlet />
-          </div>
-        </main>
-      </div>
-      <ScrollRestoration />
-    </SidebarProvider>
+    <StoreCurrencyProvider>
+      <SidebarProvider defaultOpen={sidebarStartsOpen()}>
+        <a
+          href="#main-content"
+          className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:start-4 focus:top-3"
+        >
+          {t('shell.skipToContent')}
+        </a>
+        <AppSidebar />
+        <div className="relative flex min-w-0 flex-1 flex-col bg-background">
+          <AppHeader user={user} />
+          <RouteProgress />
+          <main id="main-content" tabIndex={-1} className="flex-1">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+        <ScrollRestoration />
+      </SidebarProvider>
+    </StoreCurrencyProvider>
   )
 }
 

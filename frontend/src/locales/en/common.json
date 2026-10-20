@@ -59,8 +59,12 @@
     "newProduct": "New Product",
     "editProduct": "Edit Product",
     "attributes": "Attributes",
+    "settings": "Settings",
     "customers": "Customers",
-    "customer": "Customer"
+    "customer": "Customer",
+    "shippingZones": "Shipping zones",
+    "shippingZone": "Shipping zone",
+    "carriers": "Carriers"
   },
   "navGroups": {
     "dashboard": "Dashboard",
@@ -77,7 +81,8 @@
     "skipToContent": "Skip to content",
     "toggleSidebar": "Toggle sidebar",
     "userMenu": "Open the user menu",
-    "loadingPage": "Loading the page…"
+    "loadingPage": "Loading the page…",
+    "storeCurrency": "Prices in {{code}}"
   },
   "dataTable": {
     "sortBy": "Sort by {{column}}",

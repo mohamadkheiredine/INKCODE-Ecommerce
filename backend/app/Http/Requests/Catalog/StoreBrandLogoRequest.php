@@ -3,19 +3,16 @@
 namespace App\Http\Requests\Catalog;
 
 use App\Models\Brand;
+use App\Support\LogoFile;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Validation\Rules\File;
 
 /**
- * A Brand's logo: a PNG, JPEG or WebP image of at most 1 MB. SVG is refused, because
- * an SVG served from our own origin can carry scripts.
+ * A Brand's logo (see {@see LogoFile::rules()}).
  */
 class StoreBrandLogoRequest extends FormRequest
 {
-    public const int MAX_KILOBYTES = 1024;
-
     public function authorize(): bool
     {
         $brand = $this->route('brand');
@@ -28,9 +25,7 @@ class StoreBrandLogoRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'logo' => ['required', File::types(['png', 'jpg', 'jpeg', 'webp'])->max(self::MAX_KILOBYTES), 'image'],
-        ];
+        return ['logo' => LogoFile::rules()];
     }
 
     /**

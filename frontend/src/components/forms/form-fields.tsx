@@ -9,6 +9,12 @@ import {
 import { useTranslation } from 'react-i18next'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -48,8 +54,13 @@ export function TextField<T extends FieldValues>({
   description,
   idPrefix,
   className,
+  unit,
   ...inputProps
-}: BaseFieldProps<T> & Omit<ComponentProps<typeof Input>, 'name' | 'id'>) {
+}: BaseFieldProps<T> &
+  Omit<ComponentProps<typeof Input>, 'name' | 'id'> & {
+    /** Shown after the value, inside the field ("days", "%"). */
+    unit?: string
+  }) {
   const message = useFieldMessage()
   const id = ids(idPrefix, name)
 
@@ -57,24 +68,34 @@ export function TextField<T extends FieldValues>({
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState }) => (
-        <Field data-invalid={fieldState.invalid}>
-          <FieldLabel htmlFor={id.id}>{label}</FieldLabel>
-          <Input
-            {...inputProps}
-            {...field}
-            value={field.value ?? ''}
-            id={id.id}
-            aria-invalid={fieldState.invalid}
-            aria-describedby={
-              cn(fieldState.error && id.error, description && id.description) || undefined
-            }
-            className={cn('h-10 rounded-lg bg-background', className)}
-          />
-          {description && <FieldDescription id={id.description}>{description}</FieldDescription>}
-          <FieldError id={id.error}>{message(fieldState.error)}</FieldError>
-        </Field>
-      )}
+      render={({ field, fieldState }) => {
+        const input = {
+          ...inputProps,
+          ...field,
+          value: field.value ?? '',
+          id: id.id,
+          'aria-invalid': fieldState.invalid,
+          'aria-describedby':
+            cn(fieldState.error && id.error, description && id.description) || undefined,
+        }
+        return (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={id.id}>{label}</FieldLabel>
+            {unit ? (
+              <InputGroup className="h-10 rounded-lg bg-background">
+                <InputGroupInput {...input} className={className} />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>{unit}</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+            ) : (
+              <Input {...input} className={cn('h-10 rounded-lg bg-background', className)} />
+            )}
+            {description && <FieldDescription id={id.description}>{description}</FieldDescription>}
+            <FieldError id={id.error}>{message(fieldState.error)}</FieldError>
+          </Field>
+        )
+      }}
     />
   )
 }

@@ -24,6 +24,13 @@ use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
+use App\Http\Controllers\Settings\StoreLogoController;
+use App\Http\Controllers\Settings\StoreProfileController;
+use App\Http\Controllers\Settings\StoreSettingsController;
+use App\Http\Controllers\Shipping\CarrierController;
+use App\Http\Controllers\Shipping\ShippingMethodController;
+use App\Http\Controllers\Shipping\ShippingQuoteController;
+use App\Http\Controllers\Shipping\ShippingZoneController;
 use Illuminate\Support\Facades\Route;
 
 // Every route in this file is served under /api/v1 (see bootstrap/app.php).
@@ -92,6 +99,34 @@ Route::middleware('auth:sanctum')->group(function () {
         ->scoped()
         ->middlewareFor('destroy', 'can:update,customer');
     Route::apiResource('customers.notes', CustomerNoteController::class)->only(['index', 'store']);
+
+    // Shipping: Roles that see Orders may look; Policies let only shipping.manage change.
+    // The quote is for Roles that create Orders (QuoteShippingRequest).
+    Route::get('/shipping/quote', [ShippingQuoteController::class, 'show'])->name('shipping.quote');
+    Route::apiResource('shipping-zones', ShippingZoneController::class)
+        ->middlewareFor('show', 'can:view,shipping_zone')
+        ->middlewareFor('destroy', 'can:delete,shipping_zone');
+    Route::post('/shipping-zones/{shipping_zone}/methods', [ShippingMethodController::class, 'store'])->name('shipping-zones.methods.store');
+    Route::put('/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'update'])->name('shipping-methods.update');
+    Route::delete('/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'destroy'])
+        ->can('delete', 'shipping_method')
+        ->name('shipping-methods.destroy');
+    Route::apiResource('carriers', CarrierController::class)
+        ->middlewareFor('show', 'can:view,carrier')
+        ->middlewareFor('destroy', 'can:delete,carrier');
+
+    // Settings: only the Admin (settings.manage) sees or changes them all.
+    Route::get('/settings', [StoreSettingsController::class, 'show'])
+        ->can(Permission::SettingsManage->value)
+        ->name('settings.show');
+    Route::put('/settings', [StoreSettingsController::class, 'update'])->name('settings.update');
+    Route::post('/settings/logo', [StoreLogoController::class, 'store'])->name('settings.logo.store');
+    Route::delete('/settings/logo', [StoreLogoController::class, 'destroy'])
+        ->can(Permission::SettingsManage->value)
+        ->name('settings.logo.destroy');
+
+    // The public part of the settings (name, logo, Store currency): every signed-in User.
+    Route::get('/store', [StoreProfileController::class, 'show'])->name('store.show');
 
     Route::get('/roles', [RoleController::class, 'index'])
         ->can(Permission::UsersManage->value)

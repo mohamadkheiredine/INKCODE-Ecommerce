@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { asLanguage } from './i18n'
 
@@ -13,17 +13,40 @@ export function intlLocale(language: string | undefined): string {
 /** Amounts arrive from the API as decimal strings ("1234.50") and are never turned into floats. */
 export type Amount = number | `${number}`
 
+/** The Store currency: its ISO code and the symbol chosen for it in Settings. */
+export type StoreCurrency = { code: string; symbol: string }
+
+/** The Store currency until the store's own settings have loaded. */
+export const DEFAULT_CURRENCY: StoreCurrency = { code: 'USD', symbol: '$' }
+
+/** The Store currency every amount on screen is written in; the app shell provides it. */
+export const CurrencyContext = createContext<StoreCurrency>(DEFAULT_CURRENCY)
+
 export type Formatters = ReturnType<typeof createFormatters>
 
-export function createFormatters(language: string | undefined) {
+export function createFormatters(
+  language: string | undefined,
+  currency: StoreCurrency = DEFAULT_CURRENCY,
+) {
   const locale = intlLocale(language)
+  // Every amount is stored to the cent, so it is shown to the cent in any currency.
+  const moneyFormat = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 
   return {
     locale,
     number: (value: number, options?: Intl.NumberFormatOptions) =>
       new Intl.NumberFormat(locale, options).format(value),
-    money: (amount: Amount, currency = 'USD') =>
-      new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount),
+    /** An amount in the Store currency, written with the symbol chosen in Settings. */
+    money: (amount: Amount) =>
+      moneyFormat
+        .formatToParts(amount)
+        .map((part) => (part.type === 'currency' ? currency.symbol : part.value))
+        .join(''),
     date: (value: Date | string, options: Intl.DateTimeFormatOptions = { dateStyle: 'medium' }) =>
       new Intl.DateTimeFormat(locale, options).format(new Date(value)),
     dateTime: (value: Date | string) =>
@@ -52,9 +75,13 @@ const RELATIVE_TIME_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ['minute', 60],
 ]
 
-/** Formatters for the active interface language; they update when the language switches. */
+/**
+ * Formatters for the active interface language and the Store currency; they update when
+ * either changes.
+ */
 export function useFormatters(): Formatters {
   const { i18n } = useTranslation()
   const language = i18n.resolvedLanguage
-  return useMemo(() => createFormatters(language), [language])
+  const currency = useContext(CurrencyContext)
+  return useMemo(() => createFormatters(language, currency), [language, currency])
 }

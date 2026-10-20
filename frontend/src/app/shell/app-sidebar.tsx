@@ -4,6 +4,7 @@ import { Logo, LogoMark } from '@/components/brand/logo'
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useDirection } from '@/components/ui/direction'
 import { useCan } from '@/features/auth/hooks/use-can'
+import { StoreBadge } from '@/features/settings/components/store-badge'
 import { type NavEntry, visibleNavigation } from '@/lib/navigation'
 import { NAV_ENTRIES } from '../navigation'
 
@@ -63,6 +65,9 @@ export function AppSidebar() {
           ))}
         </nav>
       </SidebarContent>
+      <SidebarFooter className="p-3 group-data-[collapsible=icon]:p-2">
+        <StoreBadge />
+      </SidebarFooter>
       <SidebarRail aria-label={t('shell.toggleSidebar')} />
     </Sidebar>
   )

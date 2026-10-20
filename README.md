@@ -170,6 +170,16 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Several addresses per Customer, always with exactly one default billing and one default shipping address: the first address takes both, another can take either over, and removing a default hands it to the oldest remaining address. MySQL itself refuses a second default.
   - Tags are typed freely (or picked from existing ones) and created on save; internal notes are signed by their author and timestamped, and are never edited.
   - Admin, Sales and Support manage Customers; Operations, Finance and Viewer only look; Inventory has no access. Every change is audited. 300 demo Customers are seeded.
+- **Shipping zones, Shipping methods and Carriers (#14):**
+  - A Shipping zone covers whole countries or single cities; a place belongs to one zone only. Each zone has flat-price Shipping methods (price, estimated delivery days, active flag).
+  - Quoting an address checks the city first, then the country, and offers the zone's active methods cheapest first; an address no zone covers gets no methods and a clear message. The Shipping zones page has a "Check an address" card that asks the same quote Order creation will.
+  - Carriers have an optional tracking link template holding `{tracking_number}`, with a live example in the form.
+  - Roles that see Orders can look; only Admin and Operations change shipping, and every change is audited.
+
+- **Store settings (#15):**
+  - The Admin edits the store profile and logo, the Store currency (code and symbol), the VAT rate (5% by default), the Deduction stage (Shipped by default), the Return window (14 days), the default Low-stock threshold (5) and the language and theme new Users start with. Each business setting is explained on screen in English and Arabic, with a live preview of how amounts will look.
+  - Settings live in one typed, database-checked row, are cached for every module that reads them, and every change writes an audit entry. Only the Admin can see or change them all; every signed-in User sees the store's name, logo and currency in the sidebar.
+  - Every amount in the SPA is written in the Store currency with its chosen symbol, always to the cent.
 
 - **Products with generated Variants (#10):**
   - A shared Attribute library (Size, Color, Material…) whose values are unique within each Attribute and carry the codes SKUs are made of.
@@ -185,5 +195,6 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
 - A Customer's Order history and Lifetime value join the profile with Orders (#16, #17) and Payments (#19); Segments and the activity/value filters come with #22. Refusing to delete a Customer who has Orders relies on the restricting foreign key Orders add in #16.
 - Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.
 - A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).
+- Changing the Store currency relabels amounts; it never converts them (one currency, no exchange rates). The default language and theme apply to Users created from #25 on.
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.
 - Payments use a mock gateway adapter. No live payment provider is integrated (per the brief).

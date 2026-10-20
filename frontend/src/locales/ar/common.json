@@ -59,8 +59,12 @@
     "newProduct": "منتج جديد",
     "editProduct": "تعديل المنتج",
     "attributes": "السمات",
+    "settings": "الإعدادات",
     "customers": "العملاء",
-    "customer": "العميل"
+    "customer": "العميل",
+    "shippingZones": "مناطق الشحن",
+    "shippingZone": "منطقة الشحن",
+    "carriers": "شركات الشحن"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",
@@ -77,7 +81,8 @@
     "skipToContent": "تخطَّ إلى المحتوى",
     "toggleSidebar": "إظهار الشريط الجانبي أو إخفاؤه",
     "userMenu": "فتح قائمة المستخدم",
-    "loadingPage": "جارٍ تحميل الصفحة…"
+    "loadingPage": "جارٍ تحميل الصفحة…",
+    "storeCurrency": "الأسعار بعملة {{code}}"
   },
   "dataTable": {
     "sortBy": "رتّب حسب {{column}}",

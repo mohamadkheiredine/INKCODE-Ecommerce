@@ -79,4 +79,33 @@ final class DatabaseErrors
             throw ValidationException::withMessages([$field => $message ?? __('validation.unique', ['attribute' => $field])]);
         }
     }
+
+    /**
+     * Runs a save that can collide on several unique indexes; a duplicate on one of them,
+     * from a simultaneous save, answers 422 on that index's field with its message.
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $save
+     * @param  array<string, array{string, string}>  $fieldsByIndex  index name => [field, message]
+     * @return T
+     */
+    public static function refuseDuplicateOnIndexes(Closure $save, array $fieldsByIndex): mixed
+    {
+        try {
+            return $save();
+        } catch (QueryException $exception) {
+            // MySQL names the index at the end: "… for key 'shipping_zones.shipping_zones_name_unique'".
+            $detail = (string) ($exception->errorInfo[2] ?? '');
+            if (($exception->errorInfo[1] ?? null) === self::MYSQL_DUPLICATE_ENTRY) {
+                foreach ($fieldsByIndex as $index => [$field, $message]) {
+                    if (str_contains($detail, "$index'")) {
+                        throw ValidationException::withMessages([$field => $message]);
+                    }
+                }
+            }
+
+            throw $exception;
+        }
+    }
 }
