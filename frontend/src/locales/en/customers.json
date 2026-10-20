@@ -1,0 +1,118 @@
+{
+  "description": "The people you sell to: how to reach them, where they live, and what the team knows about them.",
+  "new": "New Customer",
+  "search": "Search by name, email or phone",
+  "tagFilter": "Tag",
+  "allTags": "All Tags",
+  "loading": "Loading Customers…",
+  "noPhone": "No phone",
+  "emptyTitle": "No Customers yet",
+  "emptyDescription": "Add your first Customer to keep their contact details, addresses and notes in one place.",
+  "emptyDescriptionReadOnly": "Customers appear here once a Sales or Support User adds them.",
+  "deleteDescription": "Their addresses and notes are deleted too. A Customer who has Orders cannot be deleted.",
+  "fields": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "tags": "Tags",
+    "since": "Customer since"
+  },
+  "form": {
+    "newTitle": "New Customer",
+    "editTitle": "Edit Customer",
+    "description": "A name and at least an email or a phone number.",
+    "contactHint": "Enter an email, a phone number, or both.",
+    "create": "Add Customer"
+  },
+  "tags": {
+    "placeholder": "Type a Tag and press Enter",
+    "hint": "Press Enter or a comma to add a Tag. New Tags are created when you save.",
+    "suggestions": "Existing Tags",
+    "remove": "Remove the Tag {{name}}"
+  },
+  "toasts": {
+    "created": "Customer added.",
+    "saved": "Customer saved.",
+    "deleted": "Customer deleted."
+  },
+  "profile": {
+    "since": "Customer since {{date}}",
+    "none": "Not given",
+    "noTags": "No Tags",
+    "notFoundTitle": "Customer not found",
+    "notFoundDescription": "This Customer doesn't exist or was deleted.",
+    "backToList": "Back to Customers"
+  },
+  "addresses": {
+    "title": "Addresses",
+    "description": "One default address for billing and one for shipping.",
+    "add": "Add address",
+    "newTitle": "New address",
+    "editTitle": "Edit address",
+    "formDescription": "Where the Customer receives Orders or invoices.",
+    "firstDescription": "The first address becomes the default for billing and shipping.",
+    "chooseCountry": "Choose a country",
+    "emptyTitle": "No addresses yet",
+    "emptyDescription": "Add an address so Orders can be billed and shipped.",
+    "emptyReadOnly": "This Customer has no addresses yet.",
+    "added": "Address added.",
+    "saved": "Address saved.",
+    "removed": "Address removed.",
+    "remove": "Remove",
+    "removeDescription": "The address is removed from this Customer.",
+    "removeDefaultDescription": "This is a default address. The Customer's oldest remaining address becomes the default instead.",
+    "keepsDefault": "This is the default now. To change it, make another address the default.",
+    "fields": {
+      "label": "Label",
+      "recipient_name": "Recipient",
+      "phone": "Phone",
+      "country_code": "Country",
+      "city": "City",
+      "line1": "Address line 1",
+      "line2": "Address line 2 (optional)",
+      "postal_code": "Postal code (optional)"
+    },
+    "useAsDefault": {
+      "billing": "Use as the default billing address",
+      "shipping": "Use as the default shipping address"
+    },
+    "defaultBadge": {
+      "billing": "Default billing",
+      "shipping": "Default shipping"
+    },
+    "makeDefault": {
+      "billing": "Make default for billing",
+      "shipping": "Make default for shipping"
+    },
+    "madeDefault": {
+      "billing": "Default billing address changed.",
+      "shipping": "Default shipping address changed."
+    }
+  },
+  "notes": {
+    "title": "Notes",
+    "description": "Internal notes, visible to staff only.",
+    "new": "New note",
+    "placeholder": "What should the team know?",
+    "add": "Add note",
+    "added": "Note added.",
+    "older": "Show older notes",
+    "empty": "No notes yet. Write the first one above.",
+    "emptyReadOnly": "No notes yet.",
+    "errorTitle": "The notes didn't load",
+    "formerUser": "Former User"
+  },
+  "validation": {
+    "nameRequired": "Enter a name.",
+    "nameTooLong": "Keep the name to 120 characters or fewer.",
+    "emailFormat": "Enter a valid email address.",
+    "phoneFormat": "Use digits, spaces, dashes or brackets, for example +961 3 123 456.",
+    "emailOrPhone": "Enter an email or a phone number so the Customer can be reached.",
+    "tooManyTags": "A Customer can have up to 20 Tags.",
+    "required": "Fill in this field.",
+    "tooLong": "This is too long.",
+    "countryRequired": "Choose a country.",
+    "noteRequired": "Write the note first.",
+    "noteTooLong": "Keep the note to 2,000 characters or fewer."
+  }
+}

@@ -55,7 +55,9 @@
     "notFound": "Page not found",
     "categories": "Categories",
     "brands": "Brands",
-    "settings": "Settings"
+    "settings": "Settings",
+    "customers": "Customers",
+    "customer": "Customer"
   },
   "navGroups": {
     "dashboard": "Dashboard",

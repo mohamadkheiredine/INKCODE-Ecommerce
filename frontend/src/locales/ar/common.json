@@ -55,7 +55,9 @@
     "notFound": "الصفحة غير موجودة",
     "categories": "الفئات",
     "brands": "العلامات التجارية",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "customers": "العملاء",
+    "customer": "العميل"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",
