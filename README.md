@@ -165,6 +165,11 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Creating and editing happen in dialogs, with server validation errors shown under the matching field. Deleting asks for confirmation, and a parent that still has children (or a record still in use) is refused with a clear message.
   - Every Role can view the catalog; only Admin and Operations can change it, and the API enforces this.
   - Every change, including profile preferences and password changes, writes an audit entry with who did it and the values before and after.
+- **Shipping zones, Shipping methods and Carriers (#14):**
+  - A Shipping zone covers whole countries or single cities; a place belongs to one zone only. Each zone has flat-price Shipping methods (price, estimated delivery days, active flag).
+  - Quoting an address checks the city first, then the country, and offers the zone's active methods cheapest first; an address no zone covers gets no methods and a clear message. The Shipping zones page has a "Check an address" card that asks the same quote Order creation will.
+  - Carriers have an optional tracking link template holding `{tracking_number}`, with a live example in the form.
+  - Roles that see Orders can look; only Admin and Operations change shipping, and every change is audited.
 
 ### Incomplete / assumptions
 
