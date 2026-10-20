@@ -65,6 +65,12 @@
     "shippingZones": "Shipping zones",
     "shippingZone": "Shipping zone",
     "carriers": "Carriers",
+    "warehouses": "Warehouses",
+    "stockLevels": "Stock levels",
+    "stockMovements": "Stock movements",
+    "receipts": "Receipts",
+    "newReceipt": "Receive stock",
+    "receipt": "Receipt",
     "users": "Users",
     "roles": "Roles & permissions",
     "auditLog": "Audit log"

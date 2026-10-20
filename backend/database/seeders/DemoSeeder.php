@@ -18,8 +18,10 @@ class DemoSeeder extends Seeder
             DemoCatalogSeeder::class,
             DemoCustomersSeeder::class,
             DemoShippingSeeder::class,
-            // Last: it describes the records the seeders above created.
+            // After the seeders above: it describes the records they created.
             DemoAuditSeeder::class,
+            // After the audit history: it records its own entries through the real actions.
+            DemoInventorySeeder::class,
         ]);
     }
 }

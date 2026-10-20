@@ -6,6 +6,7 @@ use App\Actions\Catalog\CreateProduct;
 use App\Actions\Catalog\DeleteProduct;
 use App\Actions\Catalog\ListProducts;
 use App\Actions\Catalog\UpdateProduct;
+use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Catalog\ListProductsRequest;
 use App\Http\Requests\Catalog\StoreProductRequest;
@@ -13,6 +14,7 @@ use App\Http\Requests\Catalog\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -33,9 +35,16 @@ class ProductController extends Controller
     /**
      * Authorized by the route (`can:view,product`).
      */
-    public function show(Product $product): ProductResource
+    public function show(Request $request, Product $product): ProductResource
     {
-        return new ProductResource($product->loadForDisplay());
+        $product->loadForDisplay();
+
+        // Each Variant's stock per Warehouse, for Roles that see stock.
+        if ($request->user()?->can(Permission::InventoryView->value)) {
+            $product->load('variants.stockBalances.warehouse:id,name,code');
+        }
+
+        return new ProductResource($product);
     }
 
     public function update(UpdateProductRequest $request, Product $product, UpdateProduct $updateProduct): ProductResource

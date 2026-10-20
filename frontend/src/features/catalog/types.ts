@@ -96,6 +96,13 @@ export type Variant = {
   low_stock_threshold: number | null
   options: { attribute: string; value: string }[]
   value_ids: number[]
+  /** Its stock per Warehouse that ever held it; only sent to Roles that see stock. */
+  stock?: {
+    warehouse: { id: number; name: string; code: string }
+    on_hand: number
+    reserved: number
+    available: number
+  }[]
 }
 
 /** One Product with everything its screen shows. */

@@ -132,6 +132,72 @@ export const routes: RouteObject[] = [
             ],
           },
           {
+            path: 'inventory/stock',
+            handle: crumb('stockLevels'),
+            lazy: async () => ({
+              Component: withPermission(
+                'inventory.view',
+                (await import('@/features/inventory/routes/stock-levels-page')).StockLevelsPage,
+              ),
+            }),
+          },
+          {
+            path: 'inventory/movements',
+            handle: crumb('stockMovements'),
+            lazy: async () => ({
+              Component: withPermission(
+                'inventory.view',
+                (await import('@/features/inventory/routes/stock-movements-page'))
+                  .StockMovementsPage,
+              ),
+            }),
+          },
+          {
+            path: 'inventory/warehouses',
+            handle: crumb('warehouses'),
+            lazy: async () => ({
+              Component: withPermission(
+                'inventory.view',
+                (await import('@/features/inventory/routes/warehouses-page')).WarehousesPage,
+              ),
+            }),
+          },
+          {
+            path: 'inventory/receipts',
+            handle: crumb('receipts'),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: withPermission(
+                    'inventory.view',
+                    (await import('@/features/inventory/routes/receipts-page')).ReceiptsPage,
+                  ),
+                }),
+              },
+              {
+                path: 'new',
+                handle: crumb('newReceipt'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'inventory.receive',
+                    (await import('@/features/inventory/routes/new-receipt-page')).NewReceiptPage,
+                  ),
+                }),
+              },
+              {
+                path: ':receiptId',
+                handle: crumb('receipt'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'inventory.view',
+                    (await import('@/features/inventory/routes/receipt-page')).ReceiptPage,
+                  ),
+                }),
+              },
+            ],
+          },
+          {
             path: 'shipping/zones',
             handle: crumb('shippingZones'),
             children: [

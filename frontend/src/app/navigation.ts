@@ -2,6 +2,12 @@ import { auditLogNav } from '@/features/audit/nav'
 import { attributesNav, brandsNav, categoriesNav, productsNav } from '@/features/catalog/nav'
 import { customersNav } from '@/features/customers/nav'
 import { homeNav } from '@/features/home/nav'
+import {
+  receiptsNav,
+  stockLevelsNav,
+  stockMovementsNav,
+  warehousesNav,
+} from '@/features/inventory/nav'
 import { settingsNav } from '@/features/settings/nav'
 import { rolesNav, usersNav } from '@/features/users/nav'
 import { carriersNav, shippingZonesNav } from '@/features/shipping/nav'
@@ -18,6 +24,10 @@ export const NAV_ENTRIES: readonly NavEntry[] = [
   categoriesNav,
   brandsNav,
   attributesNav,
+  stockLevelsNav,
+  receiptsNav,
+  stockMovementsNav,
+  warehousesNav,
   shippingZonesNav,
   carriersNav,
   usersNav,

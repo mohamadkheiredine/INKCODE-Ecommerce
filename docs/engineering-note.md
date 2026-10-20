@@ -136,6 +136,12 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - Trimming input by hand duplicated Laravel's `TrimStrings` middleware, so it was removed.
   - Security pass (inline, as for #9): every route authorizes through a Form Request or a Policy check, address routes use scoped bindings (another Customer's address is a 404), only listed fields are mass-assignable, `LIKE` terms are escaped, and `mailto:`/`tel:` links only carry validated values. `composer audit` was clean; `npm audit` is unchanged (the known shadcn-CLI dev advisories).
 
+- **Inventory (#11), reviewed and corrected while building:**
+  - One stock service (ADR 0008) with an append-only movement ledger, plus CHECK constraints as a second guard.
+  - A real multi-process concurrency test found a deadlock: inserting Receipt lines took shared foreign-key locks on the Variants before the service's exclusive lock. Lines are now saved only after the Variants are locked.
+  - The idempotency middleware first rolled back twice when it replayed an answer, wiping the outer transaction; a test caught it and the flow was restructured.
+  - Security pass (inline): every route authorizes through a Form Request, a Policy or a route `can`; stock on the Product page is only sent to Roles with `inventory.view`; idempotency keys are scoped per User and bound to the request body.
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_

@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
  */
 class UserActivationController extends Controller
 {
-    public function deactivate(Request $request, User $user, DeactivateUser $deactivateUser): UserResource
+    public function destroy(Request $request, User $user, DeactivateUser $deactivateUser): UserResource
     {
         /** @var User $actor */
         $actor = $request->user();
@@ -22,7 +22,7 @@ class UserActivationController extends Controller
         return new UserResource($deactivateUser->handle($actor, $user));
     }
 
-    public function reactivate(User $user, ReactivateUser $reactivateUser): UserResource
+    public function store(User $user, ReactivateUser $reactivateUser): UserResource
     {
         return new UserResource($reactivateUser->handle($user));
     }

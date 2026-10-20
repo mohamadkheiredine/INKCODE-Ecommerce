@@ -23,6 +23,10 @@ use App\Http\Controllers\Customers\CustomerAddressController;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
 use App\Http\Controllers\Customers\TagController;
+use App\Http\Controllers\Inventory\ReceiptController;
+use App\Http\Controllers\Inventory\StockLevelController;
+use App\Http\Controllers\Inventory\StockMovementController;
+use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
@@ -121,6 +125,18 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->middlewareFor('show', 'can:view,carrier')
         ->middlewareFor('destroy', 'can:delete,carrier');
 
+    // Inventory: Roles with inventory.view look; warehouses.manage changes Warehouses and
+    // inventory.receive records Receipts (safe to retry with an Idempotency-Key).
+    Route::apiResource('warehouses', WarehouseController::class)
+        ->except('destroy')
+        ->middlewareFor('show', 'can:view,warehouse');
+    Route::get('/stock-levels', [StockLevelController::class, 'index'])->name('stock-levels.index');
+    Route::get('/stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
+    Route::apiResource('receipts', ReceiptController::class)
+        ->only(['index', 'store', 'show'])
+        ->middlewareFor('show', 'can:view,receipt')
+        ->middlewareFor('store', 'idempotent');
+
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])
         ->can(Permission::SettingsManage->value)
@@ -147,10 +163,10 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
     Route::apiResource('users', UserController::class)
         ->except('destroy')
         ->middlewareFor('show', 'can:view,user');
-    Route::post('/users/{user}/deactivate', [UserActivationController::class, 'deactivate'])
+    Route::post('/users/{user}/deactivate', [UserActivationController::class, 'destroy'])
         ->can('update', 'user')
         ->name('users.deactivate');
-    Route::post('/users/{user}/reactivate', [UserActivationController::class, 'reactivate'])
+    Route::post('/users/{user}/reactivate', [UserActivationController::class, 'store'])
         ->can('update', 'user')
         ->name('users.reactivate');
 });

@@ -12,6 +12,7 @@ import { useCan } from '@/features/auth/hooks/use-can'
 import { isApiError } from '@/lib/api/api-error'
 import { useEntranceAnimation } from '@/lib/motion'
 import { ProductDetailsForm } from '../components/product-details-form'
+import { ProductStockCard } from '@/features/inventory/components/product-stock-card'
 import { ProductImagesCard } from '../components/product-images-card'
 import { ProductStatusBadge } from '../components/product-status-badge'
 import { VariantBuilder } from '../components/variant-builder'
@@ -121,6 +122,7 @@ function ProductEditor({ product }: { product: Product }) {
           />
         </CardContent>
       </Card>
+      {product.variants.length > 0 && <ProductStockCard product={product} />}
     </div>
   )
 }
