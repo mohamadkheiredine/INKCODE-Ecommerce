@@ -10,4 +10,10 @@ enum StockMovementType: string
 {
     /** Stock arriving from a supplier (a Receipt): adds On-hand. */
     case Receipt = 'receipt';
+
+    /** An Order was Confirmed: its units are promised to it (adds Reserved). */
+    case Reservation = 'reservation';
+
+    /** An Order holding Reserved units was cancelled: they are free again (removes Reserved). */
+    case Release = 'release';
 }

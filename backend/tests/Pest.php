@@ -1,9 +1,15 @@
 <?php
 
 use App\Actions\Inventory\CreateReceipt;
+use App\Actions\Orders\CreateOrder;
 use App\Enums\Role;
 use App\Models\AuditEntry;
+use App\Models\Customer;
+use App\Models\CustomerAddress;
+use App\Models\Order;
 use App\Models\Receipt;
+use App\Models\ShippingMethod;
+use App\Models\ShippingZone;
 use App\Models\User;
 use App\Models\Variant;
 use App\Models\Warehouse;
@@ -112,6 +118,34 @@ function sessionOf(TestResponse $response): string
 {
     return $response->getCookie((string) config('session.cookie'))?->getValue()
         ?? throw new RuntimeException('The response started no session.');
+}
+
+/**
+ * Creates a Pending Order, as the API does, for a new Customer in Beirut shipped by a $5
+ * Standard method: one line per `[Variant, quantity]`, fulfilled from the Warehouse.
+ *
+ * @param  list<array{Variant, int}>  $lines
+ */
+function placeOrder(Warehouse $warehouse, array $lines, ?Customer $customer = null): Order
+{
+    $customer ??= Customer::factory()->create();
+    $address = $customer->addresses()->where('is_default_shipping', true)->first()
+        ?? CustomerAddress::factory()->defaultForBoth()->create(['customer_id' => $customer->id, 'country_code' => 'LB', 'city' => 'Beirut']);
+    $method = ShippingMethod::query()->where('name', 'Standard')->first() ?? ShippingMethod::factory()->create([
+        'shipping_zone_id' => ShippingZone::factory()->covering('LB')->create()->id,
+        'name' => 'Standard',
+        'price' => '5.00',
+    ]);
+
+    return app(CreateOrder::class)->handle([
+        'customer_id' => $address->customer_id,
+        'billing_address_id' => $address->id,
+        'shipping_address_id' => $address->id,
+        'warehouse_id' => $warehouse->id,
+        'shipping_method_id' => $method->id,
+        'notes' => null,
+        'lines' => array_map(fn (array $line): array => ['variant_id' => $line[0]->id, 'quantity' => $line[1]], $lines),
+    ]);
 }
 
 /**

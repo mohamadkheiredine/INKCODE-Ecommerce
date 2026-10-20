@@ -135,7 +135,7 @@ describe('retrying a Receipt with an Idempotency-Key', function () {
         $this->withHeader('Idempotency-Key', 'receipt-42')->postJson('/api/v1/receipts', receiptPayload($warehouse, $variant))->assertCreated();
         $this->withHeader('Idempotency-Key', 'receipt-42')
             ->postJson('/api/v1/receipts', receiptPayload($warehouse, $variant, ['supplier_reference' => 'PO-OTHER']))
-            ->assertUnprocessable()
+            ->assertConflict()
             ->assertJsonPath('code', 'idempotency_key_reused');
 
         expect(Receipt::query()->count())->toBe(1);

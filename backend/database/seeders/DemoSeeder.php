@@ -22,6 +22,8 @@ class DemoSeeder extends Seeder
             DemoAuditSeeder::class,
             // After the audit history: it records its own entries through the real actions.
             DemoInventorySeeder::class,
+            // Orders need the stocked Products, the Customers and the Shipping methods.
+            DemoOrdersSeeder::class,
         ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Actions\Profile\ChangePassword;
+use App\Models\Order;
 use App\Models\Receipt;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -31,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Relation::morphMap(['receipt' => Receipt::class]);
+        Relation::morphMap(['receipt' => Receipt::class, 'order' => Order::class]);
 
         Password::defaults(fn (): Password => Password::min(10)->max(72)->letters()->mixedCase()->numbers());
 

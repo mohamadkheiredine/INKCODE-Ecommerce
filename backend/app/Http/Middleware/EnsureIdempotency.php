@@ -19,7 +19,7 @@ use Throwable;
  * change and its stored answer commit together. A retry arriving while the first
  * request still runs waits on the key's row and then replays its answer. Only successful
  * answers are kept: after a refusal (422, 409…) the same key may be sent again. A key
- * reused for a different request is refused with 422 `idempotency_key_reused`.
+ * reused for a different request conflicts with the first one: 409 `idempotency_key_reused`.
  */
 final class EnsureIdempotency
 {
@@ -81,7 +81,7 @@ final class EnsureIdempotency
     private function replay(IdempotencyKey $stored, string $requestHash): Response
     {
         if (! hash_equals($stored->request_hash, $requestHash)) {
-            throw new BusinessRuleViolation('idempotency_key_reused', __('errors.idempotency_key_reused'), 422);
+            throw new BusinessRuleViolation('idempotency_key_reused', __('errors.idempotency_key_reused'));
         }
 
         return response($stored->response_body, $stored->response_status, [
