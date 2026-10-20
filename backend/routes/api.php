@@ -20,7 +20,8 @@ use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
 use App\Http\Controllers\Customers\TagController;
 use App\Http\Controllers\Inventory\ReceiptController;
-use App\Http\Controllers\Inventory\StockController;
+use App\Http\Controllers\Inventory\StockLevelController;
+use App\Http\Controllers\Inventory\StockMovementController;
 use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
@@ -123,8 +124,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('warehouses', WarehouseController::class)
         ->except('destroy')
         ->middlewareFor('show', 'can:view,warehouse');
-    Route::get('/stock-levels', [StockController::class, 'levels'])->name('stock-levels.index');
-    Route::get('/stock-movements', [StockController::class, 'movements'])->name('stock-movements.index');
+    Route::get('/stock-levels', [StockLevelController::class, 'index'])->name('stock-levels.index');
+    Route::get('/stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
     Route::apiResource('receipts', ReceiptController::class)
         ->only(['index', 'store', 'show'])
         ->middlewareFor('show', 'can:view,receipt')
