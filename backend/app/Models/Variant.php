@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Product $product
  * @property-read Collection<int, AttributeValue> $attributeValues
+ * @property-read Collection<int, StockBalance> $stockBalances
  */
 #[Fillable(['sku', 'combination_key', 'price', 'average_cost', 'low_stock_threshold', 'position'])]
 class Variant extends Model implements Auditable
@@ -57,6 +59,16 @@ class Variant extends Model implements Auditable
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Its stock in each Warehouse that ever held it, in Warehouse order.
+     *
+     * @return HasMany<StockBalance, $this>
+     */
+    public function stockBalances(): HasMany
+    {
+        return $this->hasMany(StockBalance::class)->orderBy('warehouse_id');
     }
 
     /**

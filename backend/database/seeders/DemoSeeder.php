@@ -18,6 +18,7 @@ class DemoSeeder extends Seeder
             DemoCatalogSeeder::class,
             DemoCustomersSeeder::class,
             DemoShippingSeeder::class,
+            DemoInventorySeeder::class,
         ]);
     }
 }

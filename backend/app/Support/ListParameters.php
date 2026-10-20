@@ -61,22 +61,28 @@ final readonly class ListParameters
     }
 
     /**
-     * Sorts (the key breaks ties, so rows never jump between pages) and returns the
-     * requested page. Every page link keeps the search, filters and sort.
+     * Sorts (the key, then any extra tie-breaker columns for a list that joins rows,
+     * break ties, so rows never jump between pages) and returns the requested page. Every
+     * page link keeps the search, filters and sort.
      *
      * @template TModel of Model
      *
      * @param  Builder<TModel>  $query
+     * @param  list<string>  $tieBreakers
      * @return LengthAwarePaginator<int, TModel>
      */
-    public function paginate(Builder $query): LengthAwarePaginator
+    public function paginate(Builder $query, array $tieBreakers = []): LengthAwarePaginator
     {
         $direction = $this->sortDescending ? 'desc' : 'asc';
 
-        return $query
+        $query
             ->orderBy($this->sortColumn, $direction)
-            ->orderBy($query->getModel()->getQualifiedKeyName(), $direction)
-            ->paginate($this->perPage)
-            ->withQueryString();
+            ->orderBy($query->getModel()->getQualifiedKeyName(), $direction);
+
+        foreach ($tieBreakers as $column) {
+            $query->orderBy($column, $direction);
+        }
+
+        return $query->paginate($this->perPage)->withQueryString();
     }
 }

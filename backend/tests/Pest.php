@@ -1,10 +1,15 @@
 <?php
 
+use App\Actions\Inventory\CreateReceipt;
 use App\Enums\Role;
 use App\Models\AuditEntry;
+use App\Models\Receipt;
 use App\Models\User;
+use App\Models\Variant;
+use App\Models\Warehouse;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -25,6 +30,12 @@ pest()->extend(TestCase::class)
 
 pest()->extend(TestCase::class)
     ->in('Unit');
+
+// Concurrency tests run separate PHP processes, which only see committed rows, so they
+// truncate instead of rolling back.
+pest()->extend(TestCase::class)
+    ->use(DatabaseTruncation::class)
+    ->in('Concurrency');
 
 /*
 |--------------------------------------------------------------------------
@@ -101,4 +112,24 @@ function sessionOf(TestResponse $response): string
 {
     return $response->getCookie((string) config('session.cookie'))?->getValue()
         ?? throw new RuntimeException('The response started no session.');
+}
+
+/**
+ * Receives stock through a Receipt, as the API does: one line per
+ * `[Variant, quantity, unit cost]`.
+ *
+ * @param  list<array{Variant, int, string}>  $lines
+ */
+function receiveStock(Warehouse $warehouse, array $lines, string $supplierReference = 'PO-1'): Receipt
+{
+    return app(CreateReceipt::class)->handle([
+        'warehouse_id' => $warehouse->id,
+        'supplier_reference' => $supplierReference,
+        'notes' => null,
+        'lines' => array_map(fn (array $line): array => [
+            'variant_id' => $line[0]->id,
+            'quantity' => $line[1],
+            'unit_cost' => $line[2],
+        ], $lines),
+    ]);
 }

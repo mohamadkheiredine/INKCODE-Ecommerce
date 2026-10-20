@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\StockBalance;
 use App\Models\Variant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,6 +28,14 @@ class VariantResource extends JsonResource
             'low_stock_threshold' => $this->low_stock_threshold,
             'options' => $this->whenLoaded('attributeValues', fn (): array => $this->options()),
             'value_ids' => $this->whenLoaded('attributeValues', fn (): array => $this->attributeValues->modelKeys()),
+            'stock' => $this->whenLoaded('stockBalances', fn (): array => $this->stockBalances
+                ->map(fn (StockBalance $balance): array => [
+                    'warehouse' => $balance->warehouse->only('id', 'name', 'code'),
+                    'on_hand' => $balance->on_hand,
+                    'reserved' => $balance->reserved,
+                    'available' => $balance->available,
+                ])
+                ->all()),
         ];
     }
 }

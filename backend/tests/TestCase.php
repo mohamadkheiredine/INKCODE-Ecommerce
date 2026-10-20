@@ -15,6 +15,14 @@ abstract class TestCase extends BaseTestCase
 
     protected string $seeder = RolesAndPermissionsSeeder::class;
 
+    /**
+     * Tests that truncate (tests/Concurrency) keep the rows migrations insert: the one
+     * store settings row.
+     *
+     * @var list<string>
+     */
+    protected array $exceptTables = ['store_settings'];
+
     protected function setUp(): void
     {
         parent::setUp();
