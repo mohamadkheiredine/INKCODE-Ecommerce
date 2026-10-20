@@ -179,6 +179,16 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'audit-log',
+            handle: crumb('auditLog'),
+            lazy: async () => ({
+              Component: withPermission(
+                'audit.view',
+                (await import('@/features/audit/routes/audit-log-page')).AuditLogPage,
+              ),
+            }),
+          },
+          {
             path: '*',
             handle: crumb('notFound'),
             lazy: async () => ({ Component: (await import('./not-found-page')).NotFoundPage }),
