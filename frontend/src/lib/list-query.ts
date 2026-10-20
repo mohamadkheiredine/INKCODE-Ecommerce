@@ -54,6 +54,12 @@ export type ListQueryConfig = {
 export const PAGE_SIZES = [15, 25, 50, 100] as const
 export const DEFAULT_PER_PAGE = PAGE_SIZES[0]
 
+/** A filter check for record ids ("12"). */
+export const isId = (value: string) => /^[1-9]\d{0,18}$/.test(value)
+
+/** A filter check for amounts with at most two decimals ("25", "19.90"). */
+export const isAmount = (value: string) => /^\d{1,8}(?:\.\d{1,2})?$/.test(value)
+
 export function parseSort(value: string | null | undefined): ListSort | null {
   if (!value) return null
   return value.startsWith('-')

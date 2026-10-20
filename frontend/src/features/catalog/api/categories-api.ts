@@ -8,6 +8,8 @@ export const categoryKeys = {
   list: (query: ListQuery) => [...categoryKeys.lists(), query] as const,
   /** Every top-level Category, for the parent picker. */
   parents: () => [...categoryKeys.all, 'parents'] as const,
+  /** Every Category, for the Product form and filters. */
+  options: () => [...categoryKeys.all, 'options'] as const,
 }
 
 /** The API's page-size limit; enough for every top-level Category of one store. */
@@ -24,6 +26,14 @@ export const categoriesApi = {
   async topLevel(): Promise<Category[]> {
     const { data } = await http.get<ListPage<Category>>('/categories', {
       params: { 'filter[level]': 'top', sort: 'name', per_page: MAX_PER_PAGE },
+    })
+    return data.data
+  },
+
+  /** Every Category of the store (both levels), by name. */
+  async all(): Promise<Category[]> {
+    const { data } = await http.get<ListPage<Category>>('/categories', {
+      params: { sort: 'name', per_page: MAX_PER_PAGE },
     })
     return data.data
   },

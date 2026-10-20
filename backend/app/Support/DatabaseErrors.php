@@ -59,14 +59,15 @@ final class DatabaseErrors
 
     /**
      * Runs a save; a duplicate value from a simultaneous save answers 422 on `$field`, the
-     * one unique field the save can collide on.
+     * one unique field the save can collide on, with `$message` or the standard
+     * "already taken" text.
      *
      * @template T
      *
      * @param  Closure(): T  $save
      * @return T
      */
-    public static function refuseDuplicate(Closure $save, string $field): mixed
+    public static function refuseDuplicate(Closure $save, string $field, ?string $message = null): mixed
     {
         try {
             return $save();
@@ -75,7 +76,7 @@ final class DatabaseErrors
                 throw $exception;
             }
 
-            throw ValidationException::withMessages([$field => __('validation.unique', ['attribute' => $field])]);
+            throw ValidationException::withMessages([$field => $message ?? __('validation.unique', ['attribute' => $field])]);
         }
     }
 

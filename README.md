@@ -181,10 +181,17 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Settings live in one typed, database-checked row, are cached for every module that reads them, and every change writes an audit entry. Only the Admin can see or change them all; every signed-in User sees the store's name, logo and currency in the sidebar.
   - Every amount in the SPA is written in the Store currency with its chosen symbol, always to the cent.
 
+- **Products with generated Variants (#10):**
+  - A shared Attribute library (Size, Color, Material…) whose values are unique within each Attribute and carry the codes SKUs are made of.
+  - Products have a Category, an optional Brand, a base price (without VAT), a taxable flag, tags, SEO fields, a status (Draft / Active / Archived) and up to ten images. Images can be reordered, and the first one is the main image.
+  - Picking 3 Colors × 4 Sizes generates 12 Variants. Each gets a readable, unique SKU (`CLASSIC-TEE-RED-M`) and the base price. Generating again only adds the missing combinations and keeps existing Variants. SKU, price, Average cost and Low-stock threshold are edited in place, and a taken SKU is refused under its field.
+  - The list searches by name or SKU, filters by status, Category (a top-level one includes its children), Brand and price range, sorts by name, price and date, and supports bulk activate, archive and delete-where-allowed.
+
 ### Incomplete / assumptions
 
 - The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
-- Marking a notification as read is the User's own reading state and is not audited. The audit log viewer arrives with #26. Refusing to delete a Category or Brand that Products use relies on the restricting foreign keys Products add in #10.
+- Marking a notification as read is the User's own reading state and is not audited. The audit log viewer arrives with #26. Categories and Brands that Products use cannot be deleted (restricting foreign keys).
+- A Product or Variant that appears on an Order can only be archived, never deleted. This holds once Order lines reference Variants with a restricting foreign key (#16). Stock per Warehouse arrives with #11, and a Variant's empty Low-stock threshold follows the store default from Settings (#15).
 - A Customer's Order history and Lifetime value join the profile with Orders (#16, #17) and Payments (#19); Segments and the activity/value filters come with #22. Refusing to delete a Customer who has Orders relies on the restricting foreign key Orders add in #16.
 - Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.
 - A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).

@@ -2,14 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Database\Seeder;
 
 /**
- * The demo store's Categories (two levels) and Brands. Idempotent: running it again
- * restores these records by slug and leaves anything Users added alone. The demo data
- * ticket (#28) builds Products on top of them.
+ * The demo store's Categories (two levels), Brands and Attribute library. Idempotent:
+ * running it again restores these records by slug or name and leaves anything Users
+ * added alone. The demo data ticket (#28) builds Products on top of them.
  */
 class DemoCatalogSeeder extends Seeder
 {
@@ -47,8 +48,26 @@ class DemoCatalogSeeder extends Seeder
         'cedar-co' => 'Cedar & Co.',
     ];
 
+    /**
+     * The shared Attribute library: each value's name and its SKU code.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private const ATTRIBUTES = [
+        'Color' => ['Black' => 'BLK', 'White' => 'WHT', 'Red' => 'RED', 'Navy' => 'NAVY', 'Olive' => 'OLV'],
+        'Size' => ['XS' => 'XS', 'S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL'],
+        'Material' => ['Cotton' => 'COT', 'Linen' => 'LIN', 'Wool' => 'WOOL', 'Leather' => 'LTH'],
+    ];
+
     public function run(): void
     {
+        foreach (self::ATTRIBUTES as $name => $values) {
+            $attribute = Attribute::query()->firstOrCreate(['name' => $name]);
+            foreach (array_keys($values) as $position => $valueName) {
+                $attribute->values()->updateOrCreate(['name' => $valueName], ['code' => $values[$valueName], 'position' => $position]);
+            }
+        }
+
         foreach (self::CATEGORIES as $slug => $category) {
             $parent = Category::query()->updateOrCreate(
                 ['slug' => $slug],

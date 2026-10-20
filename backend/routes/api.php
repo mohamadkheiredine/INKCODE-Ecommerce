@@ -5,9 +5,16 @@ use App\Http\Controllers\Access\RoleController;
 use App\Http\Controllers\Auth\CurrentUserController;
 use App\Http\Controllers\Auth\DemoAccountController;
 use App\Http\Controllers\Auth\SessionController;
+use App\Http\Controllers\Catalog\AttributeController;
 use App\Http\Controllers\Catalog\BrandController;
 use App\Http\Controllers\Catalog\BrandLogoController;
 use App\Http\Controllers\Catalog\CategoryController;
+use App\Http\Controllers\Catalog\ProductBulkActionController;
+use App\Http\Controllers\Catalog\ProductController;
+use App\Http\Controllers\Catalog\ProductImageController;
+use App\Http\Controllers\Catalog\ProductImageOrderController;
+use App\Http\Controllers\Catalog\VariantController;
+use App\Http\Controllers\Catalog\VariantGenerationController;
 use App\Http\Controllers\Customers\CustomerAddressController;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
@@ -60,6 +67,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/brands/{brand}/logo', [BrandLogoController::class, 'destroy'])
         ->can('update', 'brand')
         ->name('brands.logo.destroy');
+    Route::apiResource('attributes', AttributeController::class)
+        ->middlewareFor('show', 'can:view,attribute')
+        ->middlewareFor('destroy', 'can:delete,attribute');
+    Route::post('/products/bulk', [ProductBulkActionController::class, 'store'])->name('products.bulk');
+    Route::apiResource('products', ProductController::class)
+        ->middlewareFor('show', 'can:view,product')
+        ->middlewareFor('destroy', 'can:delete,product');
+    Route::post('/products/{product}/images', [ProductImageController::class, 'store'])->name('products.images.store');
+    Route::put('/products/{product}/images/order', [ProductImageOrderController::class, 'update'])->name('products.images.reorder');
+    Route::delete('/products/{product}/images/{image}', [ProductImageController::class, 'destroy'])
+        ->scopeBindings()
+        ->can('update', 'product')
+        ->name('products.images.destroy');
+    Route::post('/products/{product}/variants/generate', [VariantGenerationController::class, 'store'])
+        ->name('products.variants.generate');
+    Route::put('/products/{product}/variants', [VariantController::class, 'update'])->name('products.variants.update');
+    Route::delete('/products/{product}/variants/{variant}', [VariantController::class, 'destroy'])
+        ->scopeBindings()
+        ->can('update', 'product')
+        ->name('products.variants.destroy');
 
     // Customers: Roles with customers.view look; Policies let only customers.manage change a
     // Customer, their addresses, Tags and notes.

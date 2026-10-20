@@ -12,6 +12,11 @@ export function useBrands(query: ListQuery) {
   })
 }
 
+/** Every Brand, for pickers. */
+export function useBrandOptions() {
+  return useQuery({ queryKey: brandKeys.options(), queryFn: () => brandsApi.all() })
+}
+
 type SaveBrand = { id: number | null; input: BrandInput; logo: LogoChange }
 
 /** The saved Brand, and the reason its logo change failed, if it did. */
