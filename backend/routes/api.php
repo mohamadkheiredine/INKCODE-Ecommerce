@@ -12,6 +12,7 @@ use App\Http\Controllers\Catalog\CategoryController;
 use App\Http\Controllers\Catalog\ProductBulkActionController;
 use App\Http\Controllers\Catalog\ProductController;
 use App\Http\Controllers\Catalog\ProductImageController;
+use App\Http\Controllers\Catalog\ProductImageOrderController;
 use App\Http\Controllers\Catalog\VariantController;
 use App\Http\Controllers\Catalog\VariantGenerationController;
 use App\Http\Controllers\Notifications\NotificationController;
@@ -63,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middlewareFor('show', 'can:view,product')
         ->middlewareFor('destroy', 'can:delete,product');
     Route::post('/products/{product}/images', [ProductImageController::class, 'store'])->name('products.images.store');
-    Route::put('/products/{product}/images/order', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
+    Route::put('/products/{product}/images/order', [ProductImageOrderController::class, 'update'])->name('products.images.reorder');
     Route::delete('/products/{product}/images/{image}', [ProductImageController::class, 'destroy'])
         ->scopeBindings()
         ->can('update', 'product')
