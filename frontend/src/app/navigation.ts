@@ -1,4 +1,5 @@
 import { attributesNav, brandsNav, categoriesNav, productsNav } from '@/features/catalog/nav'
+import { customersNav } from '@/features/customers/nav'
 import { homeNav } from '@/features/home/nav'
 import type { NavEntry } from '@/lib/navigation'
 
@@ -8,6 +9,7 @@ import type { NavEntry } from '@/lib/navigation'
  */
 export const NAV_ENTRIES: readonly NavEntry[] = [
   homeNav,
+  customersNav,
   productsNav,
   categoriesNav,
   brandsNav,

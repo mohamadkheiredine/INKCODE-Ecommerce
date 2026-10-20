@@ -28,7 +28,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Products CRUD: images, categories, brands, SKU, price, cost, SEO fields, tags, status (#10; stock per Warehouse arrives with #11)
 - [x] Variant editor (size / color / other attributes), each variant with its own SKU, price, Average cost and Low-stock threshold (#10; stock per Warehouse with #11)
 - [x] Server-side filtering, sorting, pagination, bulk actions (TanStack Table) (#9 lists, #10 Products bulk activate / archive / delete)
-- [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters
+- [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters (list with search and Tag filter, profile, addresses with default billing and shipping, Tags and notes are done, #13; order history comes with #16/#17, Lifetime value and Segments with #22)
 - [ ] Warehouses (3+): on-hand, reserved, available per variant per warehouse
 - [ ] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation
 - [ ] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice

@@ -58,7 +58,9 @@
     "products": "المنتجات",
     "newProduct": "منتج جديد",
     "editProduct": "تعديل المنتج",
-    "attributes": "السمات"
+    "attributes": "السمات",
+    "customers": "العملاء",
+    "customer": "العميل"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

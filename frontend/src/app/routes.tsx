@@ -107,6 +107,31 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'customers',
+            handle: crumb('customers'),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: withPermission(
+                    'customers.view',
+                    (await import('@/features/customers/routes/customers-page')).CustomersPage,
+                  ),
+                }),
+              },
+              {
+                path: ':customerId',
+                handle: crumb('customer'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'customers.view',
+                    (await import('@/features/customers/routes/customer-page')).CustomerPage,
+                  ),
+                }),
+              },
+            ],
+          },
+          {
             path: '*',
             handle: crumb('notFound'),
             lazy: async () => ({ Component: (await import('./not-found-page')).NotFoundPage }),

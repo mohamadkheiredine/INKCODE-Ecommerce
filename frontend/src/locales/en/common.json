@@ -58,7 +58,9 @@
     "products": "Products",
     "newProduct": "New Product",
     "editProduct": "Edit Product",
-    "attributes": "Attributes"
+    "attributes": "Attributes",
+    "customers": "Customers",
+    "customer": "Customer"
   },
   "navGroups": {
     "dashboard": "Dashboard",

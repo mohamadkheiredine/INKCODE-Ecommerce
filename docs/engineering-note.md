@@ -33,6 +33,11 @@
 - **Money as DECIMAL strings:** prices are `DECIMAL(12,2)` and Average cost is `DECIMAL(14,4)` (so re-weighting on Receipts in #11 doesn't drift). They travel as strings end to end. The price filter compares in SQL with `CAST(? AS DECIMAL)`, never as floats. A Product's list price is its lowest Variant price (its base price while it has none), and both the price filter and the sort use it.
 - **Deleting what was sold:** Variants cascade from their Product, and Order lines (#16) must reference Variants with `restrictOnDelete()`. Deleting a Product that was ever ordered then fails in the database and comes back as 409 `in_use` ("archive it instead"). Bulk delete skips those Products and reports why.
 - **Snapshot-friendly Variants:** `Variant::options()` returns the combination as `[{attribute, value}]`, ready for Order lines to copy along with SKU, name, price and the taxable flag.
+- **Default addresses guarded twice:** the address actions keep exactly one default billing and one default shipping address per Customer, under a lock on the Customer row, and two generated columns (the Customer's id only on the default row) carry unique indexes, so the database refuses a second default even if a bug slipped through. A default is never simply switched off (422); another address takes it over, and removing a default hands it to the oldest remaining address. The demoted address's change is audited too.
+- **Tags belong to Customers:** a `tags` table with a case-insensitive unique name and a `customer_tag` pivot (Products keep their own JSON tags, #10). Tags are created on the fly with `firstOrCreate` (which falls back to insert-or-select), so two Users typing the same new Tag share one row. Tagging is recorded on the Customer's audit trail as a `tags` value, not as separate entries.
+- **Notes are append-only:** a note keeps its author (set to null if that User is ever removed, shown as "Former User") and its time. Notes are a record of what was said, so there is no edit or delete.
+- **Shared country list:** addresses store an ISO 3166-1 alpha-2 `country_code` validated by `AppSupportCountries` (shared with Shipping, #14); the SPA shows names in the interface language through `Intl.DisplayNames`, so nothing is translated by hand.
+- **Bulk demo seeding:** the 300 demo Customers are generated with a fixed Faker seed and inserted in a few bulk queries (about 1 s instead of a minute of row-by-row inserts through Docker on Windows).
 - _(add: order state machine, idempotency, stock service as they land)_
 
 ## AI tools used
@@ -116,11 +121,17 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - Arabic plurals needed all six forms (zero, one, two, few, many, other).
   - Security, checked inline: image type and size limits with SVG refused; files stored under generated names and removed only after the change is saved; the price filter uses bound parameters; scoped route bindings, so another Product's Variant or image answers 404; Policies on every write, including bulk actions.
 
+- **Customers (#13), reviewed and corrected while building:**
+  - The first demo seeder inserted row by row and took about a minute; it now builds rows in memory and inserts them in bulk.
+  - Trimming input by hand duplicated Laravel's `TrimStrings` middleware, so it was removed.
+  - Security pass (inline, as for #9): every route authorizes through a Form Request or a Policy check, address routes use scoped bindings (another Customer's address is a 404), only listed fields are mass-assignable, `LIKE` terms are escaped, and `mailto:`/`tel:` links only carry validated values. `composer audit` was clean; `npm audit` is unchanged (the known shadcn-CLI dev advisories).
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_
 
 - Locally, `php artisan serve` handles one request at a time on Windows, so Playwright runs one browser at a time there; CI and the Docker stack can run in parallel.
 - Ending an active session when an Admin deactivates a User arrives with Users & Roles administration (#25).
+- Refusing to delete a Customer who has Orders relies on the restricting foreign key from the Orders table (#16); `DeleteCustomer` already turns it into a 409, and the Pest test for it lands with Orders.
 - Refusing to delete a Category or Brand that Products use relies on restricting foreign keys from the Products table (#10); the 409 path has no backend test until then.
 - `npm audit` reports 7 high advisories, all inside the `shadcn` CLI's development-only dependencies (`braces` via `fast-glob`); nothing from them ships in the SPA, and the suggested fix is a downgrade, so they are left until the CLI updates.

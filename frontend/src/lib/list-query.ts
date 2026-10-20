@@ -44,8 +44,8 @@ export type ListQueryConfig = {
   /** The sortable fields; an unknown sort in the URL falls back to the default. */
   sorts: readonly string[]
   /**
-   * Each filter with its allowed values, or a check for open-ended values (an id, an
-   * amount); a value in the URL that doesn't pass is ignored.
+   * Each filter with its allowed values, or a check for filters whose values come from
+   * data (a Tag's id); a value in the URL that isn't allowed is ignored.
    */
   filters?: Record<string, readonly string[] | ((value: string) => boolean)>
   defaultPerPage?: number
@@ -70,6 +70,9 @@ export function parseSort(value: string | null | undefined): ListSort | null {
 export function formatSort({ field, direction }: ListSort): string {
   return direction === 'desc' ? `-${field}` : field
 }
+
+/** A filter check for record ids ("12"). */
+export const isRecordId = (value: string): boolean => /^[1-9]\d*$/.test(value)
 
 function positiveInteger(value: string | null, fallback: number): number {
   const number = Number(value)
