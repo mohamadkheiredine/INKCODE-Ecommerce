@@ -12,6 +12,7 @@ use App\Models\ShippingMethod;
 use App\Models\ShippingZone;
 use App\Models\User;
 use App\Models\Variant;
+use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as Router;
@@ -49,6 +50,7 @@ function recordsForRouteParameters(): array
         'shipping_zone' => ShippingZone::factory()->create(),
         'shipping_method' => $method,
         'user' => User::factory()->withRole(Role::Sales)->create(),
+        'warehouse' => Warehouse::factory()->create(),
     ];
 
     return array_map(fn (Model $record): int => (int) $record->getKey(), $records);

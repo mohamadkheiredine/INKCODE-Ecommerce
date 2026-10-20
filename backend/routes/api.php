@@ -163,10 +163,10 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
     Route::apiResource('users', UserController::class)
         ->except('destroy')
         ->middlewareFor('show', 'can:view,user');
-    Route::post('/users/{user}/deactivate', [UserActivationController::class, 'deactivate'])
+    Route::post('/users/{user}/deactivate', [UserActivationController::class, 'destroy'])
         ->can('update', 'user')
         ->name('users.deactivate');
-    Route::post('/users/{user}/reactivate', [UserActivationController::class, 'reactivate'])
+    Route::post('/users/{user}/reactivate', [UserActivationController::class, 'store'])
         ->can('update', 'user')
         ->name('users.reactivate');
 });

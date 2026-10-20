@@ -2,7 +2,6 @@
 
 namespace App\Actions\Access;
 
-use App\Http\Requests\Access\ListUsersRequest;
 use App\Models\User;
 use App\Support\ListParameters;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -26,7 +25,7 @@ final class ListUsers
         }
 
         if ($parameters->hasFilter('status')) {
-            $query->where('is_active', $parameters->filter('status') === ListUsersRequest::STATUS_ACTIVE);
+            $query->where('is_active', $parameters->filter('status') === 'active');
         }
 
         return $parameters->paginate($query);
