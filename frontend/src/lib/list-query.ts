@@ -43,8 +43,11 @@ export type ListQueryConfig = {
   defaultSort: ListSort
   /** The sortable fields; an unknown sort in the URL falls back to the default. */
   sorts: readonly string[]
-  /** Each filter with its allowed values; an unknown value in the URL is ignored. */
-  filters?: Record<string, readonly string[]>
+  /**
+   * Each filter with its allowed values, or a check for filters whose values come from
+   * data (a Tag's id); a value in the URL that isn't allowed is ignored.
+   */
+  filters?: Record<string, readonly string[] | ((value: string) => boolean)>
   defaultPerPage?: number
 }
 
@@ -62,6 +65,9 @@ export function formatSort({ field, direction }: ListSort): string {
   return direction === 'desc' ? `-${field}` : field
 }
 
+/** A filter check for record ids ("12"). */
+export const isRecordId = (value: string): boolean => /^[1-9]\d*$/.test(value)
+
 function positiveInteger(value: string | null, fallback: number): number {
   const number = Number(value)
   return Number.isInteger(number) && number > 0 ? number : fallback
@@ -73,7 +79,8 @@ export function readListQuery(params: URLSearchParams, config: ListQueryConfig):
   const filters: Record<string, string> = {}
   for (const [name, allowed] of Object.entries(config.filters ?? {})) {
     const value = params.get(`filter[${name}]`)
-    if (value && allowed.includes(value)) filters[name] = value
+    const isAllowed = typeof allowed === 'function' ? allowed : (v: string) => allowed.includes(v)
+    if (value && isAllowed(value)) filters[name] = value
   }
   const perPage = positiveInteger(params.get('per_page'), config.defaultPerPage ?? DEFAULT_PER_PAGE)
 

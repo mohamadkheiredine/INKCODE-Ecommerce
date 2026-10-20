@@ -165,11 +165,17 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Creating and editing happen in dialogs, with server validation errors shown under the matching field. Deleting asks for confirmation, and a parent that still has children (or a record still in use) is refused with a clear message.
   - Every Role can view the catalog; only Admin and Operations can change it, and the API enforces this.
   - Every change, including profile preferences and password changes, writes an audit entry with who did it and the values before and after.
+- **Customers with addresses, Tags and notes (#13):**
+  - A Customer has a name and an email, a phone or both; an email belongs to one Customer. The list searches by name, email or phone, filters by Tag and sorts by name or date.
+  - Several addresses per Customer, always with exactly one default billing and one default shipping address: the first address takes both, another can take either over, and removing a default hands it to the oldest remaining address. MySQL itself refuses a second default.
+  - Tags are typed freely (or picked from existing ones) and created on save; internal notes are signed by their author and timestamped, and are never edited.
+  - Admin, Sales and Support manage Customers; Operations, Finance and Viewer only look; Inventory has no access. Every change is audited. 300 demo Customers are seeded.
 
 ### Incomplete / assumptions
 
 - The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
 - Marking a notification as read is the User's own reading state and is not audited. The audit log viewer arrives with #26. Refusing to delete a Category or Brand that Products use relies on the restricting foreign keys Products add in #10.
+- A Customer's Order history and Lifetime value join the profile with Orders (#16, #17) and Payments (#19); Segments and the activity/value filters come with #22. Refusing to delete a Customer who has Orders relies on the restricting foreign key Orders add in #16.
 - Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.
 - A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.

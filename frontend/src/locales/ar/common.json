@@ -54,7 +54,9 @@
     "profile": "الملف الشخصي",
     "notFound": "الصفحة غير موجودة",
     "categories": "الفئات",
-    "brands": "العلامات التجارية"
+    "brands": "العلامات التجارية",
+    "customers": "العملاء",
+    "customer": "العميل"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",
