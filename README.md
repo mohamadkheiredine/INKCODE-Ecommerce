@@ -181,6 +181,9 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Settings live in one typed, database-checked row, are cached for every module that reads them, and every change writes an audit entry. Only the Admin can see or change them all; every signed-in User sees the store's name, logo and currency in the sidebar.
   - Every amount in the SPA is written in the Store currency with its chosen symbol, always to the cent.
 
+- **Warehouses, stock levels and Receipts (#11):**
+  - Warehouses (name, code, address) can be created, edited and deactivated once empty. Stock levels show On-hand, Reserved, Available and Stock value for every Variant in every Warehouse, filtered by Warehouse, Product, Category and low stock.
+  - Every stock change goes through one service (ADR 0008) that locks rows in a fixed order and appends a Stock movement, so balances always equal their movements. Receipts re-weight the Average cost (ADR 0005) and are safe to retry with an `Idempotency-Key`. A multi-process test proves concurrent Receipts stay consistent.
 - **Products with generated Variants (#10):**
   - A shared Attribute library (Size, Color, Material…) whose values are unique within each Attribute and carry the codes SKUs are made of.
   - Products have a Category, an optional Brand, a base price (without VAT), a taxable flag, tags, SEO fields, a status (Draft / Active / Archived) and up to ten images. Images can be reordered, and the first one is the main image.

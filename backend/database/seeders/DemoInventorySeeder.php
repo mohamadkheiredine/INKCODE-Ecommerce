@@ -11,9 +11,11 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Receipt;
+use App\Models\User;
 use App\Models\Variant;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * The demo store's Warehouses (three active, one deactivated), a few stocked Products and
@@ -80,14 +82,26 @@ class DemoInventorySeeder extends Seeder
             );
         }
 
+        // The demo Admin set up the Products and the Inventory User received the stock, so
+        // the audit log and the Stock movements name who did it.
+        Auth::setUser(User::query()->where('email', 'admin@inkcode.test')->firstOrFail());
         $variants = collect(array_keys(self::PRODUCTS))
             ->flatMap(fn (string $slug): array => $this->product($slug)->variants()->orderBy('position')->get()->all())
             ->values();
 
-        if (Receipt::query()->where('supplier_reference', self::RECEIPTS[0][1])->exists()) {
-            return;
+        Auth::setUser(User::query()->where('email', 'inventory@inkcode.test')->firstOrFail());
+        if (! Receipt::query()->where('supplier_reference', self::RECEIPTS[0][1])->exists()) {
+            $this->receive($variants->all(), $warehouses);
         }
+        Auth::forgetUser();
+    }
 
+    /**
+     * @param  list<Variant>  $variants
+     * @param  array<string, Warehouse>  $warehouses
+     */
+    private function receive(array $variants, array $warehouses): void
+    {
         foreach (self::RECEIPTS as [$code, $reference, $costShare, $quantities]) {
             $lines = [];
             foreach ($variants as $index => $variant) {

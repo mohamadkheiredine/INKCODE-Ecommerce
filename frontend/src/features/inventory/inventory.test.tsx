@@ -146,12 +146,12 @@ describe('receiving stock', () => {
 
     expect(await screen.findByRole('heading', { name: 'RCV-2026-000042', level: 1 })).toBeInTheDocument()
     expect(posted).toHaveLength(1)
-    expect(posted[0].input).toEqual({
+    expect(posted[0]?.input).toEqual({
       warehouse_id: 1,
       supplier_reference: 'PO-7781',
       notes: '',
       lines: [{ variant_id: 9, quantity: 10, unit_cost: '5' }],
     })
-    expect(posted[0].key).toMatch(/^[0-9a-f-]{36}$/)
+    expect(posted[0]?.key).toMatch(/^[0-9a-f-]{36}$/)
   })
 })
