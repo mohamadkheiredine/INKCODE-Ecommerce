@@ -20,6 +20,11 @@ export function useParentCategories() {
   })
 }
 
+/** Every Category (both levels), for pickers. */
+export function useCategoryOptions() {
+  return useQuery({ queryKey: categoryKeys.options(), queryFn: () => categoriesApi.all() })
+}
+
 /** After any change, every Category list (and the parent picker) asks again. */
 function useInvalidateCategories() {
   const queryClient = useQueryClient()

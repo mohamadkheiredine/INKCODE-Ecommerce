@@ -54,7 +54,11 @@
     "profile": "الملف الشخصي",
     "notFound": "الصفحة غير موجودة",
     "categories": "الفئات",
-    "brands": "العلامات التجارية"
+    "brands": "العلامات التجارية",
+    "products": "المنتجات",
+    "newProduct": "منتج جديد",
+    "editProduct": "تعديل المنتج",
+    "attributes": "السمات"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

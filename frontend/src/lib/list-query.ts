@@ -43,13 +43,22 @@ export type ListQueryConfig = {
   defaultSort: ListSort
   /** The sortable fields; an unknown sort in the URL falls back to the default. */
   sorts: readonly string[]
-  /** Each filter with its allowed values; an unknown value in the URL is ignored. */
-  filters?: Record<string, readonly string[]>
+  /**
+   * Each filter with its allowed values, or a check for open-ended values (an id, an
+   * amount); a value in the URL that doesn't pass is ignored.
+   */
+  filters?: Record<string, readonly string[] | ((value: string) => boolean)>
   defaultPerPage?: number
 }
 
 export const PAGE_SIZES = [15, 25, 50, 100] as const
 export const DEFAULT_PER_PAGE = PAGE_SIZES[0]
+
+/** A filter check for record ids ("12"). */
+export const isId = (value: string) => /^[1-9]\d{0,18}$/.test(value)
+
+/** A filter check for amounts with at most two decimals ("25", "19.90"). */
+export const isAmount = (value: string) => /^\d{1,8}(?:\.\d{1,2})?$/.test(value)
 
 export function parseSort(value: string | null | undefined): ListSort | null {
   if (!value) return null
@@ -73,7 +82,8 @@ export function readListQuery(params: URLSearchParams, config: ListQueryConfig):
   const filters: Record<string, string> = {}
   for (const [name, allowed] of Object.entries(config.filters ?? {})) {
     const value = params.get(`filter[${name}]`)
-    if (value && allowed.includes(value)) filters[name] = value
+    const isAllowed = typeof allowed === 'function' ? allowed : (v: string) => allowed.includes(v)
+    if (value && isAllowed(value)) filters[name] = value
   }
   const perPage = positiveInteger(params.get('per_page'), config.defaultPerPage ?? DEFAULT_PER_PAGE)
 

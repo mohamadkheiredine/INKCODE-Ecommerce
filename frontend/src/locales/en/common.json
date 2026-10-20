@@ -54,7 +54,11 @@
     "profile": "Profile",
     "notFound": "Page not found",
     "categories": "Categories",
-    "brands": "Brands"
+    "brands": "Brands",
+    "products": "Products",
+    "newProduct": "New Product",
+    "editProduct": "Edit Product",
+    "attributes": "Attributes"
   },
   "navGroups": {
     "dashboard": "Dashboard",

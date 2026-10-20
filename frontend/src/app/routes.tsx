@@ -42,6 +42,51 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'catalog/products',
+            handle: crumb('products'),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: withPermission(
+                    'catalog.view',
+                    (await import('@/features/catalog/routes/products-page')).ProductsPage,
+                  ),
+                }),
+              },
+              {
+                path: 'new',
+                handle: crumb('newProduct'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'catalog.manage',
+                    (await import('@/features/catalog/routes/product-editor-page')).NewProductPage,
+                  ),
+                }),
+              },
+              {
+                path: ':productId',
+                handle: crumb('editProduct'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'catalog.view',
+                    (await import('@/features/catalog/routes/product-editor-page')).EditProductPage,
+                  ),
+                }),
+              },
+            ],
+          },
+          {
+            path: 'catalog/attributes',
+            handle: crumb('attributes'),
+            lazy: async () => ({
+              Component: withPermission(
+                'catalog.view',
+                (await import('@/features/catalog/routes/attributes-page')).AttributesPage,
+              ),
+            }),
+          },
+          {
             path: 'catalog/categories',
             handle: crumb('categories'),
             lazy: async () => ({
