@@ -30,7 +30,8 @@
     "created": "Created",
     "updated": "Updated",
     "deleted": "Deleted",
-    "password_changed": "Password changed"
+    "password_changed": "Password changed",
+    "status_changed": "Status changed"
   },
   "recordTypes": {
     "category": "Category",
@@ -45,7 +46,8 @@
     "shipping_method": "Shipping method",
     "carrier": "Carrier",
     "store_settings": "Settings",
-    "user": "User"
+    "user": "User",
+    "order": "Order"
   },
   "fields": {
     "name": "Name",

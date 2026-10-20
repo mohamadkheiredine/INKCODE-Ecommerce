@@ -43,7 +43,9 @@ test.describe('Inventory', () => {
 
     // The Product page shows the Variant's stock in the new Warehouse.
     await row.getByRole('link', { name: 'Leather Weekender Bag' }).click()
-    await expect(page.getByRole('heading', { name: 'Leather Weekender Bag', level: 1 })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Leather Weekender Bag', level: 1 }),
+    ).toBeVisible()
     const stock = page.getByRole('table', { name: 'Stock' })
     await expect(stock.getByRole('columnheader', { name: code })).toBeVisible()
   })

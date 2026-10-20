@@ -32,7 +32,9 @@ const LIST_CONFIG: ListQueryConfig = {
 
 /** Where a movement's source record lives in the app. */
 function sourceHref(source: StockMovement['source']): string | null {
-  return source.type === 'receipt' ? `/inventory/receipts/${source.id}` : null
+  if (source.type === 'receipt') return `/inventory/receipts/${source.id}`
+  if (source.type === 'order') return `/orders/${source.id}`
+  return null
 }
 
 /** Stock movement history: every change, newest first, linked to what caused it. */

@@ -129,22 +129,25 @@ describe('receiving stock', () => {
       'BEY-01 · Beirut Central',
     )
     await user.type(screen.getByRole('textbox', { name: 'Supplier reference' }), 'PO-7781')
-    await user.type(screen.getByRole('searchbox', { name: 'Search a SKU or Product to add' }), 'tee')
+    await user.type(
+      screen.getByRole('searchbox', { name: 'Search a SKU or Product to add' }),
+      'tee',
+    )
     await user.click(await screen.findByRole('button', { name: 'Add a Variant: TEE-BLK-S' }))
     await user.clear(screen.getByRole('textbox', { name: 'Quantity' }))
     await user.type(screen.getByRole('textbox', { name: 'Quantity' }), '10')
     await user.type(screen.getByRole('textbox', { name: 'Unit cost' }), '5.12345')
     await user.click(screen.getByRole('button', { name: 'Record Receipt' }))
-    expect(
-      await screen.findByText('Enter a cost with at most four decimals.'),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Enter a cost with at most four decimals.')).toBeInTheDocument()
 
     await user.clear(screen.getByRole('textbox', { name: 'Unit cost' }))
     await user.type(screen.getByRole('textbox', { name: 'Unit cost' }), '5')
     expect(screen.getByTestId('receipt-total')).toHaveTextContent('$50.00')
     await user.click(screen.getByRole('button', { name: 'Record Receipt' }))
 
-    expect(await screen.findByRole('heading', { name: 'RCV-2026-000042', level: 1 })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: 'RCV-2026-000042', level: 1 }),
+    ).toBeInTheDocument()
     expect(posted).toHaveLength(1)
     expect(posted[0]?.input).toEqual({
       warehouse_id: 1,

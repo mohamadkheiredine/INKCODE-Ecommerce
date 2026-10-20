@@ -34,7 +34,7 @@ export type StockLevel = {
 
 export type StockTotals = { on_hand: number; stock_value: Amount }
 
-export const MOVEMENT_TYPES = ['receipt'] as const
+export const MOVEMENT_TYPES = ['receipt', 'reservation', 'release'] as const
 export type StockMovementType = (typeof MOVEMENT_TYPES)[number]
 
 export type StockMovement = {

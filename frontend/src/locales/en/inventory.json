@@ -37,7 +37,9 @@
     "low": "Low stock"
   },
   "movementTypes": {
-    "receipt": "Receipt"
+    "receipt": "Receipt",
+    "reservation": "Reservation",
+    "release": "Release"
   },
   "warehouses": {
     "description": "The places that hold stock and ship Orders.",

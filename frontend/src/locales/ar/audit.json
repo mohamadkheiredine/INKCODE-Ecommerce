@@ -30,7 +30,8 @@
     "created": "إنشاء",
     "updated": "تعديل",
     "deleted": "حذف",
-    "password_changed": "تغيير كلمة المرور"
+    "password_changed": "تغيير كلمة المرور",
+    "status_changed": "تغيير الحالة"
   },
   "recordTypes": {
     "category": "فئة",
@@ -45,7 +46,8 @@
     "shipping_method": "طريقة شحن",
     "carrier": "شركة شحن",
     "store_settings": "الإعدادات",
-    "user": "مستخدم"
+    "user": "مستخدم",
+    "order": "طلب"
   },
   "fields": {
     "name": "الاسم",

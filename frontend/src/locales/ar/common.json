@@ -73,7 +73,10 @@
     "receipt": "استلام",
     "users": "المستخدمون",
     "roles": "الأدوار والصلاحيات",
-    "auditLog": "سجل التدقيق"
+    "auditLog": "سجل التدقيق",
+    "orders": "الطلبات",
+    "newOrder": "طلب جديد",
+    "order": "طلب"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

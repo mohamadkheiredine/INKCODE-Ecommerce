@@ -52,6 +52,7 @@ const ACTION_BADGE: Record<AuditAction, 'secondary' | 'outline' | 'destructive'>
   updated: 'outline',
   deleted: 'destructive',
   password_changed: 'outline',
+  status_changed: 'secondary',
 }
 
 /** The audit log: every recorded change, searchable and filterable, read-only. */

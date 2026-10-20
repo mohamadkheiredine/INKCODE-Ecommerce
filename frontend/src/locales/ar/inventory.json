@@ -37,7 +37,9 @@
     "low": "مخزون منخفض"
   },
   "movementTypes": {
-    "receipt": "استلام"
+    "receipt": "استلام",
+    "reservation": "حجز",
+    "release": "تحرير حجز"
   },
   "warehouses": {
     "description": "الأماكن التي تحفظ المخزون وتشحن الطلبات.",

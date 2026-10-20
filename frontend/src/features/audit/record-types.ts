@@ -30,6 +30,7 @@ export const RECORD_TYPES = {
   carrier: { link: searchedList('/shipping/carriers') },
   store_settings: { link: () => '/settings' },
   user: { link: null },
+  order: { link: (entry) => `/orders/${entry.record_id}` },
 } satisfies Record<string, RecordType>
 
 export type RecordTypeKey = keyof typeof RECORD_TYPES
