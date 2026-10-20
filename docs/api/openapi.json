@@ -524,6 +524,411 @@
                 }
             }
         },
+        "/carriers": {
+            "get": {
+                "operationId": "carriers.index",
+                "tags": [
+                    "Carrier"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "name",
+                                "created_at",
+                                "-name",
+                                "-created_at",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[tracking]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "with",
+                                "without",
+                                null
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `CarrierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CarrierResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "carriers.store",
+                "tags": [
+                    "Carrier"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreCarrierRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`CarrierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CarrierResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/carriers/{carrier}": {
+            "get": {
+                "operationId": "carriers.show",
+                "summary": "Authorized by the route (`can:view,carrier`)",
+                "tags": [
+                    "Carrier"
+                ],
+                "parameters": [
+                    {
+                        "name": "carrier",
+                        "in": "path",
+                        "required": true,
+                        "description": "The carrier ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CarrierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CarrierResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "carriers.update",
+                "tags": [
+                    "Carrier"
+                ],
+                "parameters": [
+                    {
+                        "name": "carrier",
+                        "in": "path",
+                        "required": true,
+                        "description": "The carrier ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCarrierRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CarrierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CarrierResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "carriers.destroy",
+                "summary": "Authorized by the route (`can:delete,carrier`)",
+                "tags": [
+                    "Carrier"
+                ],
+                "parameters": [
+                    {
+                        "name": "carrier",
+                        "in": "path",
+                        "required": true,
+                        "description": "The carrier ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/categories": {
             "get": {
                 "operationId": "categories.index",
@@ -2321,6 +2726,1131 @@
                 }
             }
         },
+        "/shipping-zones/{shippingZone}/methods": {
+            "post": {
+                "operationId": "shipping-zones.methods.store",
+                "tags": [
+                    "ShippingMethod"
+                ],
+                "parameters": [
+                    {
+                        "name": "shippingZone",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipping zone ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveShippingMethodRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ShippingMethodResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShippingMethodResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/shipping-methods/{shippingMethod}": {
+            "put": {
+                "operationId": "shipping-methods.update",
+                "tags": [
+                    "ShippingMethod"
+                ],
+                "parameters": [
+                    {
+                        "name": "shippingMethod",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipping method ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveShippingMethodRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ShippingMethodResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShippingMethodResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "shipping-methods.destroy",
+                "summary": "Authorized by the route (`can:delete,shipping_method`)",
+                "tags": [
+                    "ShippingMethod"
+                ],
+                "parameters": [
+                    {
+                        "name": "shippingMethod",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipping method ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/shipping/quote": {
+            "get": {
+                "operationId": "shipping.quote",
+                "summary": "The Shipping methods offered for an address (`country_code`, `city`)",
+                "tags": [
+                    "ShippingQuote"
+                ],
+                "parameters": [
+                    {
+                        "name": "country_code",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "AD",
+                                "AE",
+                                "AF",
+                                "AG",
+                                "AI",
+                                "AL",
+                                "AM",
+                                "AO",
+                                "AQ",
+                                "AR",
+                                "AS",
+                                "AT",
+                                "AU",
+                                "AW",
+                                "AX",
+                                "AZ",
+                                "BA",
+                                "BB",
+                                "BD",
+                                "BE",
+                                "BF",
+                                "BG",
+                                "BH",
+                                "BI",
+                                "BJ",
+                                "BL",
+                                "BM",
+                                "BN",
+                                "BO",
+                                "BQ",
+                                "BR",
+                                "BS",
+                                "BT",
+                                "BV",
+                                "BW",
+                                "BY",
+                                "BZ",
+                                "CA",
+                                "CC",
+                                "CD",
+                                "CF",
+                                "CG",
+                                "CH",
+                                "CI",
+                                "CK",
+                                "CL",
+                                "CM",
+                                "CN",
+                                "CO",
+                                "CR",
+                                "CU",
+                                "CV",
+                                "CW",
+                                "CX",
+                                "CY",
+                                "CZ",
+                                "DE",
+                                "DJ",
+                                "DK",
+                                "DM",
+                                "DO",
+                                "DZ",
+                                "EC",
+                                "EE",
+                                "EG",
+                                "EH",
+                                "ER",
+                                "ES",
+                                "ET",
+                                "FI",
+                                "FJ",
+                                "FK",
+                                "FM",
+                                "FO",
+                                "FR",
+                                "GA",
+                                "GB",
+                                "GD",
+                                "GE",
+                                "GF",
+                                "GG",
+                                "GH",
+                                "GI",
+                                "GL",
+                                "GM",
+                                "GN",
+                                "GP",
+                                "GQ",
+                                "GR",
+                                "GS",
+                                "GT",
+                                "GU",
+                                "GW",
+                                "GY",
+                                "HK",
+                                "HM",
+                                "HN",
+                                "HR",
+                                "HT",
+                                "HU",
+                                "ID",
+                                "IE",
+                                "IL",
+                                "IM",
+                                "IN",
+                                "IO",
+                                "IQ",
+                                "IR",
+                                "IS",
+                                "IT",
+                                "JE",
+                                "JM",
+                                "JO",
+                                "JP",
+                                "KE",
+                                "KG",
+                                "KH",
+                                "KI",
+                                "KM",
+                                "KN",
+                                "KP",
+                                "KR",
+                                "KW",
+                                "KY",
+                                "KZ",
+                                "LA",
+                                "LB",
+                                "LC",
+                                "LI",
+                                "LK",
+                                "LR",
+                                "LS",
+                                "LT",
+                                "LU",
+                                "LV",
+                                "LY",
+                                "MA",
+                                "MC",
+                                "MD",
+                                "ME",
+                                "MF",
+                                "MG",
+                                "MH",
+                                "MK",
+                                "ML",
+                                "MM",
+                                "MN",
+                                "MO",
+                                "MP",
+                                "MQ",
+                                "MR",
+                                "MS",
+                                "MT",
+                                "MU",
+                                "MV",
+                                "MW",
+                                "MX",
+                                "MY",
+                                "MZ",
+                                "NA",
+                                "NC",
+                                "NE",
+                                "NF",
+                                "NG",
+                                "NI",
+                                "NL",
+                                "NO",
+                                "NP",
+                                "NR",
+                                "NU",
+                                "NZ",
+                                "OM",
+                                "PA",
+                                "PE",
+                                "PF",
+                                "PG",
+                                "PH",
+                                "PK",
+                                "PL",
+                                "PM",
+                                "PN",
+                                "PR",
+                                "PS",
+                                "PT",
+                                "PW",
+                                "PY",
+                                "QA",
+                                "RE",
+                                "RO",
+                                "RS",
+                                "RU",
+                                "RW",
+                                "SA",
+                                "SB",
+                                "SC",
+                                "SD",
+                                "SE",
+                                "SG",
+                                "SH",
+                                "SI",
+                                "SJ",
+                                "SK",
+                                "SL",
+                                "SM",
+                                "SN",
+                                "SO",
+                                "SR",
+                                "SS",
+                                "ST",
+                                "SV",
+                                "SX",
+                                "SY",
+                                "SZ",
+                                "TC",
+                                "TD",
+                                "TF",
+                                "TG",
+                                "TH",
+                                "TJ",
+                                "TK",
+                                "TL",
+                                "TM",
+                                "TN",
+                                "TO",
+                                "TR",
+                                "TT",
+                                "TV",
+                                "TW",
+                                "TZ",
+                                "UA",
+                                "UG",
+                                "UM",
+                                "US",
+                                "UY",
+                                "UZ",
+                                "VA",
+                                "VC",
+                                "VE",
+                                "VG",
+                                "VI",
+                                "VN",
+                                "VU",
+                                "WF",
+                                "WS",
+                                "YE",
+                                "YT",
+                                "ZA",
+                                "ZM",
+                                "ZW"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 120
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ShippingQuoteResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShippingQuoteResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/shipping-zones": {
+            "get": {
+                "operationId": "shipping-zones.index",
+                "tags": [
+                    "ShippingZone"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "name",
+                                "created_at",
+                                "-name",
+                                "-created_at",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[country]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "AD",
+                                "AE",
+                                "AF",
+                                "AG",
+                                "AI",
+                                "AL",
+                                "AM",
+                                "AO",
+                                "AQ",
+                                "AR",
+                                "AS",
+                                "AT",
+                                "AU",
+                                "AW",
+                                "AX",
+                                "AZ",
+                                "BA",
+                                "BB",
+                                "BD",
+                                "BE",
+                                "BF",
+                                "BG",
+                                "BH",
+                                "BI",
+                                "BJ",
+                                "BL",
+                                "BM",
+                                "BN",
+                                "BO",
+                                "BQ",
+                                "BR",
+                                "BS",
+                                "BT",
+                                "BV",
+                                "BW",
+                                "BY",
+                                "BZ",
+                                "CA",
+                                "CC",
+                                "CD",
+                                "CF",
+                                "CG",
+                                "CH",
+                                "CI",
+                                "CK",
+                                "CL",
+                                "CM",
+                                "CN",
+                                "CO",
+                                "CR",
+                                "CU",
+                                "CV",
+                                "CW",
+                                "CX",
+                                "CY",
+                                "CZ",
+                                "DE",
+                                "DJ",
+                                "DK",
+                                "DM",
+                                "DO",
+                                "DZ",
+                                "EC",
+                                "EE",
+                                "EG",
+                                "EH",
+                                "ER",
+                                "ES",
+                                "ET",
+                                "FI",
+                                "FJ",
+                                "FK",
+                                "FM",
+                                "FO",
+                                "FR",
+                                "GA",
+                                "GB",
+                                "GD",
+                                "GE",
+                                "GF",
+                                "GG",
+                                "GH",
+                                "GI",
+                                "GL",
+                                "GM",
+                                "GN",
+                                "GP",
+                                "GQ",
+                                "GR",
+                                "GS",
+                                "GT",
+                                "GU",
+                                "GW",
+                                "GY",
+                                "HK",
+                                "HM",
+                                "HN",
+                                "HR",
+                                "HT",
+                                "HU",
+                                "ID",
+                                "IE",
+                                "IL",
+                                "IM",
+                                "IN",
+                                "IO",
+                                "IQ",
+                                "IR",
+                                "IS",
+                                "IT",
+                                "JE",
+                                "JM",
+                                "JO",
+                                "JP",
+                                "KE",
+                                "KG",
+                                "KH",
+                                "KI",
+                                "KM",
+                                "KN",
+                                "KP",
+                                "KR",
+                                "KW",
+                                "KY",
+                                "KZ",
+                                "LA",
+                                "LB",
+                                "LC",
+                                "LI",
+                                "LK",
+                                "LR",
+                                "LS",
+                                "LT",
+                                "LU",
+                                "LV",
+                                "LY",
+                                "MA",
+                                "MC",
+                                "MD",
+                                "ME",
+                                "MF",
+                                "MG",
+                                "MH",
+                                "MK",
+                                "ML",
+                                "MM",
+                                "MN",
+                                "MO",
+                                "MP",
+                                "MQ",
+                                "MR",
+                                "MS",
+                                "MT",
+                                "MU",
+                                "MV",
+                                "MW",
+                                "MX",
+                                "MY",
+                                "MZ",
+                                "NA",
+                                "NC",
+                                "NE",
+                                "NF",
+                                "NG",
+                                "NI",
+                                "NL",
+                                "NO",
+                                "NP",
+                                "NR",
+                                "NU",
+                                "NZ",
+                                "OM",
+                                "PA",
+                                "PE",
+                                "PF",
+                                "PG",
+                                "PH",
+                                "PK",
+                                "PL",
+                                "PM",
+                                "PN",
+                                "PR",
+                                "PS",
+                                "PT",
+                                "PW",
+                                "PY",
+                                "QA",
+                                "RE",
+                                "RO",
+                                "RS",
+                                "RU",
+                                "RW",
+                                "SA",
+                                "SB",
+                                "SC",
+                                "SD",
+                                "SE",
+                                "SG",
+                                "SH",
+                                "SI",
+                                "SJ",
+                                "SK",
+                                "SL",
+                                "SM",
+                                "SN",
+                                "SO",
+                                "SR",
+                                "SS",
+                                "ST",
+                                "SV",
+                                "SX",
+                                "SY",
+                                "SZ",
+                                "TC",
+                                "TD",
+                                "TF",
+                                "TG",
+                                "TH",
+                                "TJ",
+                                "TK",
+                                "TL",
+                                "TM",
+                                "TN",
+                                "TO",
+                                "TR",
+                                "TT",
+                                "TV",
+                                "TW",
+                                "TZ",
+                                "UA",
+                                "UG",
+                                "UM",
+                                "US",
+                                "UY",
+                                "UZ",
+                                "VA",
+                                "VC",
+                                "VE",
+                                "VG",
+                                "VI",
+                                "VN",
+                                "VU",
+                                "WF",
+                                "WS",
+                                "YE",
+                                "YT",
+                                "ZA",
+                                "ZM",
+                                "ZW",
+                                null
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ShippingZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ShippingZoneResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "shipping-zones.store",
+                "tags": [
+                    "ShippingZone"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreShippingZoneRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ShippingZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShippingZoneResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/shipping-zones/{shippingZone}": {
+            "get": {
+                "operationId": "shipping-zones.show",
+                "summary": "The zone with its places and all its Shipping methods, cheapest first.\nAuthorized by the route (`can:view,shipping_zone`)",
+                "tags": [
+                    "ShippingZone"
+                ],
+                "parameters": [
+                    {
+                        "name": "shippingZone",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipping zone ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ShippingZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ShippingZoneResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "locations",
+                                                        "methods"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "shipping-zones.update",
+                "tags": [
+                    "ShippingZone"
+                ],
+                "parameters": [
+                    {
+                        "name": "shippingZone",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipping zone ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateShippingZoneRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ShippingZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShippingZoneResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "shipping-zones.destroy",
+                "summary": "Authorized by the route (`can:delete,shipping_zone`)",
+                "tags": [
+                    "ShippingZone"
+                ],
+                "parameters": [
+                    {
+                        "name": "shippingZone",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipping zone ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/settings/logo": {
             "post": {
                 "operationId": "settings.logo.store",
@@ -2766,6 +4296,43 @@
                 ],
                 "title": "BrandResource"
             },
+            "CarrierResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "tracking_url_template": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "tracking_url_template",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "CarrierResource"
+            },
             "CategoryResource": {
                 "type": "object",
                 "properties": {
@@ -3154,6 +4721,178 @@
                 ],
                 "title": "RoleResource"
             },
+            "SaveShippingMethodRequest": {
+                "type": "object",
+                "description": "A new or edited Shipping method in a zone: a name unique within the zone, a flat price, the\nestimated delivery days (from\u2013to) and whether it is offered. Managing a zone's\nmethods is part of managing the zone, so the zone's `update` ability decides.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "price": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 99999999.99
+                    },
+                    "min_delivery_days": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 365
+                    },
+                    "max_delivery_days": {
+                        "type": "integer",
+                        "maximum": 365
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name",
+                    "price",
+                    "min_delivery_days",
+                    "max_delivery_days",
+                    "is_active"
+                ],
+                "title": "SaveShippingMethodRequest"
+            },
+            "ShippingMethodResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "shipping_zone_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "string"
+                    },
+                    "min_delivery_days": {
+                        "type": "integer"
+                    },
+                    "max_delivery_days": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "shipping_zone_id",
+                    "name",
+                    "price",
+                    "min_delivery_days",
+                    "max_delivery_days",
+                    "is_active",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "ShippingMethodResource"
+            },
+            "ShippingQuoteResource": {
+                "type": "object",
+                "properties": {
+                    "zone": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "methods": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "message": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "zone",
+                    "methods",
+                    "message"
+                ],
+                "title": "ShippingQuoteResource"
+            },
+            "ShippingZoneResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "locations": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "methods_count": {
+                        "type": "integer"
+                    },
+                    "active_methods_count": {
+                        "type": "integer"
+                    },
+                    "methods": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ShippingMethodResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "ShippingZoneResource"
+            },
             "SignInRequest": {
                 "type": "object",
                 "properties": {
@@ -3213,6 +4952,27 @@
                     "name"
                 ],
                 "title": "StoreBrandRequest"
+            },
+            "StoreCarrierRequest": {
+                "type": "object",
+                "description": "A new Carrier: a unique name and an optional tracking link template, an http(s) address\nholding {tracking_number} where a Shipment's tracking number goes, for example\n\"https://www.aramex.com/track/results?ShipmentNumber={tracking_number}\".",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "tracking_url_template": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "StoreCarrierRequest"
             },
             "StoreCategoryRequest": {
                 "type": "object",
@@ -3725,6 +5485,295 @@
                 ],
                 "title": "StoreSettingsResource"
             },
+            "StoreShippingZoneRequest": {
+                "type": "object",
+                "description": "A new Shipping zone: a unique name and the places it covers, each a whole country\n(no city) or one city in a country. A place another zone already covers is refused,\nso every address matches at most one zone.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "locations": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "country_code": {
+                                    "type": "string",
+                                    "enum": [
+                                        "AD",
+                                        "AE",
+                                        "AF",
+                                        "AG",
+                                        "AI",
+                                        "AL",
+                                        "AM",
+                                        "AO",
+                                        "AQ",
+                                        "AR",
+                                        "AS",
+                                        "AT",
+                                        "AU",
+                                        "AW",
+                                        "AX",
+                                        "AZ",
+                                        "BA",
+                                        "BB",
+                                        "BD",
+                                        "BE",
+                                        "BF",
+                                        "BG",
+                                        "BH",
+                                        "BI",
+                                        "BJ",
+                                        "BL",
+                                        "BM",
+                                        "BN",
+                                        "BO",
+                                        "BQ",
+                                        "BR",
+                                        "BS",
+                                        "BT",
+                                        "BV",
+                                        "BW",
+                                        "BY",
+                                        "BZ",
+                                        "CA",
+                                        "CC",
+                                        "CD",
+                                        "CF",
+                                        "CG",
+                                        "CH",
+                                        "CI",
+                                        "CK",
+                                        "CL",
+                                        "CM",
+                                        "CN",
+                                        "CO",
+                                        "CR",
+                                        "CU",
+                                        "CV",
+                                        "CW",
+                                        "CX",
+                                        "CY",
+                                        "CZ",
+                                        "DE",
+                                        "DJ",
+                                        "DK",
+                                        "DM",
+                                        "DO",
+                                        "DZ",
+                                        "EC",
+                                        "EE",
+                                        "EG",
+                                        "EH",
+                                        "ER",
+                                        "ES",
+                                        "ET",
+                                        "FI",
+                                        "FJ",
+                                        "FK",
+                                        "FM",
+                                        "FO",
+                                        "FR",
+                                        "GA",
+                                        "GB",
+                                        "GD",
+                                        "GE",
+                                        "GF",
+                                        "GG",
+                                        "GH",
+                                        "GI",
+                                        "GL",
+                                        "GM",
+                                        "GN",
+                                        "GP",
+                                        "GQ",
+                                        "GR",
+                                        "GS",
+                                        "GT",
+                                        "GU",
+                                        "GW",
+                                        "GY",
+                                        "HK",
+                                        "HM",
+                                        "HN",
+                                        "HR",
+                                        "HT",
+                                        "HU",
+                                        "ID",
+                                        "IE",
+                                        "IL",
+                                        "IM",
+                                        "IN",
+                                        "IO",
+                                        "IQ",
+                                        "IR",
+                                        "IS",
+                                        "IT",
+                                        "JE",
+                                        "JM",
+                                        "JO",
+                                        "JP",
+                                        "KE",
+                                        "KG",
+                                        "KH",
+                                        "KI",
+                                        "KM",
+                                        "KN",
+                                        "KP",
+                                        "KR",
+                                        "KW",
+                                        "KY",
+                                        "KZ",
+                                        "LA",
+                                        "LB",
+                                        "LC",
+                                        "LI",
+                                        "LK",
+                                        "LR",
+                                        "LS",
+                                        "LT",
+                                        "LU",
+                                        "LV",
+                                        "LY",
+                                        "MA",
+                                        "MC",
+                                        "MD",
+                                        "ME",
+                                        "MF",
+                                        "MG",
+                                        "MH",
+                                        "MK",
+                                        "ML",
+                                        "MM",
+                                        "MN",
+                                        "MO",
+                                        "MP",
+                                        "MQ",
+                                        "MR",
+                                        "MS",
+                                        "MT",
+                                        "MU",
+                                        "MV",
+                                        "MW",
+                                        "MX",
+                                        "MY",
+                                        "MZ",
+                                        "NA",
+                                        "NC",
+                                        "NE",
+                                        "NF",
+                                        "NG",
+                                        "NI",
+                                        "NL",
+                                        "NO",
+                                        "NP",
+                                        "NR",
+                                        "NU",
+                                        "NZ",
+                                        "OM",
+                                        "PA",
+                                        "PE",
+                                        "PF",
+                                        "PG",
+                                        "PH",
+                                        "PK",
+                                        "PL",
+                                        "PM",
+                                        "PN",
+                                        "PR",
+                                        "PS",
+                                        "PT",
+                                        "PW",
+                                        "PY",
+                                        "QA",
+                                        "RE",
+                                        "RO",
+                                        "RS",
+                                        "RU",
+                                        "RW",
+                                        "SA",
+                                        "SB",
+                                        "SC",
+                                        "SD",
+                                        "SE",
+                                        "SG",
+                                        "SH",
+                                        "SI",
+                                        "SJ",
+                                        "SK",
+                                        "SL",
+                                        "SM",
+                                        "SN",
+                                        "SO",
+                                        "SR",
+                                        "SS",
+                                        "ST",
+                                        "SV",
+                                        "SX",
+                                        "SY",
+                                        "SZ",
+                                        "TC",
+                                        "TD",
+                                        "TF",
+                                        "TG",
+                                        "TH",
+                                        "TJ",
+                                        "TK",
+                                        "TL",
+                                        "TM",
+                                        "TN",
+                                        "TO",
+                                        "TR",
+                                        "TT",
+                                        "TV",
+                                        "TW",
+                                        "TZ",
+                                        "UA",
+                                        "UG",
+                                        "UM",
+                                        "US",
+                                        "UY",
+                                        "UZ",
+                                        "VA",
+                                        "VC",
+                                        "VE",
+                                        "VG",
+                                        "VI",
+                                        "VN",
+                                        "VU",
+                                        "WF",
+                                        "WS",
+                                        "YE",
+                                        "YT",
+                                        "ZA",
+                                        "ZM",
+                                        "ZW"
+                                    ]
+                                },
+                                "city": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 120
+                                }
+                            },
+                            "required": [
+                                "country_code"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 200
+                    }
+                },
+                "required": [
+                    "name",
+                    "locations"
+                ],
+                "title": "StoreShippingZoneRequest"
+            },
             "StoreStoreLogoRequest": {
                 "type": "object",
                 "description": "The store's logo (see {@see LogoFile::rules()}). Only the Admin may change it.",
@@ -3786,6 +5835,27 @@
                     "name"
                 ],
                 "title": "UpdateBrandRequest"
+            },
+            "UpdateCarrierRequest": {
+                "type": "object",
+                "description": "A Carrier's new name and tracking link template.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "tracking_url_template": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "UpdateCarrierRequest"
             },
             "UpdateCategoryRequest": {
                 "type": "object",
@@ -3871,6 +5941,295 @@
                     }
                 },
                 "title": "UpdatePreferencesRequest"
+            },
+            "UpdateShippingZoneRequest": {
+                "type": "object",
+                "description": "A Shipping zone's new name and the full list of places it covers (replacing the old one).",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "locations": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "country_code": {
+                                    "type": "string",
+                                    "enum": [
+                                        "AD",
+                                        "AE",
+                                        "AF",
+                                        "AG",
+                                        "AI",
+                                        "AL",
+                                        "AM",
+                                        "AO",
+                                        "AQ",
+                                        "AR",
+                                        "AS",
+                                        "AT",
+                                        "AU",
+                                        "AW",
+                                        "AX",
+                                        "AZ",
+                                        "BA",
+                                        "BB",
+                                        "BD",
+                                        "BE",
+                                        "BF",
+                                        "BG",
+                                        "BH",
+                                        "BI",
+                                        "BJ",
+                                        "BL",
+                                        "BM",
+                                        "BN",
+                                        "BO",
+                                        "BQ",
+                                        "BR",
+                                        "BS",
+                                        "BT",
+                                        "BV",
+                                        "BW",
+                                        "BY",
+                                        "BZ",
+                                        "CA",
+                                        "CC",
+                                        "CD",
+                                        "CF",
+                                        "CG",
+                                        "CH",
+                                        "CI",
+                                        "CK",
+                                        "CL",
+                                        "CM",
+                                        "CN",
+                                        "CO",
+                                        "CR",
+                                        "CU",
+                                        "CV",
+                                        "CW",
+                                        "CX",
+                                        "CY",
+                                        "CZ",
+                                        "DE",
+                                        "DJ",
+                                        "DK",
+                                        "DM",
+                                        "DO",
+                                        "DZ",
+                                        "EC",
+                                        "EE",
+                                        "EG",
+                                        "EH",
+                                        "ER",
+                                        "ES",
+                                        "ET",
+                                        "FI",
+                                        "FJ",
+                                        "FK",
+                                        "FM",
+                                        "FO",
+                                        "FR",
+                                        "GA",
+                                        "GB",
+                                        "GD",
+                                        "GE",
+                                        "GF",
+                                        "GG",
+                                        "GH",
+                                        "GI",
+                                        "GL",
+                                        "GM",
+                                        "GN",
+                                        "GP",
+                                        "GQ",
+                                        "GR",
+                                        "GS",
+                                        "GT",
+                                        "GU",
+                                        "GW",
+                                        "GY",
+                                        "HK",
+                                        "HM",
+                                        "HN",
+                                        "HR",
+                                        "HT",
+                                        "HU",
+                                        "ID",
+                                        "IE",
+                                        "IL",
+                                        "IM",
+                                        "IN",
+                                        "IO",
+                                        "IQ",
+                                        "IR",
+                                        "IS",
+                                        "IT",
+                                        "JE",
+                                        "JM",
+                                        "JO",
+                                        "JP",
+                                        "KE",
+                                        "KG",
+                                        "KH",
+                                        "KI",
+                                        "KM",
+                                        "KN",
+                                        "KP",
+                                        "KR",
+                                        "KW",
+                                        "KY",
+                                        "KZ",
+                                        "LA",
+                                        "LB",
+                                        "LC",
+                                        "LI",
+                                        "LK",
+                                        "LR",
+                                        "LS",
+                                        "LT",
+                                        "LU",
+                                        "LV",
+                                        "LY",
+                                        "MA",
+                                        "MC",
+                                        "MD",
+                                        "ME",
+                                        "MF",
+                                        "MG",
+                                        "MH",
+                                        "MK",
+                                        "ML",
+                                        "MM",
+                                        "MN",
+                                        "MO",
+                                        "MP",
+                                        "MQ",
+                                        "MR",
+                                        "MS",
+                                        "MT",
+                                        "MU",
+                                        "MV",
+                                        "MW",
+                                        "MX",
+                                        "MY",
+                                        "MZ",
+                                        "NA",
+                                        "NC",
+                                        "NE",
+                                        "NF",
+                                        "NG",
+                                        "NI",
+                                        "NL",
+                                        "NO",
+                                        "NP",
+                                        "NR",
+                                        "NU",
+                                        "NZ",
+                                        "OM",
+                                        "PA",
+                                        "PE",
+                                        "PF",
+                                        "PG",
+                                        "PH",
+                                        "PK",
+                                        "PL",
+                                        "PM",
+                                        "PN",
+                                        "PR",
+                                        "PS",
+                                        "PT",
+                                        "PW",
+                                        "PY",
+                                        "QA",
+                                        "RE",
+                                        "RO",
+                                        "RS",
+                                        "RU",
+                                        "RW",
+                                        "SA",
+                                        "SB",
+                                        "SC",
+                                        "SD",
+                                        "SE",
+                                        "SG",
+                                        "SH",
+                                        "SI",
+                                        "SJ",
+                                        "SK",
+                                        "SL",
+                                        "SM",
+                                        "SN",
+                                        "SO",
+                                        "SR",
+                                        "SS",
+                                        "ST",
+                                        "SV",
+                                        "SX",
+                                        "SY",
+                                        "SZ",
+                                        "TC",
+                                        "TD",
+                                        "TF",
+                                        "TG",
+                                        "TH",
+                                        "TJ",
+                                        "TK",
+                                        "TL",
+                                        "TM",
+                                        "TN",
+                                        "TO",
+                                        "TR",
+                                        "TT",
+                                        "TV",
+                                        "TW",
+                                        "TZ",
+                                        "UA",
+                                        "UG",
+                                        "UM",
+                                        "US",
+                                        "UY",
+                                        "UZ",
+                                        "VA",
+                                        "VC",
+                                        "VE",
+                                        "VG",
+                                        "VI",
+                                        "VN",
+                                        "VU",
+                                        "WF",
+                                        "WS",
+                                        "YE",
+                                        "YT",
+                                        "ZA",
+                                        "ZM",
+                                        "ZW"
+                                    ]
+                                },
+                                "city": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 120
+                                }
+                            },
+                            "required": [
+                                "country_code"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 200
+                    }
+                },
+                "required": [
+                    "name",
+                    "locations"
+                ],
+                "title": "UpdateShippingZoneRequest"
             },
             "UpdateStoreSettingsRequest": {
                 "type": "object",

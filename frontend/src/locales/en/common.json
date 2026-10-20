@@ -57,7 +57,10 @@
     "brands": "Brands",
     "settings": "Settings",
     "customers": "Customers",
-    "customer": "Customer"
+    "customer": "Customer",
+    "shippingZones": "Shipping zones",
+    "shippingZone": "Shipping zone",
+    "carriers": "Carriers"
   },
   "navGroups": {
     "dashboard": "Dashboard",
