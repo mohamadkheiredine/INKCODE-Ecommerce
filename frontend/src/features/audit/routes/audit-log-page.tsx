@@ -195,22 +195,28 @@ export function AuditLogPage() {
               label: author.name,
             }))}
           />
-          <Input
-            type="date"
-            aria-label={t('from')}
-            value={filters.from ?? ''}
-            max={filters.to}
-            onChange={(event) => list.setFilter('from', event.target.value || null)}
-            className="h-9 sm:w-40"
-          />
-          <Input
-            type="date"
-            aria-label={t('to')}
-            value={filters.to ?? ''}
-            min={filters.from}
-            onChange={(event) => list.setFilter('to', event.target.value || null)}
-            className="h-9 sm:w-40"
-          />
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              {t('from')}
+              <Input
+                type="date"
+                value={filters.from ?? ''}
+                max={filters.to}
+                onChange={(event) => list.setFilter('from', event.target.value || null)}
+                className="h-9 w-40 bg-card"
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              {t('to')}
+              <Input
+                type="date"
+                value={filters.to ?? ''}
+                min={filters.from}
+                onChange={(event) => list.setFilter('to', event.target.value || null)}
+                className="h-9 w-40 bg-card"
+              />
+            </label>
+          </div>
         </DataTableToolbar>
         <DataTable
           columns={columns}
