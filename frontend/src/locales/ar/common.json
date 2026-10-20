@@ -55,6 +55,7 @@
     "notFound": "الصفحة غير موجودة",
     "categories": "الفئات",
     "brands": "العلامات التجارية",
+    "settings": "الإعدادات",
     "customers": "العملاء",
     "customer": "العميل",
     "shippingZones": "مناطق الشحن",
@@ -76,7 +77,8 @@
     "skipToContent": "تخطَّ إلى المحتوى",
     "toggleSidebar": "إظهار الشريط الجانبي أو إخفاؤه",
     "userMenu": "فتح قائمة المستخدم",
-    "loadingPage": "جارٍ تحميل الصفحة…"
+    "loadingPage": "جارٍ تحميل الصفحة…",
+    "storeCurrency": "الأسعار بعملة {{code}}"
   },
   "dataTable": {
     "sortBy": "رتّب حسب {{column}}",

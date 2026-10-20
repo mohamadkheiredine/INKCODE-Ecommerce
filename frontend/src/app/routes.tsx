@@ -124,6 +124,16 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'settings',
+            handle: crumb('settings'),
+            lazy: async () => ({
+              Component: withPermission(
+                'settings.manage',
+                (await import('@/features/settings/routes/settings-page')).SettingsPage,
+              ),
+            }),
+          },
+          {
             path: '*',
             handle: crumb('notFound'),
             lazy: async () => ({ Component: (await import('./not-found-page')).NotFoundPage }),

@@ -55,6 +55,7 @@
     "notFound": "Page not found",
     "categories": "Categories",
     "brands": "Brands",
+    "settings": "Settings",
     "customers": "Customers",
     "customer": "Customer",
     "shippingZones": "Shipping zones",
@@ -76,7 +77,8 @@
     "skipToContent": "Skip to content",
     "toggleSidebar": "Toggle sidebar",
     "userMenu": "Open the user menu",
-    "loadingPage": "Loading the page…"
+    "loadingPage": "Loading the page…",
+    "storeCurrency": "Prices in {{code}}"
   },
   "dataTable": {
     "sortBy": "Sort by {{column}}",

@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8003/api/v1"
+            "url": "http://localhost:8004/api/v1"
         }
     ],
     "paths": {
@@ -3851,6 +3851,197 @@
                 }
             }
         },
+        "/settings/logo": {
+            "post": {
+                "operationId": "settings.logo.store",
+                "tags": [
+                    "StoreLogo"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreStoreLogoRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`StoreSettingsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoreSettingsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "settings.logo.destroy",
+                "summary": "Authorized by the route (`can:settings.manage`)",
+                "tags": [
+                    "StoreLogo"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`StoreSettingsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoreSettingsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/store": {
+            "get": {
+                "operationId": "store.show",
+                "tags": [
+                    "StoreProfile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`StoreProfileResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoreProfileResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/settings": {
+            "get": {
+                "operationId": "settings.show",
+                "summary": "Authorized by the route (`can:settings.manage`)",
+                "tags": [
+                    "StoreSettings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`StoreSettingsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoreSettingsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "settings.update",
+                "tags": [
+                    "StoreSettings"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateStoreSettingsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`StoreSettingsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoreSettingsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/customer-tags": {
             "get": {
                 "operationId": "customer-tags.index",
@@ -4436,6 +4627,16 @@
                 ],
                 "title": "CustomerResource"
             },
+            "DeductionStage": {
+                "type": "string",
+                "description": "The Order status at which Reserved units leave On-hand, chosen in Settings. The values are the matching Order statuses, so the Order flow can compare the two directly.\n",
+                "enum": [
+                    "preparing",
+                    "ready_for_shipping",
+                    "shipped"
+                ],
+                "title": "DeductionStage"
+            },
             "DemoAccountResource": {
                 "type": "object",
                 "properties": {
@@ -4716,7 +4917,7 @@
             },
             "StoreBrandLogoRequest": {
                 "type": "object",
-                "description": "A Brand's logo: a PNG, JPEG or WebP image of at most 1 MB. SVG is refused, because\nan SVG served from our own origin can carry scripts.",
+                "description": "A Brand's logo (see {@see LogoFile::rules()}).",
                 "properties": {
                     "logo": {
                         "type": "string",
@@ -5170,6 +5371,120 @@
                 ],
                 "title": "StoreCustomerRequest"
             },
+            "StoreProfileResource": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "logo_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "currency": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "symbol": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "code",
+                            "symbol"
+                        ]
+                    }
+                },
+                "required": [
+                    "name",
+                    "logo_url",
+                    "currency"
+                ],
+                "title": "StoreProfileResource"
+            },
+            "StoreSettingsResource": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "logo_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contact_email": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contact_phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "currency_code": {
+                        "type": "string"
+                    },
+                    "currency_symbol": {
+                        "type": "string"
+                    },
+                    "vat_rate": {
+                        "type": "string"
+                    },
+                    "deduction_stage": {
+                        "$ref": "#/components/schemas/DeductionStage"
+                    },
+                    "return_window_days": {
+                        "type": "integer"
+                    },
+                    "low_stock_threshold": {
+                        "type": "integer"
+                    },
+                    "default_locale": {
+                        "$ref": "#/components/schemas/Locale"
+                    },
+                    "default_theme": {
+                        "$ref": "#/components/schemas/Theme"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "name",
+                    "logo_url",
+                    "contact_email",
+                    "contact_phone",
+                    "address",
+                    "currency_code",
+                    "currency_symbol",
+                    "vat_rate",
+                    "deduction_stage",
+                    "return_window_days",
+                    "low_stock_threshold",
+                    "default_locale",
+                    "default_theme",
+                    "updated_at"
+                ],
+                "title": "StoreSettingsResource"
+            },
             "StoreShippingZoneRequest": {
                 "type": "object",
                 "description": "A new Shipping zone: a unique name and the places it covers, each a whole country\n(no city) or one city in a country. A place another zone already covers is refused,\nso every address matches at most one zone.",
@@ -5458,6 +5773,22 @@
                     "locations"
                 ],
                 "title": "StoreShippingZoneRequest"
+            },
+            "StoreStoreLogoRequest": {
+                "type": "object",
+                "description": "The store's logo (see {@see LogoFile::rules()}). Only the Admin may change it.",
+                "properties": {
+                    "logo": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Maximum file size: 1024 kilobytes."
+                    }
+                },
+                "required": [
+                    "logo"
+                ],
+                "title": "StoreStoreLogoRequest"
             },
             "TagResource": {
                 "type": "object",
@@ -5899,6 +6230,82 @@
                     "locations"
                 ],
                 "title": "UpdateShippingZoneRequest"
+            },
+            "UpdateStoreSettingsRequest": {
+                "type": "object",
+                "description": "The whole settings form, saved at once. Only the Admin (settings.manage) may change it.\nThe limits keep every value one the other modules can work with: VAT in cents of a\npercent, whole-day Return windows, whole-unit thresholds.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "contact_email": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "contact_phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 40
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    },
+                    "currency_code": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                    },
+                    "currency_symbol": {
+                        "type": "string",
+                        "maxLength": 8
+                    },
+                    "vat_rate": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "deduction_stage": {
+                        "$ref": "#/components/schemas/DeductionStage"
+                    },
+                    "return_window_days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 365
+                    },
+                    "low_stock_threshold": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "default_locale": {
+                        "$ref": "#/components/schemas/Locale"
+                    },
+                    "default_theme": {
+                        "$ref": "#/components/schemas/Theme"
+                    }
+                },
+                "required": [
+                    "name",
+                    "currency_code",
+                    "currency_symbol",
+                    "vat_rate",
+                    "deduction_stage",
+                    "return_window_days",
+                    "low_stock_threshold",
+                    "default_locale",
+                    "default_theme"
+                ],
+                "title": "UpdateStoreSettingsRequest"
             }
         },
         "responses": {

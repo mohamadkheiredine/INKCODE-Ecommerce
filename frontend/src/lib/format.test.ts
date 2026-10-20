@@ -25,6 +25,17 @@ describe('Formatting numbers, money and dates', () => {
     expect(ar.relativeTime('2026-10-19T09:25:00', october19)).toBe('قبل 5 دقائق')
   })
 
+  it('writes money in the Store currency, with the symbol chosen in Settings', () => {
+    const euro = { code: 'EUR', symbol: '€' }
+    const lebanesePound = { code: 'LBP', symbol: 'ل.ل' }
+
+    expect(createFormatters('en', euro).money('1234.5')).toBe('€1,234.50')
+    expect(createFormatters('en', { code: 'USD', symbol: 'US$' }).money('-20')).toBe('-US$20.00')
+    // Amounts keep their cents even in a currency usually written without them.
+    expect(createFormatters('en', lebanesePound).money('1500.25')).toBe('ل.ل 1,500.25')
+    expect(createFormatters('ar', euro).money('1234.50')).toMatch(/^‏?1,234.50\s€$/)
+  })
+
   it('formats English the usual way', () => {
     const format = createFormatters('en')
 

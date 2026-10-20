@@ -1,11 +1,7 @@
 import { z } from 'zod'
+import { isLogoSize, isLogoType } from '@/lib/logo-file'
 import type { Brand, BrandInput, LogoChange } from '../types'
-
 import { optionalSlug, requiredName } from './slug'
-
-/** What the API accepts as a logo (StoreBrandLogoRequest): PNG, JPEG or WebP, up to 1 MB. */
-export const LOGO_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
-export const LOGO_MAX_BYTES = 1024 * 1024
 
 export const brandSchema = z.object({
   name: requiredName,
@@ -14,14 +10,8 @@ export const brandSchema = z.object({
   logo: z
     .instanceof(File)
     .nullable()
-    .refine(
-      (file) => file === null || (LOGO_TYPES as readonly string[]).includes(file.type),
-      'catalog:validation.logoType',
-    )
-    .refine(
-      (file) => file === null || file.size <= LOGO_MAX_BYTES,
-      'catalog:validation.logoTooLarge',
-    ),
+    .refine((file) => file === null || isLogoType(file), 'catalog:validation.logoType')
+    .refine((file) => file === null || isLogoSize(file), 'catalog:validation.logoTooLarge'),
   removeLogo: z.boolean(),
 })
 

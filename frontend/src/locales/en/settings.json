@@ -1,0 +1,92 @@
+{
+  "description": "The store's profile and the rules every module follows.",
+  "sections": {
+    "profile": {
+      "title": "Store profile",
+      "description": "How the store presents itself across the dashboard and on Invoices."
+    },
+    "money": {
+      "title": "Currency and VAT",
+      "description": "How every price, payment and report is written and taxed."
+    },
+    "stock": {
+      "title": "Stock and Returns",
+      "description": "When stock leaves the shelves, and how long Customers have to send items back."
+    },
+    "defaults": {
+      "title": "New Users",
+      "description": "What a new User starts with. Each User can change their own afterwards."
+    }
+  },
+  "fields": {
+    "name": "Store name",
+    "logo": "Logo",
+    "contactEmail": "Contact email",
+    "contactPhone": "Contact phone",
+    "address": "Address",
+    "currencyCode": "Currency code",
+    "currencySymbol": "Currency symbol",
+    "vatRate": "VAT rate",
+    "deductionStage": "Deduction stage",
+    "returnWindow": "Return window",
+    "lowStockThreshold": "Default Low-stock threshold",
+    "defaultLanguage": "Language",
+    "defaultTheme": "Theme"
+  },
+  "hints": {
+    "currencyCode": "The Store currency's three-letter ISO code, for example USD or EUR. There are no exchange rates: changing it relabels amounts, it doesn't convert them.",
+    "currencySymbol": "How amounts are written on screen, for example $ or €.",
+    "vatRate": "Added to taxable Products, whose prices are entered without VAT. An Order line keeps the rate it was priced with, so a change never alters past Orders.",
+    "deductionStage": "Confirming an Order reserves its units. At this Order status the Reserved units leave On-hand; cancelling before it puts them back.",
+    "returnWindow": "How many days after delivery a Customer may request a Return.",
+    "lowStockThreshold": "What a new Variant starts with. When a Variant's Available stock in a Warehouse drops to it or below, a low-stock alert fires.",
+    "logo": "PNG, JPEG or WebP, up to 1 MB. A square image looks best."
+  },
+  "deductionStages": {
+    "preparing": {
+      "label": "Preparing",
+      "description": "As soon as packing starts. On-hand matches the shelves earliest."
+    },
+    "ready_for_shipping": {
+      "label": "Ready for shipping",
+      "description": "Once the parcel is packed and waiting for the Carrier."
+    },
+    "shipped": {
+      "label": "Shipped",
+      "description": "When the parcel leaves the Warehouse. Cancelling stays free of stock corrections longest."
+    }
+  },
+  "units": {
+    "days_one": "day",
+    "days_other": "days",
+    "percent": "%"
+  },
+  "preview": {
+    "title": "How amounts will look",
+    "amount": "A price",
+    "vat": "VAT on {{amount}}",
+    "invalid": "Enter a valid currency code and VAT rate to see a preview."
+  },
+  "logo": {
+    "alt": "{{name}} logo",
+    "choose": "Upload a logo",
+    "replace": "Replace logo",
+    "remove": "Remove logo",
+    "saved": "Logo saved.",
+    "removed": "Logo removed.",
+    "type": "Choose a PNG, JPEG or WebP image.",
+    "tooLarge": "Choose an image of 1 MB or less."
+  },
+  "unsaved": "You have unsaved changes.",
+  "discard": "Discard",
+  "saved": "Settings saved.",
+  "validation": {
+    "nameRequired": "Enter the store's name.",
+    "email": "Enter a valid email address, or leave it empty.",
+    "currencyCode": "Use the three-letter ISO code in capitals, for example USD.",
+    "currencySymbol": "Enter a symbol of up to 8 characters.",
+    "vatRate": "Enter a percentage from 0 to 100, with up to two decimals.",
+    "returnWindow": "Enter a whole number of days from 1 to 365.",
+    "lowStockThreshold": "Enter a whole number from 0 to 100,000."
+  }
+}
