@@ -76,7 +76,8 @@
     "auditLog": "Audit log",
     "orders": "Orders",
     "newOrder": "New Order",
-    "order": "Order"
+    "order": "Order",
+    "transfers": "Transfers"
   },
   "navGroups": {
     "dashboard": "Dashboard",

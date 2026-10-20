@@ -39,7 +39,10 @@
   "movementTypes": {
     "receipt": "Receipt",
     "reservation": "Reservation",
-    "release": "Release"
+    "release": "Release",
+    "adjustment": "Adjustment",
+    "transfer_out": "Transfer out",
+    "transfer_in": "Transfer in"
   },
   "warehouses": {
     "description": "The places that hold stock and ship Orders.",
@@ -129,6 +132,61 @@
     "referenceTooLong": "Use at most 100 characters.",
     "notesTooLong": "Use at most 1,000 characters.",
     "quantity": "Enter a whole number from 1 to 1,000,000.",
-    "unitCost": "Enter a cost with at most four decimals."
+    "unitCost": "Enter a cost with at most four decimals.",
+    "quantityNotZero": "Enter a quantity other than 0.",
+    "quantityPositive": "Enter at least 1.",
+    "reasonRequired": "Choose a reason.",
+    "destinationRequired": "Choose a destination Warehouse."
+  },
+  "adjustmentReasons": {
+    "count_correction": "Count correction",
+    "damaged": "Damaged",
+    "lost": "Lost",
+    "found": "Found"
+  },
+  "transferStatus": {
+    "draft": "Draft",
+    "in_transit": "In transit",
+    "received": "Received",
+    "cancelled": "Cancelled"
+  },
+  "adjust": {
+    "action": "Adjust",
+    "title": "Adjust stock",
+    "description": "Correct On-hand for {{sku}} in {{warehouse}}. Use a negative quantity to remove units.",
+    "quantity": "Quantity change",
+    "reason": "Reason",
+    "notes": "Notes",
+    "submit": "Save Adjustment",
+    "created": "Adjustment {{number}} saved."
+  },
+  "transfers": {
+    "description": "Move stock between Warehouses: send it from the source, then receive it at the destination.",
+    "action": "Transfer",
+    "title": "Transfer stock",
+    "formDescription": "Move {{sku}} out of {{warehouse}}. It stays a Draft until you send it.",
+    "destination": "Destination Warehouse",
+    "quantity": "Quantity",
+    "notes": "Notes",
+    "submit": "Create Transfer",
+    "created": "Transfer {{number}} created as a Draft.",
+    "send": "Send",
+    "receive": "Receive",
+    "cancel": "Cancel Transfer",
+    "sent": "Transfer {{number}} sent; its units are in transit.",
+    "received": "Transfer {{number}} received.",
+    "cancelled": "Transfer {{number}} cancelled.",
+    "search": "Search by number",
+    "allStatuses": "All statuses",
+    "loading": "Loading Transfers…",
+    "emptyTitle": "No Transfers yet",
+    "emptyDescription": "Start a Transfer from a row on the Stock levels page.",
+    "emptyDescriptionReadOnly": "Transfers between Warehouses will appear here.",
+    "route": "Route",
+    "units": "Units",
+    "status": "Status",
+    "number": "Transfer",
+    "date": "Date",
+    "actions": "Actions"
   }
 }

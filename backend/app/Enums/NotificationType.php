@@ -13,6 +13,8 @@ enum NotificationType: string
 {
     case Welcome = 'welcome';
 
+    case LowStock = 'low_stock';
+
     /**
      * The message in the current language, filled with the values saved when it was sent.
      *

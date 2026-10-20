@@ -39,7 +39,10 @@
   "movementTypes": {
     "receipt": "استلام",
     "reservation": "حجز",
-    "release": "تحرير حجز"
+    "release": "تحرير حجز",
+    "adjustment": "تعديل",
+    "transfer_out": "تحويل صادر",
+    "transfer_in": "تحويل وارد"
   },
   "warehouses": {
     "description": "الأماكن التي تحفظ المخزون وتشحن الطلبات.",
@@ -129,6 +132,61 @@
     "referenceTooLong": "استخدم 100 حرف على الأكثر.",
     "notesTooLong": "استخدم 1000 حرف على الأكثر.",
     "quantity": "أدخل عدداً صحيحاً من 1 إلى 1000000.",
-    "unitCost": "أدخل تكلفة بأربعة أرقام عشرية على الأكثر."
+    "unitCost": "أدخل تكلفة بأربعة أرقام عشرية على الأكثر.",
+    "quantityNotZero": "أدخل كمية غير الصفر.",
+    "quantityPositive": "أدخل 1 على الأقل.",
+    "reasonRequired": "اختر سبباً.",
+    "destinationRequired": "اختر المستودع الوجهة."
+  },
+  "adjustmentReasons": {
+    "count_correction": "تصحيح جرد",
+    "damaged": "تالف",
+    "lost": "مفقود",
+    "found": "معثور عليه"
+  },
+  "transferStatus": {
+    "draft": "مسودة",
+    "in_transit": "قيد النقل",
+    "received": "مستلَم",
+    "cancelled": "ملغى"
+  },
+  "adjust": {
+    "action": "تعديل",
+    "title": "تعديل المخزون",
+    "description": "صحّح الكمية المتوفرة من {{sku}} في {{warehouse}}. استخدم كمية سالبة لخصم الوحدات.",
+    "quantity": "تغيّر الكمية",
+    "reason": "السبب",
+    "notes": "ملاحظات",
+    "submit": "حفظ التعديل",
+    "created": "تم حفظ التعديل {{number}}."
+  },
+  "transfers": {
+    "description": "انقل المخزون بين المستودعات: أرسله من المصدر ثم استلمه في الوجهة.",
+    "action": "تحويل",
+    "title": "تحويل المخزون",
+    "formDescription": "انقل {{sku}} من {{warehouse}}. يبقى مسودة حتى ترسله.",
+    "destination": "المستودع الوجهة",
+    "quantity": "الكمية",
+    "notes": "ملاحظات",
+    "submit": "إنشاء التحويل",
+    "created": "تم إنشاء التحويل {{number}} كمسودة.",
+    "send": "إرسال",
+    "receive": "استلام",
+    "cancel": "إلغاء التحويل",
+    "sent": "تم إرسال التحويل {{number}}؛ وحداته قيد النقل.",
+    "received": "تم استلام التحويل {{number}}.",
+    "cancelled": "تم إلغاء التحويل {{number}}.",
+    "search": "ابحث بالرقم",
+    "allStatuses": "كل الحالات",
+    "loading": "جارٍ تحميل التحويلات…",
+    "emptyTitle": "لا توجد تحويلات بعد",
+    "emptyDescription": "ابدأ تحويلاً من صف في صفحة مستويات المخزون.",
+    "emptyDescriptionReadOnly": "ستظهر هنا التحويلات بين المستودعات.",
+    "route": "المسار",
+    "units": "الوحدات",
+    "status": "الحالة",
+    "number": "التحويل",
+    "date": "التاريخ",
+    "actions": "الإجراءات"
   }
 }

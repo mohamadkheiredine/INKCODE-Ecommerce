@@ -4,8 +4,13 @@ namespace Database\Seeders;
 
 use App\Actions\Catalog\CreateProduct;
 use App\Actions\Catalog\GenerateVariants;
+use App\Actions\Inventory\ChangeTransferStatus;
+use App\Actions\Inventory\CreateAdjustment;
 use App\Actions\Inventory\CreateReceipt;
+use App\Actions\Inventory\CreateTransfer;
+use App\Enums\AdjustmentReason;
 use App\Enums\ProductStatus;
+use App\Enums\TransferStatus;
 use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
@@ -92,6 +97,7 @@ class DemoInventorySeeder extends Seeder
         Auth::setUser(User::query()->where('email', 'inventory@inkcode.test')->firstOrFail());
         if (! Receipt::query()->where('supplier_reference', self::RECEIPTS[0][1])->exists()) {
             $this->receive($variants->all(), $warehouses);
+            $this->adjustAndTransfer($variants->all(), $warehouses);
         }
         Auth::forgetUser();
     }
@@ -153,5 +159,41 @@ class DemoInventorySeeder extends Seeder
         app(GenerateVariants::class)->handle($product, $valueIds);
 
         return $product;
+    }
+
+    /**
+     * A few corrections and Transfers on top of the Receipts: one damaged batch (which
+     * drops a Variant to low stock and alerts the bell), a found unit, and Transfers that
+     * were received, are in transit and are still a Draft.
+     *
+     * @param  list<Variant>  $variants
+     * @param  array<string, Warehouse>  $warehouses
+     */
+    private function adjustAndTransfer(array $variants, array $warehouses): void
+    {
+        foreach ([[8, -2, AdjustmentReason::Damaged, 'Water damage in aisle 3'], [3, 1, AdjustmentReason::Found, null]] as [$index, $delta, $reason, $notes]) {
+            app(CreateAdjustment::class)->handle([
+                'warehouse_id' => $warehouses['BEY-01']->id,
+                'variant_id' => $variants[$index]->id,
+                'quantity_delta' => $delta,
+                'reason' => $reason,
+                'notes' => $notes,
+            ]);
+        }
+
+        foreach ([[0, 6, TransferStatus::Received], [1, 4, TransferStatus::InTransit], [2, 2, TransferStatus::Draft]] as [$index, $quantity, $status]) {
+            $transfer = app(CreateTransfer::class)->handle([
+                'source_warehouse_id' => $warehouses['BEY-01']->id,
+                'destination_warehouse_id' => $warehouses['TRI-01']->id,
+                'notes' => null,
+                'lines' => [['variant_id' => $variants[$index]->id, 'quantity' => $quantity]],
+            ]);
+            if ($status !== TransferStatus::Draft) {
+                app(ChangeTransferStatus::class)->handle($transfer, TransferStatus::InTransit);
+            }
+            if ($status === TransferStatus::Received) {
+                app(ChangeTransferStatus::class)->handle($transfer, TransferStatus::Received);
+            }
+        }
     }
 }

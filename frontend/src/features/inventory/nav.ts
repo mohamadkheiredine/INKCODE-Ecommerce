@@ -1,4 +1,10 @@
-import { ArrowRightLeftIcon, BoxesIcon, PackagePlusIcon, WarehouseIcon } from 'lucide-react'
+import {
+  ArrowLeftRightIcon,
+  ArrowRightLeftIcon,
+  BoxesIcon,
+  PackagePlusIcon,
+  WarehouseIcon,
+} from 'lucide-react'
 import type { NavEntry } from '@/lib/navigation'
 
 /**
@@ -34,5 +40,13 @@ export const warehousesNav: NavEntry = {
   group: 'operations',
   to: '/inventory/warehouses',
   icon: WarehouseIcon,
+  permission: 'inventory.view',
+}
+
+export const transfersNav: NavEntry = {
+  page: 'transfers',
+  group: 'operations',
+  to: '/inventory/transfers',
+  icon: ArrowLeftRightIcon,
   permission: 'inventory.view',
 }

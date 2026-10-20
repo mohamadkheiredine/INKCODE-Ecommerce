@@ -76,7 +76,8 @@
     "auditLog": "سجل التدقيق",
     "orders": "الطلبات",
     "newOrder": "طلب جديد",
-    "order": "طلب"
+    "order": "طلب",
+    "transfers": "التحويلات"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

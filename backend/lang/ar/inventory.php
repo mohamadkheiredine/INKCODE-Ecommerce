@@ -11,6 +11,9 @@ return [
         'variant_id' => 'المتغير',
         'quantity' => 'الكمية',
         'unit_cost' => 'تكلفة الوحدة',
+        'reason' => 'السبب',
+        'source_warehouse_id' => 'المستودع المصدر',
+        'destination_warehouse_id' => 'المستودع الوجهة',
     ],
 
     'warehouses' => [
@@ -26,5 +29,20 @@ return [
     'receipts' => [
         'warehouse_unavailable' => 'اختر مستودعاً نشطاً.',
         'variant_repeated' => 'هذا المتغير موجود في الاستلام بالفعل. عدّل كميته بدلاً من ذلك.',
+    ],
+
+    'adjustments' => [
+        'not_zero' => 'أدخل كمية للإضافة (موجبة) أو للخصم (سالبة).',
+    ],
+
+    'transfers' => [
+        'same_warehouse' => 'اختر مستودعاً وجهةً مختلفاً عن المصدر.',
+        'invalid_transition' => 'لا يمكن أن يصبح التحويل :from :to.',
+        'status' => [
+            'draft' => 'مسودة',
+            'in_transit' => 'قيد النقل',
+            'received' => 'مستلَم',
+            'cancelled' => 'ملغى',
+        ],
     ],
 ];

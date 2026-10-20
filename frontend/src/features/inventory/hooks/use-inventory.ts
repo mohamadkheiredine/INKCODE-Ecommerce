@@ -1,7 +1,13 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ListQuery } from '@/lib/list-query'
 import { inventoryApi, inventoryKeys } from '../api/inventory-api'
-import type { ReceiptInput, WarehouseInput } from '../types'
+import type {
+  AdjustmentInput,
+  ReceiptInput,
+  TransferInput,
+  TransferStep,
+  WarehouseInput,
+} from '../types'
 
 export function useWarehouses(query: ListQuery) {
   return useQuery({
@@ -75,6 +81,41 @@ export function useCreateReceipt() {
   return useMutation({
     mutationFn: ({ input, idempotencyKey }: { input: ReceiptInput; idempotencyKey: string }) =>
       inventoryApi.createReceipt(input, idempotencyKey),
+    onSuccess: invalidate,
+  })
+}
+
+export function useTransfers(query: ListQuery) {
+  return useQuery({
+    queryKey: inventoryKeys.transfers(query),
+    queryFn: () => inventoryApi.transfers(query),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useCreateAdjustment() {
+  const invalidate = useInvalidateStock()
+  return useMutation({
+    mutationFn: ({ input, idempotencyKey }: { input: AdjustmentInput; idempotencyKey: string }) =>
+      inventoryApi.createAdjustment(input, idempotencyKey),
+    onSuccess: invalidate,
+  })
+}
+
+export function useCreateTransfer() {
+  const invalidate = useInvalidateStock()
+  return useMutation({
+    mutationFn: ({ input, idempotencyKey }: { input: TransferInput; idempotencyKey: string }) =>
+      inventoryApi.createTransfer(input, idempotencyKey),
+    onSuccess: invalidate,
+  })
+}
+
+export function useChangeTransfer() {
+  const invalidate = useInvalidateStock()
+  return useMutation({
+    mutationFn: ({ id, step }: { id: number; step: TransferStep }) =>
+      inventoryApi.changeTransfer(id, step, crypto.randomUUID()),
     onSuccess: invalidate,
   })
 }

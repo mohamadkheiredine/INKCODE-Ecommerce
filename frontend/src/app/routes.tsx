@@ -198,6 +198,16 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'inventory/transfers',
+            handle: crumb('transfers'),
+            lazy: async () => ({
+              Component: withPermission(
+                'inventory.view',
+                (await import('@/features/inventory/routes/transfers-page')).TransfersPage,
+              ),
+            }),
+          },
+          {
             path: 'inventory/receipts',
             handle: crumb('receipts'),
             children: [

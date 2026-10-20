@@ -6,6 +6,7 @@ import {
   receiptsNav,
   stockLevelsNav,
   stockMovementsNav,
+  transfersNav,
   warehousesNav,
 } from '@/features/inventory/nav'
 import { ordersNav } from '@/features/orders/nav'
@@ -29,6 +30,7 @@ export const NAV_ENTRIES: readonly NavEntry[] = [
   stockLevelsNav,
   receiptsNav,
   stockMovementsNav,
+  transfersNav,
   warehousesNav,
   shippingZonesNav,
   carriersNav,

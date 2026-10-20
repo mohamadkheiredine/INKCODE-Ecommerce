@@ -158,3 +158,72 @@ describe('receiving stock', () => {
     expect(posted[0]?.key).toMatch(/^[0-9a-f-]{36}$/)
   })
 })
+
+describe('Adjustments and Transfers', () => {
+  const stockUser: CurrentUser = {
+    ...inventoryUser,
+    permissions: [...inventoryUser.permissions, 'inventory.adjust', 'inventory.transfer'],
+  }
+
+  it('adjusts a stock row with a reason and shows the refusal when On-hand would drop below Reserved', async () => {
+    stockLevelStore([aStockLevel({ variant: { id: 7, sku: 'TEE-RED-M', options: [] } })])
+    let sent: unknown
+    server.use(
+      http.post('*/api/v1/adjustments', async ({ request }) => {
+        sent = await request.json()
+        return apiError(409, 'insufficient_stock', 'Not enough stock of TEE-RED-M.')
+      }),
+    )
+    const { user } = await open('/inventory/stock', 'Stock levels', stockUser)
+
+    await user.click(await screen.findByRole('button', { name: 'Adjust: TEE-RED-M (BEY-01)' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Adjust stock' })
+    await user.click(within(dialog).getByRole('button', { name: 'Save Adjustment' }))
+    expect(await within(dialog).findByText('Choose a reason.')).toBeInTheDocument()
+
+    await user.type(within(dialog).getByRole('textbox', { name: 'Quantity change' }), '-3')
+    await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Reason' }), 'damaged')
+    await user.click(within(dialog).getByRole('button', { name: 'Save Adjustment' }))
+
+    expect(await within(dialog).findByText('Not enough stock of TEE-RED-M.')).toBeInTheDocument()
+    expect(sent).toMatchObject({
+      variant_id: 7,
+      warehouse_id: 1,
+      quantity_delta: -3,
+      reason: 'damaged',
+    })
+  })
+
+  it('lists Transfers and sends a Draft', async () => {
+    const transfer = {
+      id: 5,
+      number: 'TRF-2026-000005',
+      status: 'draft',
+      source_warehouse: { id: 1, name: 'Beirut Central', code: 'BEY-01' },
+      destination_warehouse: { id: 2, name: 'Tripoli North', code: 'TRI-01' },
+      notes: null,
+      user: null,
+      units: 4,
+      created_at: '2026-10-21T09:00:00Z',
+    }
+    warehouseStore([])
+    server.use(
+      http.get('*/api/v1/transfers', () =>
+        HttpResponse.json({
+          data: [transfer],
+          meta: { current_page: 1, last_page: 1, per_page: 25, total: 1 },
+        }),
+      ),
+      http.post('*/api/v1/transfers/5/send', () => {
+        transfer.status = 'in_transit'
+        return HttpResponse.json({ data: transfer })
+      }),
+    )
+    const { user } = await open('/inventory/transfers', 'Transfers', stockUser)
+
+    const row = (await screen.findByText('TRF-2026-000005')).closest('tr')!
+    expect(within(row).getByText('Draft')).toBeInTheDocument()
+    await user.click(within(row).getByRole('button', { name: 'Send' }))
+    expect(await within(row).findByRole('button', { name: 'Receive' })).toBeInTheDocument()
+  })
+})
