@@ -111,8 +111,14 @@ function ProductEditor({ product }: { product: Product }) {
           <CardDescription>{t('variants.description')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {!readOnly && <VariantBuilder key={variantsKey(product)} product={product} />}
-          <VariantsEditor key={variantsKey(product)} product={product} readOnly={readOnly} />
+          {!readOnly && (
+            <VariantBuilder key={`builder-${variantsKey(product)}`} product={product} />
+          )}
+          <VariantsEditor
+            key={`editor-${variantsKey(product)}`}
+            product={product}
+            readOnly={readOnly}
+          />
         </CardContent>
       </Card>
     </div>

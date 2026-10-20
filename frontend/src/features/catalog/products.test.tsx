@@ -18,7 +18,10 @@ const operationsUser: CurrentUser = {
   preferences: { locale: 'en', theme: 'light' },
 }
 
-const fields = {
+const fields: Omit<
+  ProductListItem,
+  'id' | 'name' | 'main_image_url' | 'price_min' | 'price_max' | 'variants_count'
+> = {
   slug: 'classic-tee',
   description: null,
   category: { id: 1, name: 'Shirts', slug: 'shirts' },
@@ -31,7 +34,7 @@ const fields = {
   status: 'active',
   created_at: '2026-10-01T09:00:00+00:00',
   updated_at: '2026-10-01T09:00:00+00:00',
-} as const
+}
 
 const tee: ProductListItem = {
   ...fields,
