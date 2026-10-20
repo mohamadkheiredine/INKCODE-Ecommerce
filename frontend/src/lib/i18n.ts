@@ -7,6 +7,7 @@ import arCommon from '@/locales/ar/common.json'
 import arCustomers from '@/locales/ar/customers.json'
 import arErrors from '@/locales/ar/errors.json'
 import arHome from '@/locales/ar/home.json'
+import arInventory from '@/locales/ar/inventory.json'
 import arNotifications from '@/locales/ar/notifications.json'
 import arProfile from '@/locales/ar/profile.json'
 import arSettings from '@/locales/ar/settings.json'
@@ -17,6 +18,7 @@ import enCommon from '@/locales/en/common.json'
 import enCustomers from '@/locales/en/customers.json'
 import enErrors from '@/locales/en/errors.json'
 import enHome from '@/locales/en/home.json'
+import enInventory from '@/locales/en/inventory.json'
 import enNotifications from '@/locales/en/notifications.json'
 import enProfile from '@/locales/en/profile.json'
 import enSettings from '@/locales/en/settings.json'
@@ -41,6 +43,7 @@ export const resources = {
     customers: enCustomers,
     errors: enErrors,
     home: enHome,
+    inventory: enInventory,
     notifications: enNotifications,
     profile: enProfile,
     settings: enSettings,
@@ -53,6 +56,7 @@ export const resources = {
     customers: arCustomers,
     errors: arErrors,
     home: arHome,
+    inventory: arInventory,
     notifications: arNotifications,
     profile: arProfile,
     settings: arSettings,
@@ -87,6 +91,7 @@ void i18n
       'customers',
       'errors',
       'home',
+      'inventory',
       'notifications',
       'profile',
       'settings',

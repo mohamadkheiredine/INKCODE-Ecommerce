@@ -64,7 +64,13 @@
     "customer": "Customer",
     "shippingZones": "Shipping zones",
     "shippingZone": "Shipping zone",
-    "carriers": "Carriers"
+    "carriers": "Carriers",
+    "warehouses": "Warehouses",
+    "stockLevels": "Stock levels",
+    "stockMovements": "Stock movements",
+    "receipts": "Receipts",
+    "newReceipt": "Receive stock",
+    "receipt": "Receipt"
   },
   "navGroups": {
     "dashboard": "Dashboard",
