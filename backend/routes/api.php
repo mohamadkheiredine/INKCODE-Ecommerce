@@ -23,9 +23,11 @@ use App\Http\Controllers\Customers\CustomerAddressController;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
 use App\Http\Controllers\Customers\TagController;
+use App\Http\Controllers\Inventory\AdjustmentController;
 use App\Http\Controllers\Inventory\ReceiptController;
 use App\Http\Controllers\Inventory\StockLevelController;
 use App\Http\Controllers\Inventory\StockMovementController;
+use App\Http\Controllers\Inventory\TransferController;
 use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
@@ -136,6 +138,20 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->only(['index', 'store', 'show'])
         ->middlewareFor('show', 'can:view,receipt')
         ->middlewareFor('store', 'idempotent');
+    // inventory.adjust records Adjustments; inventory.transfer creates, sends, receives and
+    // cancels Transfers. Stock-changing calls are safe to retry with an Idempotency-Key.
+    Route::apiResource('adjustments', AdjustmentController::class)
+        ->only(['index', 'store'])
+        ->middlewareFor('store', 'idempotent');
+    Route::apiResource('transfers', TransferController::class)
+        ->only(['index', 'store', 'show'])
+        ->middlewareFor('show', 'can:view,transfer')
+        ->middlewareFor('store', 'idempotent');
+    foreach (['send', 'receive', 'cancel'] as $step) {
+        Route::post("/transfers/{transfer}/$step", [TransferController::class, $step])
+            ->middleware(['can:update,transfer', 'idempotent'])
+            ->name("transfers.$step");
+    }
 
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])

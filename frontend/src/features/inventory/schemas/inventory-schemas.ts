@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import type { ReceiptInput, Warehouse, WarehouseInput } from '../types'
+import {
+  ADJUSTMENT_REASONS,
+  type ReceiptInput,
+  type Warehouse,
+  type WarehouseInput,
+} from '../types'
 
 /* Warehouse ---------------------------------------------------------------------- */
 
@@ -87,3 +92,29 @@ export function toReceiptInput(values: ReceiptFormValues): ReceiptInput {
     })),
   }
 }
+
+/* Adjustment and Transfer (from a Stock level row) ------------------------------- */
+
+/** As StoreAdjustmentRequest: a signed, non-zero quantity and a reason. */
+export const adjustmentSchema = z.object({
+  quantity: z
+    .string()
+    .trim()
+    .regex(/^-?[1-9]\d{0,6}$/, 'inventory:validation.quantityNotZero'),
+  reason: z.enum(ADJUSTMENT_REASONS, { error: 'inventory:validation.reasonRequired' }),
+  notes: z.string().trim().max(1000),
+})
+
+export type AdjustmentFormValues = z.input<typeof adjustmentSchema>
+
+/** As StoreTransferRequest with one line: another Warehouse and a positive quantity. */
+export const transferSchema = z.object({
+  destination_warehouse_id: z.string().min(1, 'inventory:validation.destinationRequired'),
+  quantity: z
+    .string()
+    .trim()
+    .regex(/^[1-9]\d{0,6}$/, 'inventory:validation.quantityPositive'),
+  notes: z.string().trim().max(1000),
+})
+
+export type TransferFormValues = z.input<typeof transferSchema>

@@ -34,7 +34,7 @@ export type StockLevel = {
 
 export type StockTotals = { on_hand: number; stock_value: Amount }
 
-export const MOVEMENT_TYPES = ['receipt'] as const
+export const MOVEMENT_TYPES = ['receipt', 'adjustment', 'transfer_out', 'transfer_in'] as const
 export type StockMovementType = (typeof MOVEMENT_TYPES)[number]
 
 export type StockMovement = {
@@ -89,3 +89,41 @@ export type ReceiptInput = {
 export function optionsLabel(options: VariantOption[]): string {
   return options.map((option) => option.value).join(' / ')
 }
+
+export const ADJUSTMENT_REASONS = ['count_correction', 'damaged', 'lost', 'found'] as const
+export type AdjustmentReason = (typeof ADJUSTMENT_REASONS)[number]
+
+export type AdjustmentInput = {
+  warehouse_id: number
+  variant_id: number
+  quantity_delta: number
+  reason: AdjustmentReason
+  notes: string | null
+}
+
+export type Adjustment = AdjustmentInput & { id: number; number: string; created_at: string }
+
+export const TRANSFER_STATUSES = ['draft', 'in_transit', 'received', 'cancelled'] as const
+export type TransferStatus = (typeof TRANSFER_STATUSES)[number]
+
+/** Draft → in transit (send) → received; only a Draft can be cancelled. */
+export type Transfer = {
+  id: number
+  number: string
+  status: TransferStatus
+  source_warehouse: WarehouseRef
+  destination_warehouse: WarehouseRef
+  notes: string | null
+  user: { id: number; name: string } | null
+  units?: number
+  created_at: string
+}
+
+export type TransferInput = {
+  source_warehouse_id: number
+  destination_warehouse_id: number
+  notes: string | null
+  lines: { variant_id: number; quantity: number }[]
+}
+
+export type TransferStep = 'send' | 'receive' | 'cancel'

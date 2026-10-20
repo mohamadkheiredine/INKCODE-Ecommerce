@@ -30,7 +30,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Server-side filtering, sorting, pagination, bulk actions (TanStack Table) (#9 lists, #10 Products bulk activate / archive / delete)
 - [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters (list with search and Tag filter, profile, addresses with default billing and shipping, Tags and notes are done, #13; order history comes with #16/#17, Lifetime value and Segments with #22)
 - [x] Warehouses (3+): on-hand, reserved, available per variant per warehouse; stock per Variant per Warehouse on the Product page (#11)
-- [ ] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation (#11: Stock movement ledger, Receipts with weighted Average cost, Stock value and low-stock filter; adjustments, transfers and alerts in #12)
+- [x] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation (#11: Stock movement ledger, Receipts with weighted Average cost, Stock value and low-stock filter; #12: Adjustments with a reason, two-step Transfers (Draft → In transit → Received, cancellable before sending), low-stock bell alerts sent once until stock recovers)
 - [ ] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice
 - [ ] Concurrency safe: no overselling under simultaneous orders (row locks + transactions)
 - [ ] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee

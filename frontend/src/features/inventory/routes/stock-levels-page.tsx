@@ -1,5 +1,12 @@
-import { BoxesIcon, HistoryIcon, PackagePlusIcon, XIcon } from 'lucide-react'
-import { useMemo, useRef } from 'react'
+import {
+  ArrowLeftRightIcon,
+  BoxesIcon,
+  HistoryIcon,
+  PackagePlusIcon,
+  SlidersHorizontalIcon,
+  XIcon,
+} from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import type { DataTableColumn } from '@/components/data-table/columns'
@@ -19,6 +26,7 @@ import { useListQuery } from '@/hooks/use-list-query'
 import { useFormatters } from '@/lib/format'
 import { isId, type ListQueryConfig } from '@/lib/list-query'
 import { useEntranceAnimation } from '@/lib/motion'
+import { type StockAction, StockActionDialog } from '../components/stock-action-dialog'
 import { useAllWarehouses, useStockLevels } from '../hooks/use-inventory'
 import { optionsLabel, type StockLevel } from '../types'
 
@@ -32,7 +40,11 @@ const LIST_CONFIG: ListQueryConfig = {
 /** Stock levels: every Variant in every Warehouse, with totals for the current filters. */
 export function StockLevelsPage() {
   const { t } = useTranslation('inventory')
-  const canReceive = useCan()('inventory.receive')
+  const can = useCan()
+  const canReceive = can('inventory.receive')
+  const canAdjust = can('inventory.adjust')
+  const canTransfer = can('inventory.transfer')
+  const [action, setAction] = useState<StockAction | null>(null)
   const list = useListQuery(LIST_CONFIG)
   const levels = useStockLevels(list.query)
   const warehouses = useAllWarehouses()
@@ -136,19 +148,44 @@ export function StockLevelsPage() {
         id: 'history',
         header: () => <span className="sr-only">{t('stock.history')}</span>,
         meta: { className: 'w-12 text-end' },
-        cell: ({ row }) => (
-          <Button asChild variant="ghost" size="icon-sm">
-            <Link
-              to={`/inventory/movements?filter[variant]=${row.original.variant.id}&filter[warehouse]=${row.original.warehouse.id}`}
-              aria-label={`${t('stock.history')}: ${row.original.variant.sku} (${row.original.warehouse.code})`}
-            >
-              <HistoryIcon aria-hidden="true" />
-            </Link>
-          </Button>
-        ),
+        cell: ({ row }) => {
+          const target = `${row.original.variant.sku} (${row.original.warehouse.code})`
+          return (
+            <div className="flex justify-end gap-1">
+              {canAdjust && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`${t('adjust.action')}: ${target}`}
+                  onClick={() => setAction({ kind: 'adjust', level: row.original })}
+                >
+                  <SlidersHorizontalIcon aria-hidden="true" />
+                </Button>
+              )}
+              {canTransfer && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`${t('transfers.action')}: ${target}`}
+                  onClick={() => setAction({ kind: 'transfer', level: row.original })}
+                >
+                  <ArrowLeftRightIcon className="rtl:rotate-180" aria-hidden="true" />
+                </Button>
+              )}
+              <Button asChild variant="ghost" size="icon-sm">
+                <Link
+                  to={`/inventory/movements?filter[variant]=${row.original.variant.id}&filter[warehouse]=${row.original.warehouse.id}`}
+                  aria-label={`${t('stock.history')}: ${target}`}
+                >
+                  <HistoryIcon aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+          )
+        },
       },
     ],
-    [t, number, money],
+    [t, number, money, canAdjust, canTransfer],
   )
 
   const receiveButton = (
@@ -249,6 +286,7 @@ export function StockLevelsPage() {
           }}
         />
       </div>
+      <StockActionDialog action={action} onClose={() => setAction(null)} />
     </div>
   )
 }
