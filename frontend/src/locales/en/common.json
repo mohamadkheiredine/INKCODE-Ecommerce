@@ -64,7 +64,8 @@
     "customer": "Customer",
     "shippingZones": "Shipping zones",
     "shippingZone": "Shipping zone",
-    "carriers": "Carriers"
+    "carriers": "Carriers",
+    "auditLog": "Audit log"
   },
   "navGroups": {
     "dashboard": "Dashboard",
