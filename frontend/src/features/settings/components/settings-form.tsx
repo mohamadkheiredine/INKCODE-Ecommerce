@@ -237,7 +237,7 @@ export function SettingsForm({ settings }: { settings: StoreSettings }) {
   )
 }
 
-/** Stays in view at the bottom while there are changes to save. */
+/** Ends the form; while there are changes to save it stays in view at the bottom. */
 function SaveBar({
   dirty,
   busy,
@@ -251,7 +251,7 @@ function SaveBar({
 
   return (
     <div
-      className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-background/90 px-4 py-3 shadow-lg backdrop-blur data-[dirty=false]:shadow-none"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card px-4 py-3 data-[dirty=true]:sticky data-[dirty=true]:bottom-4 data-[dirty=true]:z-10 data-[dirty=true]:bg-background/90 data-[dirty=true]:shadow-lg data-[dirty=true]:backdrop-blur"
       data-dirty={dirty}
     >
       <p role="status" className="text-sm text-muted-foreground">
