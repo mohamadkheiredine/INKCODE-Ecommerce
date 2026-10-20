@@ -1,6 +1,7 @@
 import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
+import arAudit from '@/locales/ar/audit.json'
 import arAuth from '@/locales/ar/auth.json'
 import arCatalog from '@/locales/ar/catalog.json'
 import arCommon from '@/locales/ar/common.json'
@@ -12,6 +13,7 @@ import arNotifications from '@/locales/ar/notifications.json'
 import arProfile from '@/locales/ar/profile.json'
 import arSettings from '@/locales/ar/settings.json'
 import arShipping from '@/locales/ar/shipping.json'
+import enAudit from '@/locales/en/audit.json'
 import enAuth from '@/locales/en/auth.json'
 import enCatalog from '@/locales/en/catalog.json'
 import enCommon from '@/locales/en/common.json'
@@ -39,6 +41,7 @@ export const resources = {
   en: {
     common: enCommon,
     auth: enAuth,
+    audit: enAudit,
     catalog: enCatalog,
     customers: enCustomers,
     errors: enErrors,
@@ -52,6 +55,7 @@ export const resources = {
   ar: {
     common: arCommon,
     auth: arAuth,
+    audit: arAudit,
     catalog: arCatalog,
     customers: arCustomers,
     errors: arErrors,
