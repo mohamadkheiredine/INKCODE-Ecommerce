@@ -73,7 +73,8 @@
     "receipt": "Receipt",
     "users": "Users",
     "roles": "Roles & permissions",
-    "auditLog": "Audit log"
+    "auditLog": "Audit log",
+    "transfers": "Transfers"
   },
   "navGroups": {
     "dashboard": "Dashboard",

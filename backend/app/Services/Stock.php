@@ -2,18 +2,23 @@
 
 namespace App\Services;
 
+use App\Enums\Role;
 use App\Enums\StockMovementType;
 use App\Exceptions\BusinessRuleViolation;
 use App\Models\Receipt;
 use App\Models\ReceiptLine;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
+use App\Models\User;
 use App\Models\Variant;
 use App\Models\Warehouse;
+use App\Notifications\LowStock;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * The only way stock changes (ADR 0008). Every operation runs in one transaction that
@@ -33,6 +38,7 @@ final class Stock
     public function __construct(
         private readonly AuthFactory $auth,
         private readonly AuditTrail $auditTrail,
+        private readonly Settings $settings,
     ) {}
 
     /**
@@ -68,6 +74,7 @@ final class Stock
                 }
 
                 $balance->update(['on_hand' => $onHand, 'reserved' => $reserved]);
+                $this->trackLowStock($balance);
                 $movements[] = StockMovement::query()->create([
                     'variant_id' => $change->variantId,
                     'warehouse_id' => $change->warehouseId,
@@ -215,6 +222,35 @@ final class Stock
         }
 
         return $balances;
+    }
+
+    /**
+     * Alerts active Inventory and Admin Users once when Available drops to the Low-stock
+     * threshold (the Variant's own, else the store's) or below; the alert re-arms only once
+     * Available is above the threshold again. Runs inside the movement's transaction, so a
+     * refused change sends nothing.
+     */
+    private function trackLowStock(StockBalance $balance): void
+    {
+        $available = $balance->on_hand - $balance->reserved;
+        $threshold = $balance->variant->low_stock_threshold ?? $this->settings->lowStockThreshold();
+        $isLow = $available <= $threshold;
+
+        if ($isLow === ($balance->low_stock_alerted_at !== null)) {
+            return;
+        }
+
+        $balance->update(['low_stock_alerted_at' => $isLow ? now() : null]);
+
+        if ($isLow) {
+            Notification::send(
+                User::query()
+                    ->where('is_active', true)
+                    ->whereHas('roles', fn (Builder $roles) => $roles->whereIn('name', [Role::Admin->value, Role::Inventory->value]))
+                    ->get(),
+                new LowStock($balance->variant->sku, $balance->warehouse->name, $available),
+            );
+        }
     }
 
     private function balanceKey(int $variantId, int $warehouseId): string

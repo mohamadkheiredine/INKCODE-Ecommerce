@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property int $on_hand
  * @property int $reserved
  * @property int $available
+ * @property Carbon|null $low_stock_alerted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Variant $variant
@@ -37,6 +38,7 @@ class StockBalance extends Model
             'on_hand' => 'integer',
             'reserved' => 'integer',
             'available' => 'integer',
+            'low_stock_alerted_at' => 'datetime',
         ];
     }
 
