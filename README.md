@@ -165,6 +165,10 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Creating and editing happen in dialogs, with server validation errors shown under the matching field. Deleting asks for confirmation, and a parent that still has children (or a record still in use) is refused with a clear message.
   - Every Role can view the catalog; only Admin and Operations can change it, and the API enforces this.
   - Every change, including profile preferences and password changes, writes an audit entry with who did it and the values before and after.
+- **Store settings (#15):**
+  - The Admin edits the store profile and logo, the Store currency (code and symbol), the VAT rate (5% by default), the Deduction stage (Shipped by default), the Return window (14 days), the default Low-stock threshold (5) and the language and theme new Users start with. Each business setting is explained on screen in English and Arabic, with a live preview of how amounts will look.
+  - Settings live in one typed, database-checked row, are cached for every module that reads them, and every change writes an audit entry. Only the Admin can see or change them all; every signed-in User sees the store's name, logo and currency in the sidebar.
+  - Every amount in the SPA is written in the Store currency with its chosen symbol, always to the cent.
 
 ### Incomplete / assumptions
 
@@ -172,5 +176,6 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
 - Marking a notification as read is the User's own reading state and is not audited. The audit log viewer arrives with #26. Refusing to delete a Category or Brand that Products use relies on the restricting foreign keys Products add in #10.
 - Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.
 - A User with no Role, or a deactivated User, cannot sign in. Ending an active session when an Admin deactivates someone arrives with Users & Roles administration (#25).
+- Changing the Store currency relabels amounts; it never converts them (one currency, no exchange rates). The default language and theme apply to Users created from #25 on.
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.
 - Payments use a mock gateway adapter. No live payment provider is integrated (per the brief).
