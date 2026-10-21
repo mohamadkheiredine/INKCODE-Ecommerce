@@ -23,8 +23,11 @@ use Illuminate\Support\Facades\Auth;
  */
 class DemoPaymentsSeeder extends Seeder
 {
+    private Carbon $realNow;
+
     public function run(): void
     {
+        $this->realNow = Carbon::now();
         if (Payment::query()->exists()) {
             return;
         }
@@ -33,7 +36,7 @@ class DemoPaymentsSeeder extends Seeder
         try {
             $orders = Order::query()->where('status', '!=', OrderStatus::Cancelled)->orderBy('id')->get();
             foreach ($orders->values() as $index => $order) {
-                Carbon::setTestNow($order->placed_at->copy()->addHours(3)->min(Carbon::now()));
+                $this->at($order->placed_at->copy()->addHours(3));
                 $this->pay($order, $index);
             }
         } finally {
@@ -52,7 +55,7 @@ class DemoPaymentsSeeder extends Seeder
             2 => $record->handle($order, PaymentMethod::Card, $order->total, CardTestOutcome::Approve, null, null),
             3 => (function () use ($record, $order): void {
                 $record->handle($order, PaymentMethod::Card, $order->total, CardTestOutcome::Decline, null, null);
-                Carbon::setTestNow(Carbon::now()->addMinutes(20));
+                $this->at(Carbon::now()->addMinutes(20));
                 $record->handle($order, PaymentMethod::Card, $order->total, CardTestOutcome::Approve, 'Second attempt approved', null);
             })(),
             4 => $record->handle($order, PaymentMethod::Manual, bcdiv($order->total, '2', 2), null, 'Deposit in cash', null),
@@ -61,8 +64,14 @@ class DemoPaymentsSeeder extends Seeder
 
         if ($index === 1) {
             // The second Order is weeks old, so a day later is still in the past.
-            Carbon::setTestNow(Carbon::now()->addDay());
+            $this->at(Carbon::now()->addDay());
             app(IssueRefund::class)->handle($order, PaymentMethod::Manual, '5.00', 'Goodwill gesture for a late delivery', null);
         }
+    }
+
+    /** Moves the clock there, never past the real now. */
+    private function at(Carbon $moment): void
+    {
+        Carbon::setTestNow($moment->copy()->min($this->realNow));
     }
 }

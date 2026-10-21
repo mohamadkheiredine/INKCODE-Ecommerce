@@ -36,8 +36,11 @@ class DemoOrdersSeeder extends Seeder
 {
     private const int ORDERS = 16;
 
+    private Carbon $realNow;
+
     public function run(): void
     {
+        $this->realNow = Carbon::now();
         if (Order::query()->exists()) {
             return;
         }
@@ -57,7 +60,7 @@ class DemoOrdersSeeder extends Seeder
         try {
             for ($index = 0; $index < self::ORDERS; $index++) {
                 // Each Order is entered (and its history recorded) on its own day, the last one today.
-                Carbon::setTestNow($today->copy()->subDays(30 - $index * 2)->setTime(9 + $index % 8, 15 * ($index % 4)));
+                $this->at($today->copy()->subDays(30 - $index * 2)->setTime(9 + $index % 8, 15 * ($index % 4)));
                 $address = $addresses[$index % count($addresses)];
 
                 Auth::setUser($sales);
@@ -75,12 +78,12 @@ class DemoOrdersSeeder extends Seeder
 
                 Auth::setUser($operations);
                 if ($index % 4 !== 0) {
-                    Carbon::setTestNow(Carbon::now()->addHours(2));
+                    $this->at(Carbon::now()->addHours(2));
                     app(ConfirmOrder::class)->handle($order);
                 }
                 $this->fulfil($order, $index, $operations);
                 if ($index % 4 === 3) {
-                    Carbon::setTestNow(Carbon::now()->addDay());
+                    $this->at(Carbon::now()->addDay());
                     app(CancelOrder::class)->handle($order, 'Customer changed their mind');
                 }
             }
@@ -107,7 +110,7 @@ class DemoOrdersSeeder extends Seeder
         }
 
         foreach ([OrderStatus::Preparing, OrderStatus::ReadyForShipping] as $step) {
-            Carbon::setTestNow(Carbon::now()->addDay());
+            $this->at(Carbon::now()->addDay());
             $order = app(AdvanceOrder::class)->handle($order, $step);
             if ($step === $target) {
                 break;
@@ -123,7 +126,7 @@ class DemoOrdersSeeder extends Seeder
         };
         $carriers = Carrier::query()->orderBy('id')->get();
         foreach ($parcels as $position => $parcel) {
-            Carbon::setTestNow(Carbon::now()->addHours(3));
+            $this->at(Carbon::now()->addHours(3));
             $order = app(CreateShipment::class)->handle($order, [
                 'carrier_id' => $carriers[($index + $position) % $carriers->count()]->id,
                 'tracking_number' => sprintf('TRK%06d%02d', $order->id, $position + 1),
@@ -133,7 +136,7 @@ class DemoOrdersSeeder extends Seeder
 
         if (in_array($index, [1, 5], true)) {
             foreach ($order->shipments()->get() as $shipment) {
-                Carbon::setTestNow(Carbon::now()->addDays(2));
+                $this->at(Carbon::now()->addDays(2));
                 $order = app(DeliverShipment::class)->handle($order, $shipment, $operations);
             }
         }
@@ -166,10 +169,18 @@ class DemoOrdersSeeder extends Seeder
     {
         return CustomerAddress::query()
             ->where('is_default_shipping', true)
+            // Customers who had already joined when the first of these Orders was placed.
+            ->whereRelation('customer', 'created_at', '<=', now()->subDays(31))
             ->orderBy('id')
             ->get()
             ->filter(fn (CustomerAddress $address): bool => app(QuoteShipping::class)->handle($address->country_code, $address->city)->methods !== [])
             ->values()
             ->all();
+    }
+
+    /** Moves the clock there, never past the real now. */
+    private function at(Carbon $moment): void
+    {
+        Carbon::setTestNow($moment->copy()->min($this->realNow));
     }
 }

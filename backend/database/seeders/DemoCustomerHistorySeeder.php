@@ -145,6 +145,8 @@ class DemoCustomerHistorySeeder extends Seeder
         return CustomerAddress::query()
             ->where('is_default_shipping', true)
             ->whereNotIn('customer_id', Order::query()->select('customer_id'))
+            // Customers who had already joined when their oldest Order was placed.
+            ->whereRelation('customer', 'created_at', '<=', now()->subDays(231))
             ->orderByDesc('id')
             ->get()
             ->filter(fn (CustomerAddress $address): bool => app(QuoteShipping::class)->handle($address->country_code, $address->city)->methods !== [])
