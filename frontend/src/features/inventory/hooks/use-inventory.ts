@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { productKeys } from '@/features/catalog/api/products-api'
 import type { ListQuery } from '@/lib/list-query'
 import { inventoryApi, inventoryKeys } from '../api/inventory-api'
 import type {
@@ -63,7 +64,7 @@ function useInvalidateStock() {
   return () =>
     Promise.all([
       queryClient.invalidateQueries({ queryKey: inventoryKeys.all }),
-      queryClient.invalidateQueries({ queryKey: ['products'] }),
+      queryClient.invalidateQueries({ queryKey: productKeys.all }),
     ])
 }
 

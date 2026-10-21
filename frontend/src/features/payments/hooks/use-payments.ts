@@ -1,5 +1,8 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { orderKeys } from '@/features/orders/api/orders-api'
+import { customerKeys } from '@/features/customers/api/customers-api'
+import { dashboardKeys } from '@/features/dashboard/api/dashboard-api'
+import { reportKeys } from '@/features/reports/api/reports-api'
 import type { ListQuery } from '@/lib/list-query'
 import { type LedgerWrite, paymentKeys, paymentsApi } from '../api/payments-api'
 import type { PaymentInput, RefundInput } from '../types'
@@ -20,7 +23,10 @@ export function useReconciliation(query: ListQuery) {
   })
 }
 
-/** A ledger write changes the Order, the payments list and reconciliation together. */
+/**
+ * A ledger write changes the Order, the payments list and reconciliation together, and the
+ * Customer's Lifetime value and the sales figures.
+ */
 function useLedgerChanged() {
   const queryClient = useQueryClient()
   return ({ order }: LedgerWrite) => {
@@ -28,6 +34,9 @@ function useLedgerChanged() {
     return Promise.all([
       queryClient.invalidateQueries({ queryKey: orderKeys.all }),
       queryClient.invalidateQueries({ queryKey: paymentKeys.all }),
+      queryClient.invalidateQueries({ queryKey: customerKeys.all }),
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all }),
+      queryClient.invalidateQueries({ queryKey: reportKeys.all }),
     ])
   }
 }

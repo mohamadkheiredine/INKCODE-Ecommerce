@@ -6,6 +6,7 @@ export const carrierKeys = {
   all: ['carriers'] as const,
   lists: () => [...carrierKeys.all, 'list'] as const,
   list: (query: ListQuery) => [...carrierKeys.lists(), query] as const,
+  shipmentOptions: () => [...carrierKeys.all, 'shipment-options'] as const,
 }
 
 export const carriersApi = {
