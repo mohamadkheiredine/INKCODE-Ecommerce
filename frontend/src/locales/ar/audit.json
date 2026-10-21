@@ -48,7 +48,8 @@
     "carrier": "شركة شحن",
     "store_settings": "الإعدادات",
     "user": "مستخدم",
-    "order": "طلب"
+    "order": "طلب",
+    "shipment": "شحنة"
   },
   "fields": {
     "name": "الاسم",

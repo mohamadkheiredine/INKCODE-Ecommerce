@@ -55,8 +55,15 @@ import { EditOrderDialog } from '../components/edit-order-dialog'
 import { AssigneeCard, CancelLinesDialog, TimelineCard } from '../components/order-flow'
 import { OrderStatusBadge } from '../components/order-status-badge'
 import { OrderTotals } from '../components/order-totals'
+import { ShipmentsCard } from '../components/shipments-card'
 import { useAdvanceOrder, useCancelOrder, useConfirmOrder, useOrder } from '../hooks/use-orders'
-import { ADVANCE_STATUSES, CANCELLABLE_STATUSES, type Order, type StockShortage } from '../types'
+import {
+  ADVANCE_STATUSES,
+  CANCELLABLE_STATUSES,
+  SHIPMENT_STATUSES,
+  type Order,
+  type StockShortage,
+} from '../types'
 
 /** One Order: its lines and totals, Customer and addresses, fulfilment, and status history. */
 export function OrderPage() {
@@ -347,6 +354,8 @@ function OrderDetail({ order }: { order: Order }) {
               </div>
             </CardContent>
           </Card>
+
+          {SHIPMENT_STATUSES.includes(order.status) && <ShipmentsCard order={order} />}
 
           <TimelineCard order={order} />
         </div>

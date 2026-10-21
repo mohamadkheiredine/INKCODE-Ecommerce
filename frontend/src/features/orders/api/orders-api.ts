@@ -9,6 +9,7 @@ import type {
   OrderStatus,
   OrderUpdateInput,
   SellableVariant,
+  ShipmentInput,
   UserRef,
 } from '../types'
 
@@ -86,6 +87,24 @@ export const ordersApi = {
     const { data } = await http.post<{ data: Order }>(
       `/orders/${id}/cancel-lines`,
       { lines, note: note || null },
+      idempotent(idempotencyKey),
+    )
+    return data.data
+  },
+
+  async ship(id: number, input: ShipmentInput, idempotencyKey: string): Promise<Order> {
+    const { data } = await http.post<{ data: Order }>(
+      `/orders/${id}/shipments`,
+      input,
+      idempotent(idempotencyKey),
+    )
+    return data.data
+  },
+
+  async deliverShipment(id: number, shipmentId: number, idempotencyKey: string): Promise<Order> {
+    const { data } = await http.post<{ data: Order }>(
+      `/orders/${id}/shipments/${shipmentId}/deliver`,
+      null,
       idempotent(idempotencyKey),
     )
     return data.data
