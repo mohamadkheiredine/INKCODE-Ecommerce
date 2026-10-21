@@ -3,13 +3,14 @@
 namespace App\Http\Requests\Orders;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Requests\ListRequest;
 use App\Models\Order;
 use Illuminate\Validation\Rule;
 
 /**
  * Orders: search the number or the Customer's name, email or phone; filter by status,
- * Fulfilling warehouse, Customer and a range of days placed; sort by date placed,
+ * Payment status, Fulfilling warehouse, Customer, Assignee and a range of days placed; sort by date placed,
  * number or total; newest first by default.
  */
 class ListOrdersRequest extends ListRequest
@@ -33,6 +34,8 @@ class ListOrdersRequest extends ListRequest
     {
         return [
             'status' => [Rule::enum(OrderStatus::class)],
+            'payment_status' => [Rule::enum(PaymentStatus::class)],
+            'assignee' => ['integer', 'min:1'],
             'warehouse' => ['integer', 'min:1'],
             'customer' => ['integer', 'min:1'],
             'from' => ['date_format:Y-m-d'],

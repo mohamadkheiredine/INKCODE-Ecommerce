@@ -15,10 +15,12 @@ import { Input } from '@/components/ui/input'
 import { useCan } from '@/features/auth/hooks/use-can'
 import { useAllWarehouses } from '@/features/inventory/hooks/use-inventory'
 import { PaymentStatusBadge } from '@/features/payments/components/payment-status-badge'
+import { PAYMENT_STATUSES } from '@/features/payments/types'
 import { useListQuery } from '@/hooks/use-list-query'
 import { useFormatters } from '@/lib/format'
 import { isId, type ListQueryConfig } from '@/lib/list-query'
 import { useEntranceAnimation } from '@/lib/motion'
+import { FulfillmentBadge } from '../components/fulfillment-badge'
 import { OrderStatusBadge } from '../components/order-status-badge'
 import { useOrders } from '../hooks/use-orders'
 import { ORDER_STATUSES, type Order } from '../types'
@@ -29,10 +31,22 @@ const isDay = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value)
 const LIST_CONFIG: ListQueryConfig = {
   defaultSort: { field: 'placed_at', direction: 'desc' },
   sorts: ['placed_at', 'number', 'total'],
-  filters: { status: ORDER_STATUSES, warehouse: isId, customer: isId, from: isDay, to: isDay },
+  filters: {
+    status: ORDER_STATUSES,
+    payment_status: PAYMENT_STATUSES,
+    warehouse: isId,
+    customer: isId,
+    assignee: isId,
+    from: isDay,
+    to: isDay,
+  },
 }
 
-/** Orders: newest first, searchable by number or Customer, filterable by status, Warehouse and date. */
+/**
+ * Orders: newest first, searchable by number or Customer, filterable by status, Payment
+ * status, Warehouse and date. Each row shows its Order, Payment and Fulfillment statuses,
+ * Shipping method and Assignee.
+ */
 export function OrdersPage() {
   const { t } = useTranslation('orders')
   const canCreate = useCan()('orders.create')
@@ -87,6 +101,36 @@ export function OrdersPage() {
         header: t('fields.paymentStatus'),
         meta: { className: 'hidden md:table-cell' },
         cell: ({ row }) => <PaymentStatusBadge status={row.original.payment_status} />,
+      },
+      {
+        id: 'fulfillment',
+        header: t('fields.fulfillment'),
+        meta: { className: 'hidden lg:table-cell' },
+        cell: ({ row }) =>
+          row.original.fulfillment && <FulfillmentBadge status={row.original.fulfillment.status} />,
+      },
+      {
+        id: 'shipping_method',
+        header: t('fields.shipping'),
+        meta: { className: 'hidden xl:table-cell' },
+        cell: ({ row }) => (
+          <span dir="auto" className="whitespace-nowrap">
+            {row.original.shipping_method.name}
+          </span>
+        ),
+      },
+      {
+        id: 'assignee',
+        header: t('assignee.title'),
+        meta: { className: 'hidden xl:table-cell' },
+        cell: ({ row }) =>
+          row.original.assignee ? (
+            <span dir="auto" className="whitespace-nowrap">
+              {row.original.assignee.name}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">{t('assignee.none')}</span>
+          ),
       },
       {
         id: 'warehouse',
@@ -148,6 +192,16 @@ export function OrdersPage() {
             options={ORDER_STATUSES.map((status) => ({
               value: status,
               label: t(`statuses.${status}`),
+            }))}
+          />
+          <DataTableFilter
+            list={list}
+            name="payment_status"
+            label={t('fields.paymentStatus')}
+            allLabel={t('allPaymentStatuses')}
+            options={PAYMENT_STATUSES.map((status) => ({
+              value: status,
+              label: t(`payments:statuses.${status}`),
             }))}
           />
           <DataTableFilter

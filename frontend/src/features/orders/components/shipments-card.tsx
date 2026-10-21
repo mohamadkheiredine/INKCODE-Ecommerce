@@ -28,15 +28,8 @@ import { apiErrorMessage } from '@/lib/forms'
 import i18n from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { useDeliverShipment, useShipOrder, useShipmentCarriers } from '../hooks/use-orders'
-import type { Fulfillment, Order, Shipment } from '../types'
-
-/** Each Shipment progress's tint, from theme tokens only. */
-const FULFILLMENT_TONES: Record<Fulfillment['status'], string> = {
-  unfulfilled: 'border-border bg-muted text-muted-foreground',
-  partially_shipped: 'border-chart-2/40 bg-chart-2/15 text-foreground',
-  shipped: 'border-chart-3/40 bg-chart-3/15 text-foreground',
-  delivered: 'border-success/40 bg-success/15 text-foreground',
-}
+import type { Order, Shipment } from '../types'
+import { FULFILLMENT_TONES, FulfillmentBadge } from './fulfillment-badge'
 
 /**
  * Shipment progress (separate from the Order status) and the Order's Shipments, each with
@@ -58,14 +51,7 @@ export function ShipmentsCard({ order }: { order: Order }) {
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
         <CardTitle className="text-base">{t('shipments.title')}</CardTitle>
         <div className="flex items-center gap-2">
-          {fulfillment && (
-            <Badge
-              variant="outline"
-              className={cn('font-medium', FULFILLMENT_TONES[fulfillment.status])}
-            >
-              {t(`shipments.progress.${fulfillment.status}`)}
-            </Badge>
-          )}
+          {fulfillment && <FulfillmentBadge status={fulfillment.status} />}
           {canShip && shipments.length > 0 && (
             <Button size="sm" className="gap-2" onClick={() => setShipping(true)}>
               <TruckIcon className="size-4" aria-hidden="true" />

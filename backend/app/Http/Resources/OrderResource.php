@@ -19,7 +19,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Amounts are decimal strings in the Order's own currency. The list has `units`; one Order
+ * Amounts are decimal strings in the Order's own currency. The list has `units`, `assignee` and
+ * `fulfillment`; one Order
  * has its `lines`, `status_history`, `shipments`, `fulfillment` (Shipment progress, separate
  * from the Order status) and `timeline` (status changes, Shipments and notes, oldest
  * first). `allowed_moves` are the statuses the Order flow lets it move to next, and
@@ -96,7 +97,17 @@ class OrderResource extends JsonResource
                 $this->relationLoaded('payments') && $this->seesPayments($request),
                 fn (): array => PaymentResource::collection($this->payments)->resolve($request),
             ),
-            'fulfillment' => $this->when($this->relationLoaded('lines') && $this->relationLoaded('shipments'), fn (): array => $this->fulfillment()),
+            'fulfillment' => $this->relationLoaded('lines') && $this->relationLoaded('shipments')
+                ? $this->fulfillment(
+                    (int) $this->lines->sum('quantity'),
+                    (int) $this->lines->sum('shipped_quantity'),
+                    $this->shipments->every(fn (Shipment $shipment): bool => $shipment->status === ShipmentStatus::Delivered),
+                )
+                : $this->whenHas('shipped_units', fn (): array => $this->fulfillment(
+                    (int) $this->getAttribute('units'),
+                    (int) $this->getAttribute('shipped_units'),
+                    (int) $this->getAttribute('undelivered_shipments') === 0,
+                )),
             'shipments' => $this->whenLoaded('shipments', fn (): array => $this->shipments
                 ->map(fn (Shipment $shipment): array => [
                     'id' => $shipment->id,
@@ -195,15 +206,12 @@ class OrderResource extends JsonResource
      *
      * @return array{status: string, shipped_units: int, units: int}
      */
-    private function fulfillment(): array
+    private function fulfillment(int $units, int $shipped, bool $everyShipmentDelivered): array
     {
-        $units = (int) $this->lines->sum('quantity');
-        $shipped = (int) $this->lines->sum('shipped_quantity');
-
         $status = match (true) {
             $shipped === 0 => 'unfulfilled',
             $shipped < $units => 'partially_shipped',
-            $this->shipments->every(fn (Shipment $shipment): bool => $shipment->status === ShipmentStatus::Delivered) => 'delivered',
+            $everyShipmentDelivered => 'delivered',
             default => 'shipped',
         };
 

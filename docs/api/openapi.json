@@ -4400,6 +4400,31 @@
                         }
                     },
                     {
+                        "name": "filter[payment_status]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/PaymentStatus"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[assignee]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ],
+                            "minimum": 1
+                        }
+                    },
+                    {
                         "name": "filter[warehouse]",
                         "in": "query",
                         "schema": {
@@ -13553,6 +13578,18 @@
                     "created_at"
                 ],
                 "title": "PaymentResource"
+            },
+            "PaymentStatus": {
+                "type": "string",
+                "description": "A summary read from an Order's Payment ledger, recomputed after every ledger write ({@see derive()}). It is separate from the Order status.\n",
+                "enum": [
+                    "unpaid",
+                    "partially_paid",
+                    "paid",
+                    "partially_refunded",
+                    "refunded"
+                ],
+                "title": "PaymentStatus"
             },
             "ProductBulkAction": {
                 "type": "string",

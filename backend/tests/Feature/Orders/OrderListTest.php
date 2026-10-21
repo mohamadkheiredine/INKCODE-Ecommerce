@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role;
+use App\Models\Carrier;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ShippingMethod;
@@ -43,6 +44,38 @@ describe('listing Orders', function () {
         $this->getJson('/api/v1/orders?filter[from]=2026-10-10&filter[to]=2026-10-15')->assertJsonPath('data.*.id', [$big->id]);
         $this->getJson('/api/v1/orders?sort=-total')->assertJsonPath('data.0.id', $big->id);
         $this->getJson('/api/v1/orders?sort=placed_at')->assertJsonPath('data.0.id', $old->id);
+    });
+
+    it('shows each row\'s Fulfillment status and Assignee, and filters by Payment status and Assignee', function () {
+        $waiting = placeOrder($this->beirut, [[$this->variant, 1]]);
+        $partial = placeOrder($this->beirut, [[$this->variant, 3]]);
+        $operations = userWithRole(Role::Operations);
+        $this->actingAs($operations);
+        $this->postJson("/api/v1/orders/$partial->id/confirm")->assertOk();
+        foreach (['preparing', 'ready_for_shipping'] as $step) {
+            $this->postJson("/api/v1/orders/$partial->id/advance", ['status' => $step])->assertOk();
+        }
+        $this->postJson("/api/v1/orders/$partial->id/shipments", [
+            'carrier_id' => Carrier::factory()->create()->id,
+            'tracking_number' => 'TRK1',
+            'lines' => [['line_id' => $partial->lines()->sole()->id, 'quantity' => 1]],
+        ])->assertOk();
+        $this->putJson("/api/v1/orders/$partial->id/assignee", ['assignee_id' => $operations->id])->assertOk();
+        $this->actingAs(userWithRole(Role::Finance))
+            ->postJson("/api/v1/orders/$partial->id/payments", ['method' => 'manual', 'amount' => $partial->refresh()->total])
+            ->assertCreated();
+
+        $this->actingAs(userWithRole(Role::Viewer))
+            ->getJson('/api/v1/orders?sort=placed_at')
+            ->assertJsonPath('data.0.fulfillment', ['status' => 'unfulfilled', 'shipped_units' => 0, 'units' => 1])
+            ->assertJsonPath('data.0.assignee', null)
+            ->assertJsonPath('data.1.fulfillment', ['status' => 'partially_shipped', 'shipped_units' => 1, 'units' => 3])
+            ->assertJsonPath('data.1.assignee.id', $operations->id)
+            ->assertJsonPath('data.1.shipping_method.name', $partial->shipping_method_name);
+
+        $this->getJson('/api/v1/orders?filter[payment_status]=paid')->assertJsonPath('data.*.id', [$partial->id]);
+        $this->getJson('/api/v1/orders?filter[payment_status]=unpaid')->assertJsonPath('data.*.id', [$waiting->id]);
+        $this->getJson("/api/v1/orders?filter[assignee]=$operations->id")->assertJsonPath('data.*.id', [$partial->id]);
     });
 
     it('refuses an unknown status, a reversed date range and unknown filters', function () {
