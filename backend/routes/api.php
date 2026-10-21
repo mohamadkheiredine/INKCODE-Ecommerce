@@ -48,6 +48,8 @@ use App\Http\Controllers\Profile\PreferencesController;
 use App\Http\Controllers\Settings\StoreLogoController;
 use App\Http\Controllers\Settings\StoreProfileController;
 use App\Http\Controllers\Settings\StoreSettingsController;
+use App\Http\Controllers\Shipments\ShipmentController;
+use App\Http\Controllers\Shipments\ShipmentDeliveryController;
 use App\Http\Controllers\Shipping\CarrierController;
 use App\Http\Controllers\Shipping\ShippingMethodController;
 use App\Http\Controllers\Shipping\ShippingQuoteController;
@@ -191,6 +193,16 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->name('orders.cancel-lines');
     Route::put('/orders/{order}/assignee', [OrderAssigneeController::class, 'update'])->name('orders.assign');
     Route::post('/orders/{order}/notes', [OrderNoteController::class, 'store'])->name('orders.notes.store');
+
+    // Shipments: shipments.manage ships a Ready for shipping Order and marks Shipments delivered.
+    Route::post('/orders/{order}/shipments', [ShipmentController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.shipments.store');
+    Route::post('/orders/{order}/shipments/{shipment}/deliver', [ShipmentDeliveryController::class, 'store'])
+        ->scopeBindings()
+        ->can('ship', 'order')
+        ->middleware('idempotent')
+        ->name('orders.shipments.deliver');
 
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])

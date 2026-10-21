@@ -2,6 +2,7 @@
 
 namespace App\Actions\Orders;
 
+use App\Actions\Shipments\FollowShipments;
 use App\Enums\OrderStatus;
 use App\Exceptions\BusinessRuleViolation;
 use App\Models\Order;
@@ -18,7 +19,8 @@ use Illuminate\Validation\ValidationException;
  * move to each line's `cancelled_quantity`, their stock is released (or put back On-hand
  * past the Deduction stage), and the Order is re-priced at its own VAT rate; shipping is
  * kept. The reason, when given, is added to the timeline as a note. Cancelling every
- * remaining unit cancels the whole Order instead ({@see CancelOrder}).
+ * remaining unit cancels the whole Order instead ({@see CancelOrder}). Shipped units cannot
+ * be cancelled; when only shipped units are left, the Order follows its Shipments.
  */
 final class CancelOrderLines
 {
@@ -28,6 +30,7 @@ final class CancelOrderLines
         private readonly OrderPricing $pricing,
         private readonly OrderStock $orderStock,
         private readonly AuditTrail $auditTrail,
+        private readonly FollowShipments $followShipments,
     ) {}
 
     /**
@@ -47,9 +50,9 @@ final class CancelOrderLines
             $lines = $order->lines->keyBy('id');
             foreach ($cancellations as $index => $cancellation) {
                 $line = $lines[$cancellation['line_id']];
-                if ($cancellation['quantity'] > $line->quantity) {
+                if ($cancellation['quantity'] > $line->quantity - $line->shipped_quantity) {
                     throw ValidationException::withMessages([
-                        "lines.$index.quantity" => __('orders.cancel_more_than_ordered', ['sku' => $line->sku, 'quantity' => $line->quantity]),
+                        "lines.$index.quantity" => __('orders.cancel_more_than_ordered', ['sku' => $line->sku, 'quantity' => $line->quantity - $line->shipped_quantity]),
                     ]);
                 }
             }
@@ -60,12 +63,11 @@ final class CancelOrderLines
             }
 
             $before = $order->auditValues();
-            $deltas = [];
+            $this->orderStock->cancel($order, $order->status, array_column($cancellations, 'quantity', 'line_id'), $note);
             foreach ($cancellations as $cancellation) {
                 $line = $lines[$cancellation['line_id']];
                 $line->quantity -= $cancellation['quantity'];
                 $line->cancelled_quantity += $cancellation['quantity'];
-                $deltas[$line->variant_id] = -$cancellation['quantity'];
             }
 
             $lines = $lines->values();
@@ -79,8 +81,8 @@ final class CancelOrderLines
             }
             $order->update(array_intersect_key($priced, array_flip(['items_total', 'discount_total', 'vat_total', 'total'])));
 
-            $this->orderStock->adjust($order, $order->status, $deltas, $note);
             $this->auditTrail->updated($order->load('lines'), $before);
+            $order = $this->followShipments->handle($order);
             if ($note !== null) {
                 $this->addOrderNote->handle($order, $user, $note);
             }

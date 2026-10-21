@@ -48,6 +48,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, OrderLine> $lines
  * @property-read Collection<int, OrderStatusChange> $statusChanges
  * @property-read Collection<int, OrderNote> $orderNotes
+ * @property-read Collection<int, Shipment> $shipments
  */
 #[Fillable([
     'number', 'status', 'customer_id', 'warehouse_id', 'shipping_method_id',
@@ -153,8 +154,27 @@ class Order extends Model implements Auditable
     }
 
     /**
+     * Its Shipments, oldest first.
+     *
+     * @return HasMany<Shipment, $this>
+     */
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(Shipment::class)->orderBy('id');
+    }
+
+    /**
+     * Whether at least one unit shipped and every unit still ordered is in a Shipment.
+     */
+    public function isFullyShipped(): bool
+    {
+        return $this->lines->sum('shipped_quantity') > 0
+            && $this->lines->every(fn (OrderLine $line): bool => $line->shipped_quantity === $line->quantity);
+    }
+
+    /**
      * Loads what one Order's page shows: Customer, Warehouse, creator, Assignee, lines,
-     * status history and notes.
+     * status history, notes and Shipments.
      */
     public function loadForDisplay(): static
     {
@@ -166,6 +186,9 @@ class Order extends Model implements Auditable
             'orderNotes.user:id,name',
             'lines.variant:id,product_id',
             'statusChanges.user:id,name',
+            'shipments.carrier:id,name,tracking_url_template',
+            'shipments.lines',
+            'shipments.statusChanges.user:id,name',
         ]);
     }
 
