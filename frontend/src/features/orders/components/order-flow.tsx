@@ -1,4 +1,4 @@
-import { CircleDotIcon, MessageSquareTextIcon } from 'lucide-react'
+import { CircleDotIcon, MessageSquareTextIcon, TruckIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -50,7 +50,10 @@ export function CancelLinesDialog({
   const dir = useDirection()
   const { number } = useFormatters()
   const cancelLines = useCancelOrderLines()
-  const lines = (order.lines ?? []).filter((line) => line.quantity > 0)
+  // Shipped units cannot be cancelled: each line offers only what is left to ship.
+  const lines = (order.lines ?? [])
+    .map((line) => ({ ...line, quantity: line.quantity - (line.shipped_quantity ?? 0) }))
+    .filter((line) => line.quantity > 0)
   const [quantities, setQuantities] = useState<Record<number, string>>({})
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -286,6 +289,8 @@ export function TimelineCard({ order }: { order: Order }) {
             <li key={`${event.type}-${event.id}`} className="flex gap-3">
               {event.type === 'status' ? (
                 <CircleDotIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              ) : event.type === 'shipment' ? (
+                <TruckIcon className="mt-0.5 size-4 shrink-0 text-chart-3" aria-hidden="true" />
               ) : (
                 <MessageSquareTextIcon
                   className="mt-0.5 size-4 shrink-0 text-muted-foreground"
@@ -296,9 +301,16 @@ export function TimelineCard({ order }: { order: Order }) {
                 <span className="text-sm font-medium">
                   {event.type === 'note'
                     ? t('timeline.note')
-                    : event.from_status === null
-                      ? t('historyCreated')
-                      : t('historyMoved', { status: t(`statuses.${event.to_status}`) })}
+                    : event.type === 'shipment'
+                      ? t(
+                          event.to_status === 'delivered'
+                            ? 'timeline.shipmentDelivered'
+                            : 'timeline.shipmentShipped',
+                          { number: event.shipment.number },
+                        )
+                      : event.from_status === null
+                        ? t('historyCreated')
+                        : t('historyMoved', { status: t(`statuses.${event.to_status}`) })}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {t('historyBy', {
@@ -306,7 +318,7 @@ export function TimelineCard({ order }: { order: Order }) {
                     when: dateTime(event.created_at),
                   })}
                 </span>
-                {(event.type === 'note' ? event.body : event.note) && (
+                {event.type !== 'shipment' && (event.type === 'note' ? event.body : event.note) && (
                   <p dir="auto" className="text-sm whitespace-pre-line text-muted-foreground">
                     {event.type === 'note' ? event.body : event.note}
                   </p>

@@ -48,7 +48,8 @@
     "carrier": "Carrier",
     "store_settings": "Settings",
     "user": "User",
-    "order": "Order"
+    "order": "Order",
+    "shipment": "Shipment"
   },
   "fields": {
     "name": "Name",

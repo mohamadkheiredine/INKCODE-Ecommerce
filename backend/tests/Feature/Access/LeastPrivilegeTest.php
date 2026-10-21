@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role;
+use App\Enums\ShipmentStatus;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Carrier;
@@ -37,12 +38,14 @@ function recordsForRouteParameters(): array
     $image = $product->images()->create(['path' => 'products/demo.jpg', 'position' => 1]);
     $address = CustomerAddress::factory()->create();
     $method = ShippingMethod::factory()->create();
+    $carrier = Carrier::factory()->create();
+    $order = placeOrder(Warehouse::factory()->create(), [[$variant, 1]]);
 
     /** @var array<string, Model> $records */
     $records = [
         'attribute' => Attribute::factory()->create(),
         'brand' => Brand::factory()->create(),
-        'carrier' => Carrier::factory()->create(),
+        'carrier' => $carrier,
         'coupon' => Coupon::factory()->create(),
         'category' => Category::factory()->create(),
         'customer' => Customer::query()->findOrFail($address->customer_id),
@@ -54,7 +57,14 @@ function recordsForRouteParameters(): array
         'shipping_method' => $method,
         'user' => User::factory()->withRole(Role::Sales)->create(),
         'warehouse' => Warehouse::factory()->create(),
-        'order' => placeOrder(Warehouse::factory()->create(), [[$variant, 1]]),
+        'order' => $order,
+        'shipment' => $order->shipments()->create([
+            'number' => $order->number.'-1',
+            'carrier_id' => $carrier->id,
+            'tracking_number' => 'TRK-1',
+            'status' => ShipmentStatus::Shipped,
+            'shipped_at' => now(),
+        ]),
         'transfer' => Transfer::query()->create([
             'source_warehouse_id' => Warehouse::factory()->create()->id,
             'destination_warehouse_id' => Warehouse::factory()->create()->id,

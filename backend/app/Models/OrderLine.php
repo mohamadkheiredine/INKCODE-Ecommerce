@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property list<array{attribute: string, value: string}> $options
  * @property int $quantity the units still ordered
  * @property int $cancelled_quantity the units removed by Partial cancellation
+ * @property int $deducted_quantity the units that left On-hand (at the Deduction stage or in a Shipment)
+ * @property int $shipped_quantity the units in its Order's Shipments (shipped ≤ deducted ≤ quantity)
  * @property string $unit_price
  * @property string $discount_amount its share of the Coupon's discount
  * @property bool $coupon_eligible whether the Order's Coupon discounts it
@@ -30,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read Variant $variant
  */
 #[Fillable([
-    'variant_id', 'product_name', 'sku', 'options', 'quantity', 'cancelled_quantity', 'unit_price', 'discount_amount',
+    'variant_id', 'product_name', 'sku', 'options', 'quantity', 'cancelled_quantity', 'deducted_quantity', 'shipped_quantity', 'unit_price', 'discount_amount',
     'coupon_eligible', 'taxable', 'vat_rate', 'vat_amount', 'line_total',
 ])]
 class OrderLine extends Model
@@ -46,6 +48,8 @@ class OrderLine extends Model
             'options' => 'array',
             'quantity' => 'integer',
             'cancelled_quantity' => 'integer',
+            'deducted_quantity' => 'integer',
+            'shipped_quantity' => 'integer',
             'unit_price' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'coupon_eligible' => 'boolean',

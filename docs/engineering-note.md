@@ -164,6 +164,12 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - Uses are `coupon_redemptions` rows made at Confirm under a lock on the Coupon row (Order → Coupon → stock, the same order everywhere), released (kept, with `released_at`) on full cancellation; a multi-process test confirms 8 Orders at once against a limit of 3 and gets exactly 3. Editing a Confirmed Order moves or releases its use; an Order that already holds a use is not re-checked against dates and limits.
   - A Coupon that Orders use cannot be deleted (restricting foreign keys, 409 `in_use`); ending it is the way to stop it.
 
+- **Shipments, Partial fulfillment and stock deduction (#18).**
+  - Deducting "at the Deduction stage" by status alone breaks when the setting changes mid-flight (an Order past the new stage would look deducted when it is not). Each Order line now counts `deducted_quantity` and `shipped_quantity` (CHECK `shipped ≤ deducted ≤ quantity`), and `OrderStock` works from those counts: reaching the stage deducts what is left, a Shipment deducts only the units it carries that were not deducted yet, and cancelling releases Reserved units first, then puts deducted ones back. The migration backfills Orders already past the stage.
+  - Shipped and Delivered are reached only through Shipments (`FollowShipments`): Shipped when every unit still ordered is in a Shipment (also when the last unshipped units are cancelled), Delivered when all Shipments are delivered. Shipped units cannot be cancelled, and a partly shipped Order is cancelled by line (409 `order_partly_shipped` for a full cancel).
+  - Shipment status (Shipped → Delivered) has its own enum, history table and audit entries; the Order resource adds `fulfillment` (progress) next to its status. Tracking numbers are unique per Carrier.
+  - Demo data ships some Orders partially and fully and delivers a few, through the same actions as the API.
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_

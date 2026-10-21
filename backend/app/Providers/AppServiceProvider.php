@@ -7,6 +7,7 @@ use App\Models\Adjustment;
 use App\Models\Order;
 use App\Models\OrderNote;
 use App\Models\Receipt;
+use App\Models\Shipment;
 use App\Models\Transfer;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
             'transfer' => Transfer::class,
             'order' => Order::class,
             'order_note' => OrderNote::class,
+            'shipment' => Shipment::class,
         ]);
 
         Password::defaults(fn (): Password => Password::min(10)->max(72)->letters()->mixedCase()->numbers());

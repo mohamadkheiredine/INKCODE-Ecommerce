@@ -25,15 +25,19 @@ final class CancelOrder
     ) {}
 
     /**
-     * @throws BusinessRuleViolation 409 `invalid_transition` once Shipped or Cancelled
+     * @throws BusinessRuleViolation 409 `invalid_transition` once Shipped or Cancelled, 409
+     *                               `order_partly_shipped` once a Shipment left (cancel the rest by line)
      */
     public function handle(Order $order, ?string $note): Order
     {
         return DB::transaction(function () use ($order, $note): Order {
             [$order, $from] = $this->moveOrderStatus->handle($order, OrderStatus::Cancelled, $note);
+            if ($order->lines->sum('shipped_quantity') > 0) {
+                throw new BusinessRuleViolation('order_partly_shipped', __('shipments.order_partly_shipped', ['number' => $order->number]));
+            }
 
-            $this->orderStock->adjust($order, $from, $order->lines
-                ->mapWithKeys(fn (OrderLine $line): array => [$line->variant_id => -$line->quantity])
+            $this->orderStock->cancel($order, $from, $order->lines
+                ->mapWithKeys(fn (OrderLine $line): array => [$line->id => $line->quantity])
                 ->all(), $note);
             $this->couponRedemptions->release($order);
 

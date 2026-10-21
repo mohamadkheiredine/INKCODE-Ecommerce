@@ -176,6 +176,11 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Carriers have an optional tracking link template holding `{tracking_number}`, with a live example in the form.
   - Roles that see Orders can look; only Admin and Operations change shipping, and every change is audited.
 
+- **Shipments and Partial fulfillment (#18):**
+  - Operations and Inventory Users ship a Ready for shipping Order in one or several Shipments, each with a Carrier, a tracking number (linked to the Carrier's tracking page) and the units of each line it carries, never more than a line has left to ship. They mark Shipments delivered; each Shipment keeps its status history.
+  - The Order becomes Shipped once everything still ordered has shipped, and Delivered once all its Shipments are delivered. Shipment progress (Not shipped, Partially shipped, Shipped, Delivered) shows apart from the Order status, and every step appears in the Order timeline and the audit log.
+  - Stock leaves On-hand exactly once: on entering the Deduction stage (Preparing or Ready for shipping), or Shipment by Shipment when it is Shipped, even if the setting changes while an Order is on its way.
+
 - **Store settings (#15):**
   - The Admin edits the store profile and logo, the Store currency (code and symbol), the VAT rate (5% by default), the Deduction stage (Shipped by default), the Return window (14 days), the default Low-stock threshold (5) and the language and theme new Users start with. Each business setting is explained on screen in English and Arabic, with a live preview of how amounts will look.
   - Settings live in one typed, database-checked row, are cached for every module that reads them, and every change writes an audit entry. Only the Admin can see or change them all; every signed-in User sees the store's name, logo and currency in the sidebar.

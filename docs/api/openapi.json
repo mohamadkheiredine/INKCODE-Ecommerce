@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8004/api/v1"
+            "url": "http://localhost:8000/api/v1"
         }
     ],
     "paths": {
@@ -6461,6 +6461,126 @@
                 }
             }
         },
+        "/orders/{order}/shipments": {
+            "post": {
+                "operationId": "orders.shipments.store",
+                "summary": "Ships some units of a Ready for shipping Order. The Order becomes Shipped once\neverything left has shipped. Refused with 409 `order_not_ready_for_shipping` in any\nother status; a quantity above what the line has left to ship is a 422. Safe to retry\nwith an `Idempotency-Key` header",
+                "tags": [
+                    "Shipment"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreShipmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/shipments/{shipment}/deliver": {
+            "post": {
+                "operationId": "orders.shipments.deliver",
+                "summary": "Marks the Shipment delivered. The Order becomes Delivered once it is Shipped and all\nits Shipments are delivered. A delivered Shipment is refused with 409\n`invalid_shipment_transition`. Safe to retry with an `Idempotency-Key` header",
+                "tags": [
+                    "ShipmentDelivery"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "shipment",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipment ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/shipping-zones/{shippingZone}/methods": {
             "post": {
                 "operationId": "shipping-zones.methods.store",
@@ -11251,6 +11371,37 @@
                             "type": "string"
                         }
                     },
+                    "fulfillment": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "unfulfilled",
+                                    "partially_shipped",
+                                    "delivered",
+                                    "shipped"
+                                ]
+                            },
+                            "shipped_units": {
+                                "type": "integer"
+                            },
+                            "units": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "status",
+                            "shipped_units",
+                            "units"
+                        ]
+                    },
+                    "shipments": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
                     "timeline": {
                         "type": "array",
                         "prefixItems": [
@@ -11313,6 +11464,12 @@
                             {
                                 "type": "array",
                                 "items": {
+                                    "type": "string"
+                                }
+                            },
+                            {
+                                "type": "array",
+                                "items": {
                                     "type": "object",
                                     "properties": {
                                         "type": {
@@ -11353,8 +11510,8 @@
                                 }
                             }
                         ],
-                        "minItems": 2,
-                        "maxItems": 2
+                        "minItems": 3,
+                        "maxItems": 3
                     },
                     "created_at": {
                         "type": [
@@ -13188,6 +13345,48 @@
                     "updated_at"
                 ],
                 "title": "StoreSettingsResource"
+            },
+            "StoreShipmentRequest": {
+                "type": "object",
+                "description": "A Shipment: its Carrier, tracking number (unique per Carrier) and how many units of which\nof the Order's lines it carries (each line once). Whether those units are still\nunshipped is the Shipment action's decision.",
+                "properties": {
+                    "carrier_id": {
+                        "type": "integer"
+                    },
+                    "tracking_number": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "line_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                }
+                            },
+                            "required": [
+                                "line_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "carrier_id",
+                    "tracking_number",
+                    "lines"
+                ],
+                "title": "StoreShipmentRequest"
             },
             "StoreShippingZoneRequest": {
                 "type": "object",

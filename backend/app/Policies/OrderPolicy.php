@@ -11,7 +11,8 @@ use App\Models\User;
  * them; confirming one commits the Order its creator entered, so the Roles that update
  * Orders (orders.update) may do it, edit an unlocked Order and add notes; orders.transition
  * moves an Order forward (Preparing, Ready for shipping); orders.cancel cancels all or part
- * of one; orders.assign gives it an Assignee.
+ * of one; orders.assign gives it an Assignee; shipments.manage ships it in Shipments and marks
+ * them delivered.
  */
 class OrderPolicy
 {
@@ -53,5 +54,10 @@ class OrderPolicy
     public function assign(User $user, Order $order): bool
     {
         return $user->hasPermissionTo(Permission::OrdersAssign->value);
+    }
+
+    public function ship(User $user, Order $order): bool
+    {
+        return $user->hasPermissionTo(Permission::ShipmentsManage->value);
     }
 }

@@ -62,37 +62,9 @@ enum OrderStatus: string
         return in_array($this, [self::Pending, self::Confirmed], true);
     }
 
-    /**
-     * Whether an Order in this status has had its units taken out of On-hand at the
-     * Deduction stage but not yet shipped, so cancelling them puts them back on hand.
-     */
-    public function holdsDeductedUnits(DeductionStage $deductionStage): bool
-    {
-        $flow = self::flow();
-        $position = array_search($this, $flow, true);
-
-        return $position !== false
-            && $position >= array_search(self::from($deductionStage->value), $flow, true)
-            && $position < array_search(self::Shipped, $flow, true);
-    }
-
     /** Before Shipped, and not already Cancelled. */
     public function isCancellable(): bool
     {
         return in_array($this, [self::Pending, self::Confirmed, self::Preparing, self::ReadyForShipping], true);
-    }
-
-    /**
-     * Whether an Order in this status holds Reserved units: it was Confirmed and has not
-     * reached the Deduction stage yet (where its Reserved units leave On-hand).
-     */
-    public function holdsReservation(DeductionStage $deductionStage): bool
-    {
-        $flow = self::flow();
-        $position = array_search($this, $flow, true);
-
-        return $position !== false
-            && $position >= array_search(self::Confirmed, $flow, true)
-            && $position < array_search(self::from($deductionStage->value), $flow, true);
     }
 }
