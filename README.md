@@ -73,6 +73,16 @@ composer dev          # http://localhost:8000
 
 Seeding in demo mode builds the store the brief asks for, entirely through the same actions the API uses, so every total, stock balance, Payment and report agrees: **200 Products** (about 1,100 Variants from Color × Size × Material, Draft and Archived ones included), **1,000 Orders** spread over the last 12 months in every status (Pending to Delivered, Cancelled, partial Shipments), **300 Customers** in every Segment, **3 active Warehouses** (plus a deactivated one) with Receipts, Adjustments and Transfers, Cash on delivery / Manual / Card payments (some declined first), goodwill Refunds, Returns at every step with Restock and Write-off decisions, Coupons, and the audit trail of all of it. A fixed random seed shapes it, so every fresh seed builds the same kind of store with dates relative to the day you seed. [docs/demo-data-checks.sql](docs/demo-data-checks.sql) proves the result is consistent: every query in its "must be zero" section returns 0.
 
+#### Optional: load the provided demo database instead of seeding
+
+If you received `inkcode-demo-database.sql` with the submission, load it to get exactly the store shown in the screenshots and the walkthrough (same Orders, numbers and dates), instead of a freshly seeded one:
+
+```bash
+docker exec -i inkcode-mysql mysql -uroot -proot inkcode < inkcode-demo-database.sql
+```
+
+Run it after `composer setup` (which creates the tables and an app key). It replaces the `inkcode` database with the exported one, so it also works over an existing install. Both ways give a complete store with the same demo accounts; a fresh seed only differs in its dates (relative to the day you seed) and some random details.
+
 ### 3. Frontend SPA
 
 ```bash
