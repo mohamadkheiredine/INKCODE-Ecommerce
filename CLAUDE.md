@@ -41,7 +41,7 @@ Start MySQL first: `docker compose up -d mysql` (Docker Desktop must be running)
 |---|---|---|
 | First setup | `composer setup` | `npm ci` |
 | Dev server | `composer dev` (http://localhost:8000) | `npm run dev` (http://localhost:5173) |
-| Tests | `composer test` (Pest, MySQL `inkcode_testing`) | `npm test` (Vitest) · `npm run test:e2e` (Playwright) |
+| Tests | `composer test` (Pest in parallel, one `inkcode_testing_test_N` DB per process) | `npm test` (Vitest) · `npm run test:e2e` (Playwright) |
 | Lint / format | `composer lint` · `composer format` (Pint) | `npm run lint` (oxlint) · `npm run format` (Prettier) |
 | Static analysis / types | `composer analyse` (Larastan level 6) | `npm run typecheck` |
 | Everything before a commit | `composer check` | `npm run check` |
