@@ -4,6 +4,8 @@ use App\Enums\AuditAction;
 use App\Enums\Role;
 use App\Models\Customer;
 use App\Models\Tag;
+use App\Models\Variant;
+use App\Models\Warehouse;
 
 describe('listing Customers', function () {
     it('lists Customers a page at a time with their Tags', function () {
@@ -176,6 +178,20 @@ describe('deleting a Customer', function () {
         expect(Customer::query()->count())->toBe(0)
             ->and(Tag::query()->where('name', 'vip')->exists())->toBeTrue()
             ->and(auditTrailOf('customer', $customer->id)->last()?->action)->toBe(AuditAction::Deleted);
+    });
+
+    it('keeps a Customer who has Orders, with 409 in_use', function () {
+        $warehouse = Warehouse::factory()->create();
+        $variant = Variant::factory()->create();
+        receiveStock($warehouse, [[$variant, 5, '4.00']]);
+        $order = placeOrder($warehouse, [[$variant, 1]]);
+
+        $this->actingAs(userWithRole(Role::Sales))
+            ->deleteJson("/api/v1/customers/{$order->customer_id}")
+            ->assertConflict()
+            ->assertJsonPath('code', 'in_use');
+
+        expect(Customer::query()->whereKey($order->customer_id)->exists())->toBeTrue();
     });
 
     it('refuses a delete from a Role that may only look', function () {
