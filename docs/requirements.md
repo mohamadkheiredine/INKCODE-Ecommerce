@@ -18,7 +18,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Shared pagination and list query format: `search`, `filter[...]`, `sort`, `page`, `per_page`; `data` + `meta` + `links`; list state kept in the URL (#9)
 - [x] Design tokens: light + dark themes, typography for Latin + Arabic (#7)
 - [x] i18n (English LTR / Arabic RTL) with runtime switching, all strings translated; Western digits in both (#7)
-- [ ] App shell: collapsible sidebar, breadcrumbs, user menu, language/theme kept on the User (#7), notifications bell (#8); global search and quick actions to come
+- [x] App shell: collapsible sidebar, breadcrumbs, user menu, language/theme kept on the User (#7), notifications bell (#8), global search (Ctrl+K) over Orders, Products and Customers and a "+" quick-actions menu, both filtered by Role (#27)
 - [x] Shared states: loading skeletons, empty states with actions, error states, toasts, form validation (#7)
 - [x] Responsive: desktop / tablet / mobile navigation (sidebar, icon rail, drawer) (#7)
 - [x] Motion: GSAP (`useGSAP`) + Lenis on the GSAP ticker, respecting `prefers-reduced-motion` (#7)

@@ -15,6 +15,7 @@ import arOrders from '@/locales/ar/orders.json'
 import arPayments from '@/locales/ar/payments.json'
 import arReturns from '@/locales/ar/returns.json'
 import arProfile from '@/locales/ar/profile.json'
+import arSearch from '@/locales/ar/search.json'
 import arSettings from '@/locales/ar/settings.json'
 import arShipping from '@/locales/ar/shipping.json'
 import arUsers from '@/locales/ar/users.json'
@@ -32,6 +33,7 @@ import enOrders from '@/locales/en/orders.json'
 import enPayments from '@/locales/en/payments.json'
 import enReturns from '@/locales/en/returns.json'
 import enProfile from '@/locales/en/profile.json'
+import enSearch from '@/locales/en/search.json'
 import enSettings from '@/locales/en/settings.json'
 import enShipping from '@/locales/en/shipping.json'
 import enUsers from '@/locales/en/users.json'
@@ -63,6 +65,7 @@ export const resources = {
     payments: enPayments,
     returns: enReturns,
     profile: enProfile,
+    search: enSearch,
     settings: enSettings,
     shipping: enShipping,
     users: enUsers,
@@ -82,6 +85,7 @@ export const resources = {
     payments: arPayments,
     returns: arReturns,
     profile: arProfile,
+    search: arSearch,
     settings: arSettings,
     shipping: arShipping,
     users: arUsers,
@@ -119,6 +123,7 @@ void i18n
       'inventory',
       'notifications',
       'profile',
+      'search',
       'settings',
       'shipping',
       'users',
