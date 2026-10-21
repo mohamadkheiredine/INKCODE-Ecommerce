@@ -1,4 +1,13 @@
-import { MailIcon, PencilIcon, PhoneIcon, Trash2Icon, UserXIcon } from 'lucide-react'
+import {
+  CalendarClockIcon,
+  MailIcon,
+  PencilIcon,
+  PhoneIcon,
+  SparklesIcon,
+  Trash2Icon,
+  UserXIcon,
+  WalletIcon,
+} from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -21,13 +30,14 @@ import { AddressesCard } from '../components/addresses-card'
 import { CustomerAvatar } from '../components/customer-avatar'
 import { CustomerFormDialog } from '../components/customer-form-dialog'
 import { NotesCard } from '../components/notes-card'
+import { SegmentBadge } from '../components/segment-badge'
 import { TagList } from '../components/tag-list'
 import { useCustomer, useDeleteCustomer } from '../hooks/use-customers'
 import type { CustomerProfile } from '../types'
 
 /**
- * A Customer's profile: contact details and Tags, Order history, addresses, and notes.
- * Lifetime value joins this page with the Payments module.
+ * A Customer's profile: contact details and Tags, Lifetime value, Segment and last Order,
+ * Order history, addresses, and notes.
  */
 export function CustomerPage() {
   const { t } = useTranslation('customers')
@@ -61,7 +71,7 @@ function Profile({ customer }: { customer: CustomerProfile }) {
   const can = useCan()
   const canManage = can('customers.manage')
   const canSeeOrders = can('orders.view')
-  const { date } = useFormatters()
+  const { date, money } = useFormatters()
   const navigate = useNavigate()
   const deleteCustomer = useDeleteCustomer()
   const [editing, setEditing] = useState(false)
@@ -154,6 +164,29 @@ function Profile({ customer }: { customer: CustomerProfile }) {
               </dd>
             </div>
           </dl>
+        </CardContent>
+      </Card>
+
+      <Card className="js-reveal">
+        <CardContent>
+          <dl className="grid gap-4 sm:grid-cols-3">
+            <ContactItem label={t('fields.lifetimeValue')} icon={WalletIcon}>
+              <span className="text-lg font-semibold tabular-nums">
+                {money(customer.lifetime_value)}
+              </span>
+            </ContactItem>
+            <ContactItem label={t('fields.segment')} icon={SparklesIcon}>
+              <SegmentBadge segment={customer.segment} />
+            </ContactItem>
+            <ContactItem label={t('fields.lastOrder')} icon={CalendarClockIcon}>
+              {customer.last_order_at ? (
+                date(customer.last_order_at)
+              ) : (
+                <span className="text-muted-foreground">{t('noOrders')}</span>
+              )}
+            </ContactItem>
+          </dl>
+          <p className="mt-4 text-xs text-muted-foreground">{t('profile.valueHint')}</p>
         </CardContent>
       </Card>
 

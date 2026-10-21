@@ -29,6 +29,8 @@ class DemoSeeder extends Seeder
             DemoPaymentsSeeder::class,
             // Returns on the Delivered Orders, after their payments (for the Refunds).
             DemoReturnsSeeder::class,
+            // Earlier Delivered Orders, so every Segment has Customers.
+            DemoCustomerHistorySeeder::class,
         ]);
     }
 }

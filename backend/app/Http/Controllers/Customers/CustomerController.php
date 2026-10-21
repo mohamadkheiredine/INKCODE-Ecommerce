@@ -55,6 +55,6 @@ class CustomerController extends Controller
 
     private function profile(Customer $customer): CustomerResource
     {
-        return new CustomerResource($customer->load(['tags', 'addresses']));
+        return new CustomerResource(Customer::query()->withValue()->with(['tags', 'addresses'])->findOrFail($customer->id));
     }
 }

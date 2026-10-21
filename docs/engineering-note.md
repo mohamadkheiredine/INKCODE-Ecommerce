@@ -191,6 +191,11 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - `GET /api/v1/dashboard?from&to` (days inclusive, at most 366, default the last 30 days) needs `dashboard.view`, which every Role holds; a User without it gets 403. It is read-only, so there is nothing to audit.
   - The SPA keeps the preset in the URL (`range`, plus `from`/`to` for custom). Recharts is lazy-loaded so the KPIs render first (it also kept the shell tests within their timeouts); the GSAP count-up and chart animations are skipped under reduced motion.
 
+- **Lifetime value and Segments (#22).**
+  - Computed in SQL on every read, never stored: `Customer::withValue()` joins two grouped subqueries (Counted orders: Revenue, first and last placed date; succeeded Refunds in those Orders' Payment ledgers) and wraps the result as the `customers` table, so the list filters, sorts and paginates by `lifetime_value`, `segment` and `last_order_at` like any column. Nothing can drift, and there is no recalculation job to forget.
+  - "Counted order" is defined once (`Order::countedStatuses()` and the `counted()` scope, ADR 0006), shared by the dashboard (#23) and the Customer list. Refunds on a Cancelled Order are not subtracted, because its Revenue was never counted.
+  - Segment rules live in one enum (`Segment::sqlCase()`), checked in order with the first match winning: New (first Counted order ≤ 30 days ago), VIP (Lifetime value ≥ $1,000), At risk (last Counted order ≥ 90 days ago), Regular. The order was our call where the glossary was silent (a $2,000 first Order is New; a lapsed big spender stays VIP). Pest tests pin each boundary to the second (30 days, 90 days, $999.99 vs $1,000.00).
+
 ## Known limitations
 
 _(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_

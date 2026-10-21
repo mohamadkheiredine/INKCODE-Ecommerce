@@ -4,6 +4,12 @@
   "search": "Search by name, email or phone",
   "tagFilter": "Tag",
   "allTags": "All Tags",
+  "allSegments": "All Segments",
+  "lifetimeValueMin": "Min. Lifetime value",
+  "lifetimeValueMax": "Max. Lifetime value",
+  "lastOrderFrom": "Last Order from",
+  "lastOrderTo": "to",
+  "noOrders": "No Orders yet",
   "loading": "Loading Customers…",
   "noPhone": "No phone",
   "emptyTitle": "No Customers yet",
@@ -15,7 +21,16 @@
     "email": "Email",
     "phone": "Phone",
     "tags": "Tags",
-    "since": "Customer since"
+    "since": "Customer since",
+    "segment": "Segment",
+    "lifetimeValue": "Lifetime value",
+    "lastOrder": "Last Order"
+  },
+  "segments": {
+    "new": "New",
+    "vip": "VIP",
+    "at_risk": "At risk",
+    "regular": "Regular"
   },
   "form": {
     "newTitle": "New Customer",
@@ -41,7 +56,8 @@
     "noTags": "No Tags",
     "notFoundTitle": "Customer not found",
     "notFoundDescription": "This Customer doesn't exist or was deleted.",
-    "backToList": "Back to Customers"
+    "backToList": "Back to Customers",
+    "valueHint": "Lifetime value is the Revenue of Confirmed and later Orders (not Cancelled) minus Refunds. Segments: New (first Order in the last 30 days), VIP (Lifetime value of $1,000 or more), At risk (no Order for 90 days), Regular (everyone else)."
   },
   "addresses": {
     "title": "Addresses",

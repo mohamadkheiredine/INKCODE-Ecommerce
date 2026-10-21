@@ -18,7 +18,7 @@ it('seeds Warehouses and stock received at different costs, consistent with the 
 
     // Received three times at rising costs, so its Average cost lies between the first and last.
     $tee = Variant::query()->where('sku', 'like', 'CLASSIC-COTTON-TEE-BLK-S%')->sole();
-    expect(Receipt::query()->count())->toBe(3)
+    expect(Receipt::query()->count())->toBe(4)
         ->and((float) $tee->average_cost)->toBeGreaterThan(7.96)->toBeLessThan(10.34)
         ->and(StockBalance::query()->sum('on_hand'))->toEqual(StockMovement::query()->sum('on_hand_delta'));
 });

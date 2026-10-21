@@ -21,7 +21,7 @@ A person the store sells to; a record kept by Users, never someone who signs in.
 _Avoid_: Client, buyer, user, account
 
 **Segment**:
-An automatic grouping of Customers by buying behaviour: New (first Order in the last 30 days), VIP (Lifetime value of $1,000 or more), At risk (no Order for 90 days), or Regular (everyone else).
+An automatic grouping of Customers by buying behaviour, from their Counted orders and checked in this order, the first match winning: New (first Order in the last 30 days), VIP (Lifetime value of $1,000 or more), At risk (no Order for 90 days), or Regular (everyone else, including a Customer with no Counted order yet).
 _Avoid_: Tier, cohort, group
 
 **Tag**:
@@ -33,7 +33,7 @@ The address a Customer's Orders are billed to (default billing) or shipped to (d
 _Avoid_: Primary address, main address
 
 **Lifetime value**:
-The Revenue of a Customer's Counted orders minus that Customer's Refunds.
+The Revenue of a Customer's Counted orders minus the Refunds recorded in those Orders' Payment ledgers.
 _Avoid_: LTV (in the interface), total spent, customer value
 
 **Audit entry**:

@@ -13,6 +13,9 @@ export function aCustomer(overrides: Partial<CustomerProfile> = {}): CustomerPro
     name: `Customer ${id}`,
     email: `customer${id}@example.com`,
     phone: null,
+    lifetime_value: '0.00',
+    last_order_at: null,
+    segment: 'regular',
     tags: [],
     addresses: [],
     created_at: '2026-10-01T09:00:00+00:00',
@@ -65,7 +68,10 @@ export function customerStore(initial: CustomerProfile[] = [], tags: Tag[] = [])
       listResponse<Customer>(customers, request, {
         searchIn: ['name', 'email', 'phone'],
         defaultSort: '-created_at',
-        filters: { tag: (row, value) => row.tags.some((tag) => tag.id === Number(value)) },
+        filters: {
+          tag: (row, value) => row.tags.some((tag) => tag.id === Number(value)),
+          segment: (row, value) => row.segment === value,
+        },
       }),
     ),
     http.get('*/api/v1/customer-tags', () =>
