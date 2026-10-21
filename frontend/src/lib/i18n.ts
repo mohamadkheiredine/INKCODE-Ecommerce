@@ -7,6 +7,7 @@ import arCatalog from '@/locales/ar/catalog.json'
 import arCommon from '@/locales/ar/common.json'
 import arCoupons from '@/locales/ar/coupons.json'
 import arCustomers from '@/locales/ar/customers.json'
+import arDashboard from '@/locales/ar/dashboard.json'
 import arErrors from '@/locales/ar/errors.json'
 import arHome from '@/locales/ar/home.json'
 import arInventory from '@/locales/ar/inventory.json'
@@ -25,6 +26,7 @@ import enCatalog from '@/locales/en/catalog.json'
 import enCommon from '@/locales/en/common.json'
 import enCoupons from '@/locales/en/coupons.json'
 import enCustomers from '@/locales/en/customers.json'
+import enDashboard from '@/locales/en/dashboard.json'
 import enErrors from '@/locales/en/errors.json'
 import enHome from '@/locales/en/home.json'
 import enInventory from '@/locales/en/inventory.json'
@@ -57,6 +59,7 @@ export const resources = {
     catalog: enCatalog,
     coupons: enCoupons,
     customers: enCustomers,
+    dashboard: enDashboard,
     errors: enErrors,
     home: enHome,
     inventory: enInventory,
@@ -77,6 +80,7 @@ export const resources = {
     catalog: arCatalog,
     coupons: arCoupons,
     customers: arCustomers,
+    dashboard: arDashboard,
     errors: arErrors,
     home: arHome,
     inventory: arInventory,
@@ -118,6 +122,7 @@ void i18n
       'catalog',
       'coupons',
       'customers',
+      'dashboard',
       'errors',
       'home',
       'inventory',

@@ -1,0 +1,72 @@
+{
+  "title": "Executive dashboard",
+  "rangeSummary": "{{from}} – {{to}}, compared with the previous period. Counted orders only.",
+  "range": {
+    "label": "Date range",
+    "from": "From",
+    "to": "To",
+    "presets": {
+      "today": "Today",
+      "7d": "7 days",
+      "30d": "30 days",
+      "month": "This month",
+      "custom": "Custom"
+    }
+  },
+  "kpis": {
+    "revenue": "Revenue",
+    "net_sales": "Net sales",
+    "orders": "Orders",
+    "pending_fulfillment": "Pending fulfillment",
+    "average_order_value": "Average order value",
+    "customers": "Customers",
+    "cancellations": "Cancellations",
+    "returns": "Returns",
+    "low_stock": "Low-stock items"
+  },
+  "change": {
+    "vsPrevious": "vs previous period",
+    "noBaseline": "New: nothing in the previous period",
+    "snapshot": "Right now"
+  },
+  "chart": {
+    "title": "Revenue",
+    "description": "Per day, with the previous period dashed",
+    "revenue": "This period",
+    "previous": "Previous period"
+  },
+  "statuses": {
+    "title": "Order status",
+    "description": "Counted orders by where they are now",
+    "orders": "Orders"
+  },
+  "topProducts": {
+    "title": "Top Products",
+    "description": "By sales on Counted orders",
+    "empty": "No Products sold in this period.",
+    "units_one": "{{count}} unit",
+    "units_other": "{{count}} units"
+  },
+  "recentOrders": {
+    "title": "Recent Orders",
+    "description": "The latest Counted orders in this period",
+    "empty": "No Counted orders in this period."
+  },
+  "alerts": {
+    "title": "Alerts",
+    "description": "What needs attention now",
+    "empty": "All clear: nothing needs attention.",
+    "low_stock_one": "{{count}} item is at or below its Low-stock threshold",
+    "low_stock_other": "{{count}} items are at or below their Low-stock threshold",
+    "orders_awaiting_confirmation_one": "{{count}} Pending Order awaits confirmation",
+    "orders_awaiting_confirmation_other": "{{count}} Pending Orders await confirmation",
+    "returns_awaiting_decision_one": "{{count}} Return awaits a decision",
+    "returns_awaiting_decision_other": "{{count}} Returns await a decision"
+  },
+  "empty": {
+    "title": "No Counted orders in this period",
+    "description": "Orders count once they are Confirmed. Pick a longer range, or create an Order.",
+    "createOrder": "Create Order",
+    "viewOrders": "View Orders"
+  }
+}

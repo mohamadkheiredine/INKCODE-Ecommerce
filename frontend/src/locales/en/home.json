@@ -2,10 +2,5 @@
   "eyebrow": "Signed in",
   "title": "Hello, {{name}}",
   "subtitle": "You're in the Inkcode Commerce back office.",
-  "today": "Today is {{date}}",
-  "role": "Role",
-  "email": "Email",
-  "access": "Access",
-  "permissionCount_one": "{{count}} permission",
-  "permissionCount_other": "{{count}} permissions"
+  "today": "Today is {{date}}"
 }
