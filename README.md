@@ -204,10 +204,14 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - One validator serves the live quote, creating and editing an Order, and Confirm, with a clear reason when a code does not apply (not started, expired, limit reached, below the minimum, no eligible items). The discount is spread over the eligible lines by value (the leftover cent goes to the largest line), and VAT is charged on the discounted amounts.
   - A use counts when the Order is Confirmed (the Coupon row is locked, so the last use goes to one Order even under simultaneous confirmations) and is freed when the Order is fully cancelled. Each Coupon's page lists the Orders and Customers that used it.
   - Admin and Sales manage Coupons; Operations, Finance and Viewer only look; Inventory and Support have no access. Five demo Coupons are seeded, and every third demo Order uses `SAVE10`.
+- **Executive dashboard (#23):**
+  - The landing page shows nine KPIs for a date range (today, 7 days, 30 days, this month or custom, kept in the URL): Revenue, Net sales, Orders, pending fulfillment, Average order value, Customers, cancellations, Returns and low-stock items, each compared with the previous period of the same length ("New" when that period had nothing). There is no conversion rate, because visits are not tracked.
+  - A daily Revenue chart against the previous period, an Order-status donut, top Products, recent Orders and alerts (low stock, Pending Orders, Returns awaiting a decision) complete it. KPI count-up and chart animations are off under reduced motion.
+  - Every figure comes from Counted orders (Confirmed or later, not Cancelled, dated by the day placed) through one shared scope, `Order::counted()`, for the reports and Lifetime value to reuse. Revenue always equals the sum of those Orders' totals.
 
 ### Incomplete / assumptions
 
-- The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
+- The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work.
 - Marking a notification as read is the User's own reading state and is not audited. Categories and Brands that Products use cannot be deleted (restricting foreign keys).
 - A Product or Variant that appears on an Order can only be archived, never deleted. This holds once Order lines reference Variants with a restricting foreign key (#16). Stock per Warehouse arrives with #11, and a Variant's empty Low-stock threshold follows the store default from Settings (#15).
 - A Customer's Order history and Lifetime value join the profile with Orders (#16, #17) and Payments (#19); Segments and the activity/value filters come with #22. Refusing to delete a Customer who has Orders relies on the restricting foreign key Orders add in #16.

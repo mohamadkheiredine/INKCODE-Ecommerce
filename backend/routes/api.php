@@ -27,6 +27,7 @@ use App\Http\Controllers\Customers\CustomerAddressController;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
 use App\Http\Controllers\Customers\TagController;
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Inventory\AdjustmentController;
 use App\Http\Controllers\Inventory\ReceiptController;
 use App\Http\Controllers\Inventory\StockLevelController;
@@ -88,6 +89,9 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
 
     // Global search (Ctrl+K): every User may search; the groups follow their Role (SearchEverything).
     Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    // The executive dashboard: Roles with dashboard.view (ShowDashboardRequest).
+    Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
 
     // Every User has their own notifications; these only ever touch the signed-in User's.
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

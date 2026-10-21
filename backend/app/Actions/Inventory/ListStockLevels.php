@@ -33,6 +33,14 @@ final class ListStockLevels
     }
 
     /**
+     * How many rows the filters keep (all pages).
+     */
+    public function count(ListParameters $parameters): int
+    {
+        return $this->query($parameters)->count();
+    }
+
+    /**
      * Units on hand and their Stock value across every row the filters keep (all pages).
      *
      * @return array{on_hand: int, stock_value: string}

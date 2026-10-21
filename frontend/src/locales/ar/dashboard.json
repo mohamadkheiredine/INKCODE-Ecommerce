@@ -1,0 +1,88 @@
+{
+  "title": "لوحة المؤشرات التنفيذية",
+  "rangeSummary": "{{from}} – {{to}}، مقارنةً بالفترة السابقة. الطلبات المحتسبة فقط.",
+  "range": {
+    "label": "الفترة",
+    "from": "من",
+    "to": "إلى",
+    "presets": {
+      "today": "اليوم",
+      "7d": "7 أيام",
+      "30d": "30 يوماً",
+      "month": "هذا الشهر",
+      "custom": "مخصصة"
+    }
+  },
+  "kpis": {
+    "revenue": "الإيرادات",
+    "net_sales": "صافي المبيعات",
+    "orders": "الطلبات",
+    "pending_fulfillment": "بانتظار التنفيذ",
+    "average_order_value": "متوسط قيمة الطلب",
+    "customers": "العملاء",
+    "cancellations": "الإلغاءات",
+    "returns": "المرتجعات",
+    "low_stock": "أصناف منخفضة المخزون"
+  },
+  "change": {
+    "vsPrevious": "مقارنةً بالفترة السابقة",
+    "noBaseline": "جديد: لا شيء في الفترة السابقة",
+    "snapshot": "الآن"
+  },
+  "chart": {
+    "title": "الإيرادات",
+    "description": "يومياً، والفترة السابقة بخط متقطع",
+    "revenue": "هذه الفترة",
+    "previous": "الفترة السابقة"
+  },
+  "statuses": {
+    "title": "حالة الطلبات",
+    "description": "الطلبات المحتسبة حسب حالتها الآن",
+    "orders": "طلبات"
+  },
+  "topProducts": {
+    "title": "أفضل المنتجات",
+    "description": "حسب المبيعات في الطلبات المحتسبة",
+    "empty": "لم يُبع أي منتج في هذه الفترة.",
+    "units_zero": "لا وحدات",
+    "units_one": "وحدة واحدة",
+    "units_two": "وحدتان",
+    "units_few": "{{count}} وحدات",
+    "units_many": "{{count}} وحدة",
+    "units_other": "{{count}} وحدة"
+  },
+  "recentOrders": {
+    "title": "أحدث الطلبات",
+    "description": "آخر الطلبات المحتسبة في هذه الفترة",
+    "empty": "لا طلبات محتسبة في هذه الفترة."
+  },
+  "alerts": {
+    "title": "التنبيهات",
+    "description": "ما يحتاج إلى متابعة الآن",
+    "empty": "لا شيء يحتاج إلى متابعة.",
+    "low_stock_zero": "لا أصناف منخفضة المخزون",
+    "low_stock_one": "صنف واحد عند حد المخزون المنخفض أو دونه",
+    "low_stock_two": "صنفان عند حد المخزون المنخفض أو دونه",
+    "low_stock_few": "{{count}} أصناف عند حد المخزون المنخفض أو دونه",
+    "low_stock_many": "{{count}} صنفاً عند حد المخزون المنخفض أو دونه",
+    "low_stock_other": "{{count}} صنف عند حد المخزون المنخفض أو دونه",
+    "orders_awaiting_confirmation_zero": "لا طلبات معلقة",
+    "orders_awaiting_confirmation_one": "طلب معلق واحد بانتظار التأكيد",
+    "orders_awaiting_confirmation_two": "طلبان معلقان بانتظار التأكيد",
+    "orders_awaiting_confirmation_few": "{{count}} طلبات معلقة بانتظار التأكيد",
+    "orders_awaiting_confirmation_many": "{{count}} طلباً معلقاً بانتظار التأكيد",
+    "orders_awaiting_confirmation_other": "{{count}} طلب معلق بانتظار التأكيد",
+    "returns_awaiting_decision_zero": "لا مرتجعات",
+    "returns_awaiting_decision_one": "مرتجع واحد بانتظار القرار",
+    "returns_awaiting_decision_two": "مرتجعان بانتظار القرار",
+    "returns_awaiting_decision_few": "{{count}} مرتجعات بانتظار القرار",
+    "returns_awaiting_decision_many": "{{count}} مرتجعاً بانتظار القرار",
+    "returns_awaiting_decision_other": "{{count}} مرتجع بانتظار القرار"
+  },
+  "empty": {
+    "title": "لا طلبات محتسبة في هذه الفترة",
+    "description": "يُحتسب الطلب بعد تأكيده. اختر فترة أطول، أو أنشئ طلباً.",
+    "createOrder": "إنشاء طلب",
+    "viewOrders": "عرض الطلبات"
+  }
+}
