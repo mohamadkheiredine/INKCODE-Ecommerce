@@ -22,7 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $deducted_quantity the units that left On-hand (at the Deduction stage or in a Shipment)
  * @property int $shipped_quantity the units in its Order's Shipments (shipped ≤ deducted ≤ quantity)
  * @property string $unit_price
- * @property string $discount_amount
+ * @property string $discount_amount its share of the Coupon's discount
+ * @property bool $coupon_eligible whether the Order's Coupon discounts it
  * @property bool $taxable
  * @property string $vat_rate
  * @property string $vat_amount
@@ -32,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 #[Fillable([
     'variant_id', 'product_name', 'sku', 'options', 'quantity', 'cancelled_quantity', 'deducted_quantity', 'shipped_quantity', 'unit_price', 'discount_amount',
-    'taxable', 'vat_rate', 'vat_amount', 'line_total',
+    'coupon_eligible', 'taxable', 'vat_rate', 'vat_amount', 'line_total',
 ])]
 class OrderLine extends Model
 {
@@ -51,6 +52,7 @@ class OrderLine extends Model
             'shipped_quantity' => 'integer',
             'unit_price' => 'decimal:2',
             'discount_amount' => 'decimal:2',
+            'coupon_eligible' => 'boolean',
             'taxable' => 'boolean',
             'vat_rate' => 'decimal:2',
             'vat_amount' => 'decimal:2',

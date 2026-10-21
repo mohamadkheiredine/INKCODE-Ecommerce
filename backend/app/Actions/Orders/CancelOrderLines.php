@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderLine;
 use App\Models\User;
 use App\Services\AuditTrail;
+use App\Services\CouponRedemptions;
 use App\Services\OrderPricing;
 use App\Services\OrderStock;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +18,8 @@ use Illuminate\Validation\ValidationException;
 /**
  * Partial cancellation: cancels some units of some lines before the Order ships. The units
  * move to each line's `cancelled_quantity`, their stock is released (or put back On-hand
- * past the Deduction stage), and the Order is re-priced at its own VAT rate; shipping is
- * kept. The reason, when given, is added to the timeline as a note. Cancelling every
+ * past the Deduction stage), and the Order is re-priced at its own VAT rate and Coupon
+ * terms (the redemption keeps the new discount); shipping is kept. The reason, when given, is added to the timeline as a note. Cancelling every
  * remaining unit cancels the whole Order instead ({@see CancelOrder}). Shipped units cannot
  * be cancelled; when only shipped units are left, the Order follows its Shipments.
  */
@@ -29,6 +30,7 @@ final class CancelOrderLines
         private readonly AddOrderNote $addOrderNote,
         private readonly OrderPricing $pricing,
         private readonly OrderStock $orderStock,
+        private readonly CouponRedemptions $couponRedemptions,
         private readonly AuditTrail $auditTrail,
         private readonly FollowShipments $followShipments,
     ) {}
@@ -72,15 +74,22 @@ final class CancelOrderLines
 
             $lines = $lines->values();
             $priced = $this->pricing->reprice(
-                $lines->map(fn (OrderLine $line): array => ['quantity' => $line->quantity, 'unit_price' => $line->unit_price, 'taxable' => $line->taxable])->all(),
+                $lines->map(fn (OrderLine $line): array => [
+                    'quantity' => $line->quantity,
+                    'unit_price' => $line->unit_price,
+                    'taxable' => $line->taxable,
+                    'coupon_eligible' => $line->coupon_eligible,
+                ])->all(),
                 $order->vat_rate,
                 $order->shipping_total,
+                $order->couponTerms(),
             );
             foreach ($lines as $index => $line) {
                 $line->fill($priced['lines'][$index])->save();
             }
             $order->update(array_intersect_key($priced, array_flip(['items_total', 'discount_total', 'vat_total', 'total'])));
 
+            $this->couponRedemptions->sync($order);
             $this->auditTrail->updated($order->load('lines'), $before);
             $order = $this->followShipments->handle($order);
             if ($note !== null) {

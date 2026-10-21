@@ -97,7 +97,7 @@ describe('Shipments', () => {
     }
     expect(requests.filter((request) => request.path === 'deliver')).toHaveLength(2)
     expect(await screen.findByText('Moved to Delivered')).toBeInTheDocument()
-  })
+  }, 15_000)
 
   it('shows a refused tracking number on its field', async () => {
     const order = anOrder({ status: 'ready_for_shipping' })

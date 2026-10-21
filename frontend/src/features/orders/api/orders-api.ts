@@ -6,6 +6,7 @@ import type {
   OrderInput,
   OrderLineInput,
   OrderQuote,
+  QuoteCouponInput,
   OrderStatus,
   OrderUpdateInput,
   SellableVariant,
@@ -17,8 +18,8 @@ export const orderKeys = {
   all: ['orders'] as const,
   list: (query: ListQuery) => [...orderKeys.all, 'list', query] as const,
   detail: (id: number) => [...orderKeys.all, 'detail', id] as const,
-  quote: (lines: OrderLineInput[], shippingMethodId: number | null) =>
-    [...orderKeys.all, 'quote', lines, shippingMethodId] as const,
+  quote: (lines: OrderLineInput[], shippingMethodId: number | null, coupon: QuoteCouponInput) =>
+    [...orderKeys.all, 'quote', lines, shippingMethodId, coupon] as const,
   sellableVariants: (search: string) => [...orderKeys.all, 'sellable-variants', search] as const,
   assignees: () => [...orderKeys.all, 'assignees'] as const,
 }
@@ -127,10 +128,16 @@ export const ordersApi = {
     return data.data
   },
 
-  async quote(lines: OrderLineInput[], shippingMethodId: number | null): Promise<OrderQuote> {
+  async quote(
+    lines: OrderLineInput[],
+    shippingMethodId: number | null,
+    coupon: QuoteCouponInput,
+  ): Promise<OrderQuote> {
     const { data } = await http.post<{ data: OrderQuote }>('/orders/quote', {
       lines,
       shipping_method_id: shippingMethodId,
+      coupon_code: coupon.code || null,
+      customer_id: coupon.customerId || null,
     })
     return data.data
   },

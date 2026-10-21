@@ -6,6 +6,7 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Carrier;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\Product;
@@ -45,6 +46,7 @@ function recordsForRouteParameters(): array
         'attribute' => Attribute::factory()->create(),
         'brand' => Brand::factory()->create(),
         'carrier' => $carrier,
+        'coupon' => Coupon::factory()->create(),
         'category' => Category::factory()->create(),
         'customer' => Customer::query()->findOrFail($address->customer_id),
         'address' => $address,

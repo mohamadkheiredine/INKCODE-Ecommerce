@@ -11,13 +11,29 @@ type Totals = {
 }
 
 /** Items, discount (when there is one), VAT, shipping and the total, as the API computed them. */
-export function OrderTotals({ totals, shippingLabel }: { totals: Totals; shippingLabel?: string }) {
+export function OrderTotals({
+  totals,
+  shippingLabel,
+  couponCode,
+}: {
+  totals: Totals
+  shippingLabel?: string
+  /** The Coupon behind the discount, named on its row. */
+  couponCode?: string | null
+}) {
   const { t } = useTranslation('orders')
   const { money } = useFormatters()
   const rows: [string, Amount][] = [
     [t('totals.items'), totals.items_total],
     ...(Number(totals.discount_total) > 0
-      ? ([[t('totals.discount'), `-${totals.discount_total}` as Amount]] as [string, Amount][])
+      ? ([
+          [
+            couponCode
+              ? t('totals.discountWithCoupon', { code: couponCode })
+              : t('totals.discount'),
+            `-${totals.discount_total}` as Amount,
+          ],
+        ] as [string, Amount][])
       : []),
     [t('totals.vat'), totals.vat_total],
     [

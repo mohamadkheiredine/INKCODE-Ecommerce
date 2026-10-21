@@ -78,7 +78,9 @@
     "newOrder": "New Order",
     "order": "Order",
     "invoice": "Invoice",
-    "transfers": "Transfers"
+    "transfers": "Transfers",
+    "coupons": "Coupons",
+    "coupon": "Coupon"
   },
   "navGroups": {
     "dashboard": "Dashboard",

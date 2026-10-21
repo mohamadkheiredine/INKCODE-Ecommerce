@@ -350,7 +350,11 @@ function OrderDetail({ order }: { order: Order }) {
                 </Table>
               </div>
               <div className="ms-auto w-full max-w-sm">
-                <OrderTotals totals={order} shippingLabel={order.shipping_method.name} />
+                <OrderTotals
+                  totals={order}
+                  shippingLabel={order.shipping_method.name}
+                  couponCode={order.coupon?.code}
+                />
               </div>
             </CardContent>
           </Card>

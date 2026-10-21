@@ -2,10 +2,13 @@
 
 namespace App\Actions\Orders;
 
+use App\Exceptions\BusinessRuleViolation;
 use App\Models\ShippingMethod;
 use App\Models\StockBalance;
 use App\Models\Variant;
 use App\Models\Warehouse;
+use App\Services\AppliedCoupon;
+use App\Services\CouponValidator;
 use App\Services\OrderPricing;
 
 /**
@@ -13,16 +16,23 @@ use App\Services\OrderPricing;
  * {@see CreateOrder} will price them, and every active Warehouse with the lines it lacks
  * Available stock for. Warehouses that can fulfil every line come first, so the form
  * pre-selects one of them as the Fulfilling warehouse.
+ *
+ * With a Coupon code, `coupon` says whether it applies ({@see CouponValidator}); one that
+ * does not is reported with its reason and the lines are priced without it, so the form
+ * can show why next to the code.
  */
 final class QuoteOrder
 {
-    public function __construct(private readonly OrderPricing $pricing) {}
+    public function __construct(
+        private readonly OrderPricing $pricing,
+        private readonly CouponValidator $couponValidator,
+    ) {}
 
     /**
      * @param  list<array{variant_id: int, quantity: int}>  $lines
-     * @return array<string, mixed> the {@see OrderPricing::price()} result plus `warehouses`
+     * @return array<string, mixed> the {@see OrderPricing::price()} result plus `coupon` and `warehouses`
      */
-    public function handle(array $lines, ?int $shippingMethodId): array
+    public function handle(array $lines, ?int $shippingMethodId, ?string $couponCode = null, ?int $customerId = null): array
     {
         $variants = Variant::query()
             ->with(['product:id,name,taxable', 'attributeValues.attribute:id,name'])
@@ -30,13 +40,42 @@ final class QuoteOrder
             ->keyBy('id');
         $shippingPrice = $shippingMethodId === null ? '0.00' : ShippingMethod::query()->findOrFail($shippingMethodId)->price;
 
+        $applied = null;
+        $coupon = null;
+        if ($couponCode !== null) {
+            try {
+                $applied = $this->couponValidator->validate($couponCode, array_map(fn (array $line): array => [
+                    ...$line,
+                    'unit_price' => $variants[$line['variant_id']]->price,
+                ], $lines), $customerId);
+                $coupon = self::validCoupon($applied);
+            } catch (BusinessRuleViolation $refusal) {
+                $coupon = [
+                    'code' => CouponValidator::normalize($couponCode),
+                    'is_valid' => false,
+                    'reason' => $refusal->details['reason'] ?? null,
+                    'message' => $refusal->getMessage(),
+                ];
+            }
+        }
+
         return [
             ...$this->pricing->price(
                 array_map(fn (array $line): array => ['variant' => $variants[$line['variant_id']], 'quantity' => $line['quantity']], $lines),
                 $shippingPrice,
+                $applied,
             ),
+            'coupon' => $coupon,
             'warehouses' => $this->warehouses($lines, $variants->map(fn (Variant $variant): string => $variant->sku)->all()),
         ];
+    }
+
+    /**
+     * @return array{code: string, is_valid: true, type: string, value: string}
+     */
+    private static function validCoupon(AppliedCoupon $applied): array
+    {
+        return ['code' => $applied->coupon->code, 'is_valid' => true, 'type' => $applied->coupon->type->value, 'value' => $applied->coupon->value];
     }
 
     /**

@@ -20,6 +20,8 @@ use App\Http\Controllers\Catalog\ProductImageController;
 use App\Http\Controllers\Catalog\ProductImageOrderController;
 use App\Http\Controllers\Catalog\VariantController;
 use App\Http\Controllers\Catalog\VariantGenerationController;
+use App\Http\Controllers\Coupons\CouponController;
+use App\Http\Controllers\Coupons\CouponRedemptionController;
 use App\Http\Controllers\Customers\CustomerAddressController;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
@@ -193,6 +195,13 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->name('orders.cancel-lines');
     Route::put('/orders/{order}/assignee', [OrderAssigneeController::class, 'update'])->name('orders.assign');
     Route::post('/orders/{order}/notes', [OrderNoteController::class, 'store'])->name('orders.notes.store');
+
+    // Coupons: Roles with coupons.view look (with each Coupon's usage); CouponPolicy lets
+    // only coupons.manage change them. Orders apply them through the Order endpoints.
+    Route::apiResource('coupons', CouponController::class)
+        ->middlewareFor('show', 'can:view,coupon')
+        ->middlewareFor('destroy', 'can:delete,coupon');
+    Route::get('/coupons/{coupon}/redemptions', [CouponRedemptionController::class, 'index'])->name('coupons.redemptions.index');
 
     // Shipments: shipments.manage ships a Ready for shipping Order and marks Shipments delivered.
     Route::post('/orders/{order}/shipments', [ShipmentController::class, 'store'])

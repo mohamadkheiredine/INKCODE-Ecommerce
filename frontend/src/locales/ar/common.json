@@ -78,7 +78,9 @@
     "newOrder": "طلب جديد",
     "order": "طلب",
     "invoice": "فاتورة",
-    "transfers": "التحويلات"
+    "transfers": "التحويلات",
+    "coupons": "القسائم",
+    "coupon": "القسيمة"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

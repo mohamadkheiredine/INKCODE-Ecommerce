@@ -199,6 +199,12 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - The Admin searches every recorded change by record name and filters by record type, action, User and date range; each entry opens a side-by-side view of the values before and after, and links to the record's page where it has one. Entries are read-only.
   - The demo store comes with a two-week history of its setup by the demo Users.
 
+- **Coupons (#20):**
+  - A Coupon takes a percentage or a fixed amount off an Order, from its start date to its optional end date, within a total and a per-Customer usage limit, above a minimum order amount, and optionally only on chosen Products or Categories (a Category includes its sub-categories). An Order carries at most one Coupon.
+  - One validator serves the live quote, creating and editing an Order, and Confirm, with a clear reason when a code does not apply (not started, expired, limit reached, below the minimum, no eligible items). The discount is spread over the eligible lines by value (the leftover cent goes to the largest line), and VAT is charged on the discounted amounts.
+  - A use counts when the Order is Confirmed (the Coupon row is locked, so the last use goes to one Order even under simultaneous confirmations) and is freed when the Order is fully cancelled. Each Coupon's page lists the Orders and Customers that used it.
+  - Admin and Sales manage Coupons; Operations, Finance and Viewer only look; Inventory and Support have no access. Five demo Coupons are seeded, and every third demo Order uses `SAVE10`.
+
 ### Incomplete / assumptions
 
 - The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work, so until the dashboard (#23) lands it holds the Home page.
