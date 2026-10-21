@@ -49,8 +49,8 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Shipping zones, carriers, rates, tracking references, shipment history, partial shipments
   - [x] Shipping zones (countries or cities), flat-price Shipping methods, Carriers with tracking link templates, and the address quote (#14)
   - [x] Shipments: tracking numbers, status history, partial shipments (#18)
-- [ ] Returns: request → approval → physical receipt → restock decision → eligible refund (no automatic restock)
-- [x] Refunds can never exceed the captured amount; partial refunds supported (#19: `refund_exceeds_captured`; cancelling or reducing a paid Order shows "Refund needed" and records the Refund in the same step; Return refunds come with #21)
+- [x] Returns: request → approval → physical receipt → restock decision → eligible refund (no automatic restock) (#21: Return window, delivered − returned units, Restock or Write-off through the stock service, Refund suggested from what was paid and capped)
+- [x] Refunds can never exceed the captured amount; partial refunds supported (#19: `refund_exceeds_captured`; cancelling or reducing a paid Order shows "Refund needed" and records the Refund in the same step; Return Refunds are capped at what was paid for the items and recorded in the ledger, #21)
 
 ## Phase 4: Reporting, permissions, notifications, settings
 
