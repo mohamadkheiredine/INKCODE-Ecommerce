@@ -7,11 +7,16 @@ import { Separator } from '@/components/ui/separator'
 import { useSidebar } from '@/components/ui/sidebar'
 import type { CurrentUser } from '@/features/auth/types'
 import { NotificationBell } from '@/features/notifications/components/notification-bell'
+import { GlobalSearch } from '@/features/search/components/global-search'
+import { QuickActionsMenu } from '@/features/search/components/quick-actions-menu'
 import { useSavePreferences } from '@/features/profile/hooks/use-profile'
 import { Breadcrumbs } from './breadcrumbs'
 import { UserMenu } from './user-menu'
 
-/** Sidebar toggle and breadcrumbs, then the language and theme switches, the notifications bell and the user menu. */
+/**
+ * Sidebar toggle and breadcrumbs, then search, quick actions, the language and theme
+ * switches, the notifications bell and the user menu.
+ */
 export function AppHeader({ user }: { user: CurrentUser }) {
   const { t } = useTranslation()
   const { toggleSidebar } = useSidebar()
@@ -35,6 +40,8 @@ export function AppHeader({ user }: { user: CurrentUser }) {
       />
       <Breadcrumbs />
       <div className="ms-auto flex shrink-0 items-center gap-1">
+        <GlobalSearch />
+        <QuickActionsMenu />
         {/* The switch applies at once; keeping it on the profile follows. */}
         <LanguageSwitcher onChange={(locale) => savePreferences({ locale })} />
         <ThemeToggle onChange={(theme) => savePreferences({ theme })} />

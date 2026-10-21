@@ -1,0 +1,27 @@
+{
+  "open": "Search",
+  "trigger": "Search…",
+  "title": "Search",
+  "description": "Find Orders, Products and Customers, or start a quick action.",
+  "placeholder": "Search Orders, Products, Customers…",
+  "hint": "Type at least 2 characters: an Order number, a name, a SKU, an email or a phone.",
+  "searching": "Searching…",
+  "groups": {
+    "orders": "Orders",
+    "products": "Products",
+    "customers": "Customers",
+    "quickActions": "Quick actions"
+  },
+  "emptyTitle": "No matches",
+  "emptyDescription": "Nothing matches “{{q}}”. Try another word, or start one of these instead.",
+  "errorTitle": "The search failed",
+  "errorDescription": "We could not search just now. Try again.",
+  "noSku": "No SKU",
+  "actions": {
+    "menu": "Quick actions",
+    "newOrder": "New order",
+    "newProduct": "New product",
+    "newCustomer": "New customer",
+    "receiveStock": "Receive stock"
+  }
+}
