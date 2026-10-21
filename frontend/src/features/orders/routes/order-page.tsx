@@ -45,6 +45,8 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { useCan } from '@/features/auth/hooks/use-can'
 import { optionsLabel } from '@/features/inventory/types'
+import { PaymentLedgerCard } from '@/features/payments/components/payment-ledger-card'
+import { RefundNeeded } from '@/features/payments/components/refund-needed'
 import { isApiError } from '@/lib/api/api-error'
 import { useFormatters } from '@/lib/format'
 import { apiErrorMessage } from '@/lib/forms'
@@ -348,6 +350,7 @@ function OrderDetail({ order }: { order: Order }) {
             </CardContent>
           </Card>
 
+          {can('payments.view') && <PaymentLedgerCard order={order} />}
           <TimelineCard order={order} />
         </div>
 
@@ -485,6 +488,7 @@ function CancelOrderDialog({ order, onClose }: { order: Order | null; onClose: (
               : t('cancel.descriptionReserved')}
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {order && <RefundNeeded order={order} owedAfterCents={0} />}
         <div className="flex flex-col gap-2">
           <Label htmlFor="cancel-note">{t('cancel.reason')}</Label>
           <Textarea

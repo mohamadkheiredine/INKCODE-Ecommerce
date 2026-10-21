@@ -152,6 +152,31 @@ export const routes: RouteObject[] = [
             ],
           },
           {
+            path: 'payments',
+            handle: crumb('payments'),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: withPermission(
+                    'payments.view',
+                    (await import('@/features/payments/routes/payments-page')).PaymentsPage,
+                  ),
+                }),
+              },
+              {
+                path: 'reconciliation',
+                handle: crumb('reconciliation'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'payments.view',
+                    (await import('@/features/payments/routes/payments-page')).ReconciliationPage,
+                  ),
+                }),
+              },
+            ],
+          },
+          {
             path: 'customers',
             handle: crumb('customers'),
             children: [

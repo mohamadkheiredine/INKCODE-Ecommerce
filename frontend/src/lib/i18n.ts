@@ -11,6 +11,7 @@ import arHome from '@/locales/ar/home.json'
 import arInventory from '@/locales/ar/inventory.json'
 import arNotifications from '@/locales/ar/notifications.json'
 import arOrders from '@/locales/ar/orders.json'
+import arPayments from '@/locales/ar/payments.json'
 import arProfile from '@/locales/ar/profile.json'
 import arSettings from '@/locales/ar/settings.json'
 import arShipping from '@/locales/ar/shipping.json'
@@ -25,6 +26,7 @@ import enHome from '@/locales/en/home.json'
 import enInventory from '@/locales/en/inventory.json'
 import enNotifications from '@/locales/en/notifications.json'
 import enOrders from '@/locales/en/orders.json'
+import enPayments from '@/locales/en/payments.json'
 import enProfile from '@/locales/en/profile.json'
 import enSettings from '@/locales/en/settings.json'
 import enShipping from '@/locales/en/shipping.json'
@@ -53,6 +55,7 @@ export const resources = {
     inventory: enInventory,
     notifications: enNotifications,
     orders: enOrders,
+    payments: enPayments,
     profile: enProfile,
     settings: enSettings,
     shipping: enShipping,
@@ -69,6 +72,7 @@ export const resources = {
     inventory: arInventory,
     notifications: arNotifications,
     orders: arOrders,
+    payments: arPayments,
     profile: arProfile,
     settings: arSettings,
     shipping: arShipping,

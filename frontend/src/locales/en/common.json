@@ -78,7 +78,9 @@
     "newOrder": "New Order",
     "order": "Order",
     "invoice": "Invoice",
-    "transfers": "Transfers"
+    "transfers": "Transfers",
+    "payments": "Payments",
+    "reconciliation": "Reconciliation"
   },
   "navGroups": {
     "dashboard": "Dashboard",
