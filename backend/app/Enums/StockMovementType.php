@@ -16,6 +16,10 @@ enum StockMovementType: string
 
     /** An Order holding Reserved units was cancelled: they are free again (removes Reserved). */
     case Release = 'release';
+    /** An Order reached the Deduction stage: its Reserved units leave On-hand (removes both). */
+    case Deduction = 'deduction';
+    /** Units deducted for an Order were cancelled before it shipped: they are back on hand. */
+    case CancellationReturn = 'cancellation_return';
 
     /** A correction with a reason (count correction, damaged, lost, found): adds or removes On-hand. */
     case Adjustment = 'adjustment';

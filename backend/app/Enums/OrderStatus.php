@@ -43,6 +43,39 @@ enum OrderStatus: string
         return $status === self::Cancelled ? $this->isCancellable() : $this->next() === $status;
     }
 
+    /**
+     * Every status this may move to: the next step, then Cancelled while that is allowed.
+     *
+     * @return list<self>
+     */
+    public function allowedMoves(): array
+    {
+        return array_values(array_filter([$this->next(), $this->isCancellable() ? self::Cancelled : null]));
+    }
+
+    /**
+     * Pending and Confirmed Orders may still change their lines, quantities and addresses.
+     * From Preparing onward (and once Cancelled) the Order is a Locked order.
+     */
+    public function isEditable(): bool
+    {
+        return in_array($this, [self::Pending, self::Confirmed], true);
+    }
+
+    /**
+     * Whether an Order in this status has had its units taken out of On-hand at the
+     * Deduction stage but not yet shipped, so cancelling them puts them back on hand.
+     */
+    public function holdsDeductedUnits(DeductionStage $deductionStage): bool
+    {
+        $flow = self::flow();
+        $position = array_search($this, $flow, true);
+
+        return $position !== false
+            && $position >= array_search(self::from($deductionStage->value), $flow, true)
+            && $position < array_search(self::Shipped, $flow, true);
+    }
+
     /** Before Shipped, and not already Cancelled. */
     public function isCancellable(): bool
     {

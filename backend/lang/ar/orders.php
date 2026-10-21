@@ -12,6 +12,10 @@ return [
         'variant_id' => 'المتغيّر',
         'quantity' => 'الكمية',
         'note' => 'السبب',
+        'status' => 'الحالة',
+        'assignee_id' => 'المسؤول',
+        'body' => 'الملاحظة',
+        'line_id' => 'البند',
     ],
 
     'address_not_customers' => 'اختر أحد عناوين هذا العميل.',
@@ -20,6 +24,10 @@ return [
     'invalid_transition' => 'حالة الطلب :number هي :from، لذا لا يمكن أن يصبح :to.',
     'insufficient_stock' => 'لا يوجد مخزون متاح كافٍ في :warehouse لـ :lines.',
     'insufficient_line' => ':sku (المطلوب :requested، المتاح :available)',
+    'locked' => 'الطلب :number حالته :status، لذا لم يعد بالإمكان تغيير بنوده أو كمياته أو عناوينه.',
+    'cancel_more_than_ordered' => 'تبقّى من :sku :quantity وحدات فقط يمكن إلغاؤها.',
+    'assignee_unavailable' => 'اختر مستخدماً نشطاً بدور مسؤول أو عمليات أو مبيعات.',
+    'line_not_on_order' => 'هذا البند ليس في الطلب.',
 
     'statuses' => [
         'pending' => 'قيد الانتظار',

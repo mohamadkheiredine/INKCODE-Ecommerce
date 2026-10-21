@@ -15,6 +15,8 @@ enum NotificationType: string
 
     case LowStock = 'low_stock';
 
+    case OrderAssigned = 'order_assigned';
+
     /**
      * The message in the current language, filled with the values saved when it was sent.
      *

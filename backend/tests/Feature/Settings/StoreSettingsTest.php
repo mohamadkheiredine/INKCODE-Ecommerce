@@ -215,7 +215,7 @@ describe('the store logo', function () {
 });
 
 describe('the public store profile', function () {
-    it('shows every signed-in User the store name, logo and currency', function (Role $role) {
+    it('shows every signed-in User the store name, logo, contact details (for Invoices) and currency', function (Role $role) {
         $this->actingAs(userWithRole(Role::Admin))->putJson('/api/v1/settings', settingsForm())->assertOk();
 
         $this->actingAs(userWithRole($role))
@@ -224,6 +224,9 @@ describe('the public store profile', function () {
             ->assertExactJson(['data' => [
                 'name' => 'Cedar & Co.',
                 'logo_url' => null,
+                'contact_email' => 'hello@cedar.test',
+                'contact_phone' => '+961 1 234 567',
+                'address' => "12 Hamra Street\nBeirut, Lebanon",
                 'currency' => ['code' => 'EUR', 'symbol' => '€'],
             ]]);
     })->with(Role::cases());

@@ -10,6 +10,7 @@ use App\Models\CustomerAddress;
 use App\Models\Product;
 use App\Models\ShippingMethod;
 use App\Models\ShippingZone;
+use App\Models\Transfer;
 use App\Models\User;
 use App\Models\Variant;
 use App\Models\Warehouse;
@@ -51,6 +52,11 @@ function recordsForRouteParameters(): array
         'shipping_method' => $method,
         'user' => User::factory()->withRole(Role::Sales)->create(),
         'warehouse' => Warehouse::factory()->create(),
+        'order' => placeOrder(Warehouse::factory()->create(), [[$variant, 1]]),
+        'transfer' => Transfer::query()->create([
+            'source_warehouse_id' => Warehouse::factory()->create()->id,
+            'destination_warehouse_id' => Warehouse::factory()->create()->id,
+        ]),
     ];
 
     return array_map(fn (Model $record): int => (int) $record->getKey(), $records);

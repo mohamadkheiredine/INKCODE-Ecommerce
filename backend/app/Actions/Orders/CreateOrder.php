@@ -62,8 +62,8 @@ final class CreateOrder
                 'customer_id' => $values['customer_id'],
                 'warehouse_id' => $values['warehouse_id'],
                 'shipping_method_id' => $method->id,
-                'billing_address' => $this->snapshot($billing),
-                'shipping_address' => $this->snapshot($shipping),
+                'billing_address' => self::snapshot($billing),
+                'shipping_address' => self::snapshot($shipping),
                 'shipping_method_name' => $method->name,
                 'currency_code' => $this->settings->currencyCode(),
                 'vat_rate' => $priced['vat_rate'],
@@ -102,7 +102,7 @@ final class CreateOrder
     /**
      * @return array{recipient_name: string, phone: string|null, country_code: string, city: string, line1: string, line2: string|null, postal_code: string|null}
      */
-    private function snapshot(CustomerAddress $address): array
+    public static function snapshot(CustomerAddress $address): array
     {
         return [
             'recipient_name' => $address->recipient_name,

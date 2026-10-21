@@ -32,6 +32,7 @@ final class ConfirmOrder
             [$order] = $this->moveOrderStatus->handle($order, OrderStatus::Confirmed);
 
             $this->stock->reserve($order, $order->warehouse_id, $order->lines
+                ->filter(fn (OrderLine $line): bool => $line->quantity > 0)
                 ->mapWithKeys(fn (OrderLine $line): array => [$line->variant_id => $line->quantity])
                 ->all());
 

@@ -39,11 +39,7 @@ final class MoveOrderStatus
         $from = $order->status;
 
         if (! $from->canMoveTo($to)) {
-            throw new BusinessRuleViolation('invalid_transition', __('orders.invalid_transition', [
-                'number' => $order->number,
-                'from' => __("orders.statuses.$from->value"),
-                'to' => __("orders.statuses.$to->value"),
-            ]));
+            throw self::refusal($order, $to);
         }
 
         $userId = $this->auth->guard()->id();
@@ -57,5 +53,18 @@ final class MoveOrderStatus
         $this->auditTrail->record(AuditAction::StatusChanged, $order, ['status' => $from->value], ['status' => $to->value]);
 
         return [$order, $from];
+    }
+
+    /**
+     * 409 `invalid_transition`: the Order cannot become `$to` from where it is. `details.allowed`
+     * lists the statuses it may move to instead.
+     */
+    public static function refusal(Order $order, OrderStatus $to): BusinessRuleViolation
+    {
+        return new BusinessRuleViolation('invalid_transition', __('orders.invalid_transition', [
+            'number' => $order->number,
+            'from' => __("orders.statuses.{$order->status->value}"),
+            'to' => __("orders.statuses.$to->value"),
+        ]), details: ['allowed' => array_map(fn (OrderStatus $status): string => $status->value, $order->status->allowedMoves())]);
     }
 }

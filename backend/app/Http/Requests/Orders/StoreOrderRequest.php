@@ -49,14 +49,15 @@ class StoreOrderRequest extends FormRequest
      * The lines of an Order (also quoted before it exists): each Variant of an Active
      * Product, once, with a quantity.
      *
+     * @param  list<int>  $onOrder  Variants already on the Order being edited
      * @return array<string, array<mixed>>
      */
-    public static function lineRules(): array
+    public static function lineRules(array $onOrder = []): array
     {
         return [
             'lines' => ['required', 'array', 'min:1', 'max:'.self::MAX_LINES],
             'lines.*' => ['array:variant_id,quantity'],
-            'lines.*.variant_id' => ['required', 'integer', 'distinct', self::sellableVariant()],
+            'lines.*.variant_id' => ['required', 'integer', 'distinct', self::sellableVariant($onOrder)],
             'lines.*.quantity' => ['required', 'integer', 'min:1', 'max:'.self::MAX_QUANTITY],
         ];
     }
@@ -139,13 +140,16 @@ class StoreOrderRequest extends FormRequest
         ], array_values($lines));
     }
 
-    private static function sellableVariant(): Closure
+    /**
+     * @param  list<int>  $onOrder  Variants already on the Order, which stay allowed even once their Product is no longer Active
+     */
+    private static function sellableVariant(array $onOrder): Closure
     {
-        return function (string $attribute, mixed $value, Closure $fail): void {
-            $sellable = is_numeric($value) && Variant::query()
+        return function (string $attribute, mixed $value, Closure $fail) use ($onOrder): void {
+            $sellable = is_numeric($value) && (in_array((int) $value, $onOrder, true) || Variant::query()
                 ->whereKey((int) $value)
                 ->whereRelation('product', 'status', ProductStatus::Active)
-                ->exists();
+                ->exists());
 
             if (! $sellable) {
                 $fail(__('orders.variant_unavailable'));
