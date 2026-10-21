@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api/v1"
+            "url": "http://localhost:8002/api/v1"
         }
     ],
     "paths": {
@@ -3910,6 +3910,168 @@
                 }
             }
         },
+        "/orders/{order}/advance": {
+            "post": {
+                "operationId": "orders.advance",
+                "summary": "Moves the Order one step forward (Preparing, Ready for shipping). A skipped or\nbackward move is refused with 409 `invalid_transition` and `details.allowed`. Safe\nto retry with an `Idempotency-Key` header",
+                "tags": [
+                    "OrderAdvance"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdvanceOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/assignees": {
+            "get": {
+                "operationId": "orders.assignees",
+                "summary": "The Users an Order may be assigned to. Authorized by the route (orders.assign)",
+                "tags": [
+                    "OrderAssignee"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/assignee": {
+            "put": {
+                "operationId": "orders.assign",
+                "summary": "Sets (or clears, with null) the Order's Assignee, who is notified in their bell",
+                "tags": [
+                    "OrderAssignee"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/orders/{order}/cancel": {
             "post": {
                 "operationId": "orders.cancel",
@@ -4020,112 +4182,12 @@
                 }
             }
         },
-        "/orders/assignees": {
-            "get": {
-                "operationId": "orders.assignees",
-                "summary": "The Users an Order may be assigned to. Authorized by the route (orders.assign)",
-                "tags": [
-                    "OrderFlow"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/orders/{order}/advance": {
-            "post": {
-                "operationId": "orders.advance",
-                "summary": "Moves the Order one step forward (Preparing, Ready for shipping). A skipped or\nbackward move is refused with 409 `invalid_transition` and `details.allowed`. Safe\nto retry with an `Idempotency-Key` header",
-                "tags": [
-                    "OrderFlow"
-                ],
-                "parameters": [
-                    {
-                        "name": "order",
-                        "in": "path",
-                        "required": true,
-                        "description": "The order ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AdvanceOrderRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "`OrderResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/OrderResource"
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
         "/orders/{order}/cancel-lines": {
             "post": {
                 "operationId": "orders.cancel-lines",
-                "summary": "Cancels some units of some lines before the Order ships, releasing their stock and\nre-pricing the Order. Safe to retry with an `Idempotency-Key` header",
+                "summary": "Partial cancellation: cancels some units of some lines before the Order ships,\nreleasing their stock and re-pricing the Order. Safe to retry with an\n`Idempotency-Key` header",
                 "tags": [
-                    "OrderFlow"
+                    "OrderLineCancellation"
                 ],
                 "parameters": [
                     {
@@ -4182,74 +4244,12 @@
                 }
             }
         },
-        "/orders/{order}/assignee": {
-            "put": {
-                "operationId": "orders.assign",
-                "summary": "Sets (or clears, with null) the Order's Assignee, who is notified in their bell",
-                "tags": [
-                    "OrderFlow"
-                ],
-                "parameters": [
-                    {
-                        "name": "order",
-                        "in": "path",
-                        "required": true,
-                        "description": "The order ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AssignOrderRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "`OrderResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/OrderResource"
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
         "/orders/{order}/notes": {
             "post": {
                 "operationId": "orders.notes.store",
-                "summary": "Adds a note to the Order's timeline (Locked orders too)",
+                "summary": "Adds a note to the Order's timeline (Locked orders too) and answers with the Order",
                 "tags": [
-                    "OrderFlow"
+                    "OrderNote"
                 ],
                 "parameters": [
                     {
@@ -4286,6 +4286,72 @@
                                     },
                                     "required": [
                                         "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/payments": {
+            "post": {
+                "operationId": "orders.payments.store",
+                "summary": "Records a payment. A declined Card charge is still recorded (status `failed`) and\nanswered with 201; a payment above the amount still due is refused with 409\n`payment_exceeds_due`",
+                "tags": [
+                    "OrderPayment"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorePaymentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        },
+                                        "payment": {
+                                            "$ref": "#/components/schemas/PaymentResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "payment"
                                     ]
                                 }
                             }
@@ -4394,6 +4460,72 @@
                 }
             }
         },
+        "/orders/{order}/refunds": {
+            "post": {
+                "operationId": "orders.refunds.store",
+                "summary": "Above the Captured amount minus earlier Refunds it is refused with 409\n`refund_exceeds_captured`",
+                "tags": [
+                    "OrderRefund"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreRefundRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        },
+                                        "payment": {
+                                            "$ref": "#/components/schemas/PaymentResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "payment"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/auth/me/password": {
             "put": {
                 "operationId": "auth.me.password",
@@ -4419,6 +4551,275 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/payments": {
+            "get": {
+                "operationId": "payments.index",
+                "tags": [
+                    "Payment"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "created_at",
+                                "amount",
+                                "-created_at",
+                                "-amount",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[kind]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/PaymentKind"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[method]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/PaymentMethod"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/PaymentOutcome"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[from]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "filter[to]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `PaymentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PaymentResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 }
             }
@@ -5605,6 +6006,229 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/payments/reconciliation": {
+            "get": {
+                "operationId": "payments.reconciliation",
+                "summary": "The Orders whose ledger total (payments minus Refunds) differs from what they owe",
+                "tags": [
+                    "Reconciliation"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "placed_at",
+                                "total",
+                                "difference",
+                                "-placed_at",
+                                "-total",
+                                "-difference",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[balance]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "due",
+                                "over",
+                                null
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ReconciliationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ReconciliationResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 }
             }
@@ -9713,6 +10337,15 @@
                 },
                 "title": "CancelOrderRequest"
             },
+            "CardTestOutcome": {
+                "type": "string",
+                "description": "The test option the mock Card gateway decides by: approve or decline the charge. It stands in for the card details a real gateway would collect; none are ever taken.\n",
+                "enum": [
+                    "approve",
+                    "decline"
+                ],
+                "title": "CardTestOutcome"
+            },
             "CarrierResource": {
                 "type": "object",
                 "properties": {
@@ -10305,6 +10938,18 @@
                     "total": {
                         "type": "string"
                     },
+                    "payment_status": {
+                        "type": "string"
+                    },
+                    "captured_amount": {
+                        "type": "string"
+                    },
+                    "refunded_amount": {
+                        "type": "string"
+                    },
+                    "amount_due": {
+                        "type": "string"
+                    },
                     "notes": {
                         "type": [
                             "string",
@@ -10354,9 +10999,41 @@
                             "type": "string"
                         }
                     },
+                    "payments": {
+                        "type": "array",
+                        "items": {}
+                    },
                     "timeline": {
                         "type": "array",
                         "prefixItems": [
+                            {
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string",
+                                                    "const": "payment"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ],
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "minItems": 0,
+                                        "maxItems": 0
+                                    }
+                                ]
+                            },
                             {
                                 "type": "array",
                                 "items": {
@@ -10456,8 +11133,8 @@
                                 }
                             }
                         ],
-                        "minItems": 2,
-                        "maxItems": 2
+                        "minItems": 3,
+                        "maxItems": 3
                     },
                     "created_at": {
                         "type": [
@@ -10483,6 +11160,10 @@
                     "vat_total",
                     "shipping_total",
                     "total",
+                    "payment_status",
+                    "captured_amount",
+                    "refunded_amount",
+                    "amount_due",
                     "notes",
                     "created_at"
                 ],
@@ -10501,6 +11182,124 @@
                     "cancelled"
                 ],
                 "title": "OrderStatus"
+            },
+            "PaymentKind": {
+                "type": "string",
+                "description": "A Payment ledger row either takes money in (payment) or gives it back (Refund).\n",
+                "enum": [
+                    "payment",
+                    "refund"
+                ],
+                "title": "PaymentKind"
+            },
+            "PaymentMethod": {
+                "type": "string",
+                "description": "How a Customer pays: Cash on delivery, Manual (bank transfer or cash), or Card through the mock Payment gateway (App\\Contracts\\PaymentGateway).\n",
+                "enum": [
+                    "cash_on_delivery",
+                    "manual",
+                    "card"
+                ],
+                "title": "PaymentMethod"
+            },
+            "PaymentOutcome": {
+                "type": "string",
+                "description": "Whether a Payment ledger row moved money. Only a Card charge the gateway declines is Failed; it stays in the ledger but counts toward nothing.\n",
+                "enum": [
+                    "succeeded",
+                    "failed"
+                ],
+                "title": "PaymentOutcome"
+            },
+            "PaymentResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "kind": {
+                        "type": "string"
+                    },
+                    "method": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "gateway_reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "idempotency_key": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "user": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "order": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "number": {
+                                "type": "string"
+                            },
+                            "currency_code": {
+                                "type": "string"
+                            },
+                            "payment_status": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "number",
+                            "currency_code",
+                            "payment_status"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "kind",
+                    "method",
+                    "amount",
+                    "status",
+                    "gateway_reference",
+                    "note",
+                    "idempotency_key",
+                    "created_at"
+                ],
+                "title": "PaymentResource"
             },
             "ProductBulkAction": {
                 "type": "string",
@@ -10808,6 +11607,65 @@
                     "created_at"
                 ],
                 "title": "ReceiptResource"
+            },
+            "ReconciliationResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "payment_status": {
+                        "type": "string"
+                    },
+                    "placed_at": {
+                        "type": "string"
+                    },
+                    "customer": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "currency_code": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "type": "string"
+                    },
+                    "amount_owed": {
+                        "type": "string"
+                    },
+                    "ledger_total": {
+                        "type": "string"
+                    },
+                    "difference": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "payment_status",
+                    "placed_at",
+                    "currency_code",
+                    "total",
+                    "amount_owed",
+                    "ledger_total",
+                    "difference"
+                ],
+                "title": "ReconciliationResource"
             },
             "ReorderProductImagesRequest": {
                 "type": "object",
@@ -11900,6 +12758,40 @@
                 ],
                 "title": "StoreOrderRequest"
             },
+            "StorePaymentRequest": {
+                "type": "object",
+                "description": "A payment on an Order: its Payment method and amount, with an optional note. A Card\ncharge also names the mock gateway's test option (approve or decline); card details are\nrefused outright, so none can ever be sent or stored.",
+                "properties": {
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "maximum": 9999999999.99
+                    },
+                    "card_outcome": {
+                        "$ref": "#/components/schemas/CardTestOutcome"
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    },
+                    "card_number": {
+                        "type": "string"
+                    },
+                    "cvc": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "method",
+                    "amount"
+                ],
+                "title": "StorePaymentRequest"
+            },
             "StoreProductImagesRequest": {
                 "type": "object",
                 "description": "New images for a Product (multipart): PNG, JPEG or WebP, at most 2 MB each, and at\nmost ten per Product in all. SVG is refused, because an SVG served from our own\norigin can carry scripts.",
@@ -12108,6 +13000,31 @@
                     "lines"
                 ],
                 "title": "StoreReceiptRequest"
+            },
+            "StoreRefundRequest": {
+                "type": "object",
+                "description": "A Refund on an Order: how it goes back (Payment method), how much, and an optional note.",
+                "properties": {
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "maximum": 9999999999.99
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "method",
+                    "amount"
+                ],
+                "title": "StoreRefundRequest"
             },
             "StoreSettingsResource": {
                 "type": "object",
