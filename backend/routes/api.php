@@ -53,6 +53,8 @@ use App\Http\Controllers\Payments\PaymentController;
 use App\Http\Controllers\Payments\ReconciliationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
+use App\Http\Controllers\Reports\ReportController;
+use App\Http\Controllers\Reports\ReportExportController;
 use App\Http\Controllers\Returns\ReturnController;
 use App\Http\Controllers\Returns\ReturnDecisionController;
 use App\Http\Controllers\Returns\ReturnReceiptController;
@@ -92,6 +94,11 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
 
     // The executive dashboard: Roles with dashboard.view (ShowDashboardRequest).
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
+
+    // The six reports (ShowReportRequest: reports.view) and their CSV / Excel exports
+    // (ExportReportRequest: reports.export too).
+    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    Route::get('/reports/{report}/export', [ReportExportController::class, 'show'])->name('reports.export');
 
     // Every User has their own notifications; these only ever touch the signed-in User's.
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

@@ -1,0 +1,102 @@
+{
+  "description": "Sales, Products, Categories, Customers, Returns and Inventory, from Counted orders, compared with the previous period.",
+  "choose": "Choose a report",
+  "range": "{{from}} – {{to}}, compared with the previous period. Counted orders only.",
+  "inventoryRange": "Stock as it is now; units received and deducted from {{from}} to {{to}}.",
+  "names": {
+    "sales": "Sales",
+    "products": "Products",
+    "categories": "Categories",
+    "customers": "Customers",
+    "returns": "Returns",
+    "inventory": "Inventory"
+  },
+  "interval": {
+    "label": "Group by",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month"
+  },
+  "rank": {
+    "label": "Rank by",
+    "sales": "Sales",
+    "units": "Units"
+  },
+  "export": {
+    "csv": "Export CSV",
+    "xlsx": "Export Excel",
+    "done": "Your report has downloaded.",
+    "failed": "The report could not be exported. Please try again."
+  },
+  "empty": {
+    "title": "Nothing to report for these days",
+    "description": "No Counted orders, Returns or stock match this date range.",
+    "action": "Show this month"
+  },
+  "pagination": "{{from}}–{{to}} of {{total}}",
+  "previousPage": "Previous page",
+  "nextPage": "Next page",
+  "summary": {
+    "revenue": "Revenue",
+    "net_sales": "Net sales",
+    "orders": "Orders",
+    "average_order_value": "Average order value",
+    "products": "Products sold",
+    "units": "Units",
+    "sales": "Sales",
+    "categories": "Categories sold",
+    "customers": "Customers",
+    "new_customers": "New Customers",
+    "returning_customers": "Returning Customers",
+    "returns": "Returns",
+    "refunded": "Refunded",
+    "return_rate": "Return rate",
+    "stock_value": "Stock value",
+    "on_hand": "On-hand units",
+    "low_stock": "Low-stock items",
+    "units_received": "Units received",
+    "units_deducted": "Units deducted for Orders"
+  },
+  "columns": {
+    "period": "Period",
+    "orders": "Orders",
+    "items": "Items",
+    "discounts": "Discounts",
+    "vat": "VAT",
+    "shipping": "Shipping",
+    "revenue": "Revenue",
+    "refunds": "Refunds",
+    "net_sales": "Net sales",
+    "average_order_value": "Average order value",
+    "product": "Product",
+    "category": "Category",
+    "parent": "Parent category",
+    "products": "Products",
+    "units": "Units",
+    "sales": "Sales",
+    "share": "Share",
+    "customer": "Customer",
+    "email": "Email",
+    "type": "New or returning",
+    "reason": "Reason",
+    "returns": "Returns",
+    "refunded": "Refunded",
+    "sku": "SKU",
+    "on_hand": "On-hand",
+    "reserved": "Reserved",
+    "available": "Available",
+    "threshold": "Low-stock threshold",
+    "low_stock": "Low-stock Warehouses",
+    "average_cost": "Average cost",
+    "stock_value": "Stock value"
+  },
+  "values": {
+    "new": "New",
+    "returning": "Returning",
+    "damaged": "Damaged",
+    "wrong_item": "Wrong item",
+    "not_as_described": "Not as described",
+    "changed_mind": "Changed mind",
+    "other": "Other"
+  }
+}

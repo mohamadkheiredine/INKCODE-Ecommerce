@@ -7,7 +7,8 @@ use App\Models\Payment;
 it('seeds demo ledgers whose Payment statuses match them', function () {
     seedStore(demoMode: true);
 
-    expect(Payment::query()->where('kind', 'refund')->count())->toBe(1)
+    // One Refund from the demo Payments, one from the Completed demo Return (DemoReturnsSeeder).
+    expect(Payment::query()->where('kind', 'refund')->count())->toBe(2)
         ->and(Payment::query()->where('status', 'failed')->count())->toBe(2)
         ->and(Payment::query()->distinct()->pluck('method')->map->value->sort()->values()->all())->toBe(['card', 'cash_on_delivery', 'manual']);
 
