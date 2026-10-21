@@ -57,7 +57,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Executive dashboard: revenue, net sales, orders, pending fulfillment, AOV, customers, cancellations, returns, low stock
 - [x] Time ranges + period comparison, revenue chart, order-status breakdown, top products, recent orders, alerts
 - [x] Conversion rate shown only if visit/session tracking exists (otherwise omitted; visits are not tracked, so it is omitted, #23)
-- [ ] Reports: sales, customers, products, categories, returns, inventory, with date filters, comparisons, CSV/Excel export
+- [x] Reports: sales, customers, products, categories, returns, inventory, with date filters, comparisons, CSV/Excel export (#24)
 - [ ] Every KPI and report computed from database records, never hard-coded
 - [x] Roles: Admin, Operations, Inventory, Sales, Support, Finance, Viewer, with granular permissions enforced by Policies; Users & Roles administration (#25): create a User with a Role and a temporary password, edit, change Role, deactivate (sessions end at once) and reactivate, no self-demotion and never without an active Admin, audited; read-only Roles & permissions matrix; the Viewer is refused every changing endpoint
 - [x] In-app notifications: a bell with the unread count, newest first, mark one or all as read, link to the record, 30 s polling paused in hidden tabs, messages in English and Arabic (#8). Events arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21)

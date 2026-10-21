@@ -3077,8 +3077,12 @@
                             "enum": [
                                 "name",
                                 "created_at",
+                                "lifetime_value",
+                                "last_order_at",
                                 "-name",
                                 "-created_at",
+                                "-lifetime_value",
+                                "-last_order_at",
                                 null
                             ]
                         }
@@ -3108,6 +3112,62 @@
                                 "integer",
                                 "null"
                             ]
+                        }
+                    },
+                    {
+                        "name": "filter[segment]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/Segment"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[lifetime_value_min]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "number",
+                                "null"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[lifetime_value_max]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "number",
+                                "null"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[last_order_from]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "filter[last_order_to]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
                         }
                     }
                 ],
@@ -3286,18 +3346,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/CustomerResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "tags",
-                                                        "addresses"
-                                                    ]
-                                                }
-                                            ]
+                                            "$ref": "#/components/schemas/CustomerResource"
                                         }
                                     },
                                     "required": [
@@ -3346,18 +3395,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/CustomerResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "tags",
-                                                        "addresses"
-                                                    ]
-                                                }
-                                            ]
+                                            "$ref": "#/components/schemas/CustomerResource"
                                         }
                                     },
                                     "required": [
@@ -3413,18 +3451,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/CustomerResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "tags",
-                                                        "addresses"
-                                                    ]
-                                                }
-                                            ]
+                                            "$ref": "#/components/schemas/CustomerResource"
                                         }
                                     },
                                     "required": [
@@ -7061,6 +7088,260 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/reports/{report}": {
+            "get": {
+                "operationId": "reports.show",
+                "summary": "One of the six reports (sales, products, categories, customers, returns, inventory)\nfor `from`\u2013`to`: its columns, rows, and a summary compared with the previous period",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "report",
+                        "in": "path",
+                        "required": true,
+                        "description": "The report ID",
+                        "schema": {
+                            "$ref": "#/components/schemas/ReportType"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "interval",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/SalesInterval"
+                        }
+                    },
+                    {
+                        "name": "rank",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "sales",
+                                "units"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "report": {
+                                                    "type": "string"
+                                                },
+                                                "range": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "from": {
+                                                            "type": "string"
+                                                        },
+                                                        "to": {
+                                                            "type": "string"
+                                                        },
+                                                        "previous_from": {
+                                                            "type": "string"
+                                                        },
+                                                        "previous_to": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "from",
+                                                        "to",
+                                                        "previous_from",
+                                                        "previous_to"
+                                                    ]
+                                                },
+                                                "columns": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "summary": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "value": {
+                                                                "type": "string"
+                                                            },
+                                                            "previous": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "change": {
+                                                                "type": [
+                                                                    "number",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "key",
+                                                            "type",
+                                                            "value",
+                                                            "previous",
+                                                            "change"
+                                                        ]
+                                                    }
+                                                },
+                                                "rows": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "report",
+                                                "range",
+                                                "columns",
+                                                "summary",
+                                                "rows"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/reports/{report}/export": {
+            "get": {
+                "operationId": "reports.export",
+                "summary": "Downloads a report as CSV or Excel (.xlsx): the same rows as the screen, for the\nsame filters. Needs reports.export as well as reports.view",
+                "tags": [
+                    "ReportExport"
+                ],
+                "parameters": [
+                    {
+                        "name": "report",
+                        "in": "path",
+                        "required": true,
+                        "description": "The report ID",
+                        "schema": {
+                            "$ref": "#/components/schemas/ReportType"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "interval",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/SalesInterval"
+                        }
+                    },
+                    {
+                        "name": "rank",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "sales",
+                                "units"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "csv",
+                                "xlsx"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -12480,6 +12761,24 @@
                             "null"
                         ]
                     },
+                    "lifetime_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "last_order_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "segment": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
                     "tags": {
                         "type": "array",
                         "items": {
@@ -13670,6 +13969,19 @@
                 ],
                 "title": "ReorderProductImagesRequest"
             },
+            "ReportType": {
+                "type": "string",
+                "description": "The six reports; the value is the report's URL segment and file name.\n",
+                "enum": [
+                    "sales",
+                    "products",
+                    "categories",
+                    "customers",
+                    "returns",
+                    "inventory"
+                ],
+                "title": "ReportType"
+            },
             "RestockDecision": {
                 "type": "string",
                 "description": "What happens to a Received Return line: back into On-hand at the Fulfilling warehouse, or a Write-off (it never re-enters stock). Values are stored.\n",
@@ -13926,6 +14238,16 @@
                 ],
                 "title": "RoleResource"
             },
+            "SalesInterval": {
+                "type": "string",
+                "description": "How the Sales report groups Counted orders: one row per day, per week (starting Monday) or per month, each dated by its first day.\n",
+                "enum": [
+                    "day",
+                    "week",
+                    "month"
+                ],
+                "title": "SalesInterval"
+            },
             "SaveShippingMethodRequest": {
                 "type": "object",
                 "description": "A new or edited Shipping method in a zone: a name unique within the zone, a flat price, the\nestimated delivery days (from\u2013to) and whether it is offered. Managing a zone's\nmethods is part of managing the zone, so the zone's `update` ability decides.",
@@ -13960,6 +14282,17 @@
                     "is_active"
                 ],
                 "title": "SaveShippingMethodRequest"
+            },
+            "Segment": {
+                "type": "string",
+                "description": "An automatic grouping of Customers by buying behaviour, from their Counted orders. A Customer is in the first Segment that matches, checked in this order: New (first Order in the last 30 days), VIP (Lifetime value of $1,000 or more), At risk (no Order for 90 days), Regular (everyone else, including a Customer with no Counted order yet).\n",
+                "enum": [
+                    "new",
+                    "vip",
+                    "at_risk",
+                    "regular"
+                ],
+                "title": "Segment"
             },
             "ShippingMethodResource": {
                 "type": "object",

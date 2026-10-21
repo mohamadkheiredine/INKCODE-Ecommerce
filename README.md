@@ -208,6 +208,10 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - The landing page shows nine KPIs for a date range (today, 7 days, 30 days, this month or custom, kept in the URL): Revenue, Net sales, Orders, pending fulfillment, Average order value, Customers, cancellations, Returns and low-stock items, each compared with the previous period of the same length ("New" when that period had nothing). There is no conversion rate, because visits are not tracked.
   - A daily Revenue chart against the previous period, an Order-status donut, top Products, recent Orders and alerts (low stock, Pending Orders, Returns awaiting a decision) complete it. KPI count-up and chart animations are off under reduced motion.
   - Every figure comes from Counted orders (Confirmed or later, not Cancelled, dated by the day placed) through one shared scope, `Order::counted()`, for the reports and Lifetime value to reuse. Revenue always equals the sum of those Orders' totals.
+- **Reports with CSV and Excel export (#24):**
+  - Six reports under Insights → Reports: Sales (by day, week or month), Products (top sellers by sales or units), Categories (with each one's share), Customers (top spenders, New vs Returning), Returns (by reason, with the return rate) and Inventory (stock per Variant, low stock, Stock value). Each has the dashboard's date range in the URL and a summary compared with the previous period.
+  - Admin and Finance download any report as CSV or Excel (.xlsx), named like `sales-report-2026-09-21-to-2026-10-20.xlsx`: the same rows as the screen, headers in the User's language, numbers stored as real numbers. Exporting is its own permission (`reports.export`); Operations, Inventory, Sales and Viewer only view, and Support has no access.
+  - A test checks that the reports' totals equal the dashboard's for the same range.
 
 ### Incomplete / assumptions
 
