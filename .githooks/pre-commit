@@ -1,0 +1,35 @@
+#!/bin/sh
+# Fast checks on the staged files only: Pint for PHP, oxlint and Prettier for the SPA.
+# The full gates (`composer check`, `npm run check`) still run before a push and in CI.
+# Enable once per clone: git config core.hooksPath .githooks
+
+root=$(git rev-parse --show-toplevel) || exit 1
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+status=0
+
+php_files=$(printf '%s\n' "$staged" | grep '^backend/.*\.php$' | sed 's#^backend/##')
+if [ -n "$php_files" ]; then
+  if ! command -v php >/dev/null 2>&1; then
+    echo "pre-commit: php is not on PATH, so Pint cannot check the staged PHP files." >&2
+    exit 1
+  fi
+  echo "pre-commit: Pint"
+  (cd "$root/backend" && php vendor/bin/pint --test $php_files) || status=1
+fi
+
+spa_files=$(printf '%s\n' "$staged" | grep '^frontend/' | sed 's#^frontend/##')
+if [ -n "$spa_files" ]; then
+  lint_files=$(printf '%s\n' "$spa_files" | grep -E '\.(ts|tsx|js|jsx|mjs)$')
+  if [ -n "$lint_files" ]; then
+    echo "pre-commit: oxlint"
+    (cd "$root/frontend" && npx --no-install oxlint $lint_files) || status=1
+  fi
+  echo "pre-commit: Prettier"
+  (cd "$root/frontend" && npx --no-install prettier --check --ignore-unknown $spa_files) || status=1
+fi
+
+if [ $status -ne 0 ]; then
+  echo "pre-commit: fix the issues above (composer format / npm run format), then commit again." >&2
+fi
+exit $status

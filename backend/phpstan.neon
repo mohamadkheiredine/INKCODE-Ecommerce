@@ -4,5 +4,7 @@ includes:
 parameters:
     paths:
         - app/
+        # Seeders build the demo store through the real actions, so they get the same checks.
+        - database/
     # Raise towards max as the codebase grows; never lower it to silence errors.
     level: 6
