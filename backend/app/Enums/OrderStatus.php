@@ -29,6 +29,17 @@ enum OrderStatus: string
     }
 
     /**
+     * The statuses of a Counted order: Confirmed or later, and not Cancelled (ADR 0006).
+     * Only Counted orders feed Lifetime value, Segments, the dashboard and reports.
+     *
+     * @return list<self>
+     */
+    public static function counted(): array
+    {
+        return [self::Confirmed, self::Preparing, self::ReadyForShipping, self::Shipped, self::Delivered];
+    }
+
+    /**
      * The one status this may move forward to, or null at the end of the flow.
      */
     public function next(): ?self

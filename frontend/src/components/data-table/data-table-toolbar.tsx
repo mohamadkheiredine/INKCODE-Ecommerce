@@ -2,6 +2,7 @@ import { SearchIcon, XIcon } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   InputGroup,
   InputGroupAddon,
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/input-group'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import type { ListQueryControls } from '@/hooks/use-list-query'
+import { isAmount } from '@/lib/list-query'
 
 /** How long typing pauses before the list searches. */
 export const SEARCH_DELAY_MS = 300
@@ -126,5 +128,47 @@ export function DataTableFilter({
         </NativeSelectOption>
       ))}
     </NativeSelect>
+  )
+}
+
+/**
+ * An amount bound kept in the URL, applied when the field is left or Enter is pressed;
+ * text that isn't an amount is ignored.
+ */
+export function DataTableAmountFilter({
+  list,
+  name,
+  label,
+}: {
+  list: ListQueryControls
+  name: string
+  label: string
+}) {
+  const applied = list.query.filters[name] ?? ''
+  const [value, setValue] = useState(applied)
+  const [previous, setPrevious] = useState(applied)
+  if (previous !== applied) {
+    setPrevious(applied)
+    setValue(applied)
+  }
+
+  const apply = () => {
+    const trimmed = value.trim()
+    if (trimmed === '' || isAmount(trimmed)) list.setFilter(name, trimmed || null)
+    else setValue(applied)
+  }
+
+  return (
+    <Input
+      inputMode="decimal"
+      aria-label={label}
+      placeholder={label}
+      value={value}
+      onChange={(event) => setValue(event.target.value)}
+      onBlur={apply}
+      onKeyDown={(event) => event.key === 'Enter' && apply()}
+      dir="ltr"
+      className="h-9 bg-card text-start sm:w-32"
+    />
   )
 }

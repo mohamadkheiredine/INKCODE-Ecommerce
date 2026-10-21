@@ -1,3 +1,5 @@
+import type { Amount } from '@/lib/format'
+
 /** A free label on Customers ("wholesale"); new ones are made by typing them. */
 export type Tag = { id: number; name: string }
 
@@ -16,12 +18,23 @@ export type CustomerAddress = {
   is_default_shipping: boolean
 }
 
-/** A Customer as the list sends it (with Tags); the profile also has the addresses. */
+/** The automatic Segments, in the order the API checks them; the first match wins. */
+export const SEGMENTS = ['new', 'vip', 'at_risk', 'regular'] as const
+export type Segment = (typeof SEGMENTS)[number]
+
+/**
+ * A Customer as the list sends it (with Tags); the profile also has the addresses.
+ * `lifetime_value` is a decimal string ("1234.50"); `last_order_at` is the last Counted
+ * order's date, or null before the first one.
+ */
 export type Customer = {
   id: number
   name: string
   email: string | null
   phone: string | null
+  lifetime_value: Amount
+  last_order_at: string | null
+  segment: Segment
   tags: Tag[]
   addresses?: CustomerAddress[]
   created_at: string

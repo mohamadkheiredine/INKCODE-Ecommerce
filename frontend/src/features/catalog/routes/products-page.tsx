@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import type { DataTableColumn } from '@/components/data-table/columns'
 import { DataTable } from '@/components/data-table/data-table'
 import {
+  DataTableAmountFilter,
   DataTableFilter,
   DataTableSearch,
   DataTableToolbar,
@@ -22,9 +23,8 @@ import { ConfirmDeleteDialog } from '@/components/feedback/confirm-delete-dialog
 import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { useCan } from '@/features/auth/hooks/use-can'
-import { type ListQueryControls, useListQuery } from '@/hooks/use-list-query'
+import { useListQuery } from '@/hooks/use-list-query'
 import { useFormatters } from '@/lib/format'
 import { apiErrorMessage } from '@/lib/forms'
 import i18n from '@/lib/i18n'
@@ -242,8 +242,8 @@ export function ProductsPage() {
               label: brand.name,
             }))}
           />
-          <PriceFilter list={list} name="price_min" label={t('products.priceMin')} />
-          <PriceFilter list={list} name="price_max" label={t('products.priceMax')} />
+          <DataTableAmountFilter list={list} name="price_min" label={t('products.priceMin')} />
+          <DataTableAmountFilter list={list} name="price_max" label={t('products.priceMax')} />
         </DataTableToolbar>
         {canManage && selection.ids.size > 0 && (
           <BulkBar ids={[...selection.ids]} onDone={() => selection.set([])} />
@@ -306,45 +306,6 @@ function useSelection(scope: string) {
       },
     }),
     [ids, scope],
-  )
-}
-
-/** A price bound, applied when the field is left or Enter is pressed; invalid text is ignored. */
-function PriceFilter({
-  list,
-  name,
-  label,
-}: {
-  list: ListQueryControls
-  name: 'price_min' | 'price_max'
-  label: string
-}) {
-  const applied = list.query.filters[name] ?? ''
-  const [value, setValue] = useState(applied)
-  const [previous, setPrevious] = useState(applied)
-  if (previous !== applied) {
-    setPrevious(applied)
-    setValue(applied)
-  }
-
-  const apply = () => {
-    const trimmed = value.trim()
-    if (trimmed === '' || isAmount(trimmed)) list.setFilter(name, trimmed || null)
-    else setValue(applied)
-  }
-
-  return (
-    <Input
-      inputMode="decimal"
-      aria-label={label}
-      placeholder={label}
-      value={value}
-      onChange={(event) => setValue(event.target.value)}
-      onBlur={apply}
-      onKeyDown={(event) => event.key === 'Enter' && apply()}
-      dir="ltr"
-      className="h-9 bg-card text-start sm:w-32"
-    />
   )
 }
 

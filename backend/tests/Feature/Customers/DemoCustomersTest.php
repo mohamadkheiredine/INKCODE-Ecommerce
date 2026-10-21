@@ -29,3 +29,12 @@ it('seeds no Customers outside demo mode', function () {
 
     expect(Customer::query()->count())->toBe(0);
 });
+
+it('seeds demo Customers in every Segment', function () {
+    seedStore(demoMode: true);
+    $this->actingAs(userWithRole(Role::Viewer));
+
+    foreach (['new', 'vip', 'at_risk', 'regular'] as $segment) {
+        expect($this->getJson("/api/v1/customers?filter[segment]=$segment")->assertOk()->json('meta.total'))->toBeGreaterThan(0, $segment);
+    }
+});

@@ -16,7 +16,7 @@ it('seeds demo Orders and Shipments whose reservations match their statuses and 
         ->join('order_lines', 'order_lines.order_id', '=', 'orders.id')
         ->sum(DB::raw('order_lines.quantity - order_lines.deducted_quantity'));
 
-    expect($statuses)->toBe(['cancelled' => 4, 'confirmed' => 2, 'delivered' => 2, 'pending' => 4, 'preparing' => 1, 'ready_for_shipping' => 2, 'shipped' => 1])
+    expect($statuses)->toBe(['cancelled' => 4, 'confirmed' => 2, 'delivered' => 12, 'pending' => 4, 'preparing' => 1, 'ready_for_shipping' => 2, 'shipped' => 1])
         ->and((int) StockBalance::query()->sum('reserved'))->toBe($reservedByOpenOrders)
         ->and(Shipment::query()->count())->toBeGreaterThanOrEqual(4)
         ->and(Shipment::query()->where('status', 'delivered')->count())->toBeGreaterThanOrEqual(2)
@@ -30,5 +30,5 @@ it('seeds demo Orders and Shipments whose reservations match their statuses and 
 
     // Seeding again changes nothing.
     seedStore(demoMode: true);
-    expect(Order::query()->count())->toBe(16);
+    expect(Order::query()->count())->toBe(26);
 });

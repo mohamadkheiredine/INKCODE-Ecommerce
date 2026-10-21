@@ -5,31 +5,46 @@ import { Link, useNavigate } from 'react-router'
 import type { DataTableColumn } from '@/components/data-table/columns'
 import { DataTable } from '@/components/data-table/data-table'
 import {
+  DataTableAmountFilter,
   DataTableFilter,
   DataTableSearch,
   DataTableToolbar,
 } from '@/components/data-table/data-table-toolbar'
 import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useCan } from '@/features/auth/hooks/use-can'
 import { useListQuery } from '@/hooks/use-list-query'
 import { useFormatters } from '@/lib/format'
-import { type ListQueryConfig, isRecordId } from '@/lib/list-query'
+import { type ListQueryConfig, isAmount, isRecordId } from '@/lib/list-query'
 import { useEntranceAnimation } from '@/lib/motion'
 import { CustomerAvatar } from '../components/customer-avatar'
 import { CustomerFormDialog } from '../components/customer-form-dialog'
+import { SegmentBadge } from '../components/segment-badge'
 import { TagList } from '../components/tag-list'
 import { useCustomerTags, useCustomers } from '../hooks/use-customers'
-import type { Customer } from '../types'
+import { type Customer, SEGMENTS } from '../types'
+
+const isDay = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value)
 
 /** What the Customers list accepts in its URL (mirrors ListCustomersRequest). */
 const LIST_CONFIG: ListQueryConfig = {
   defaultSort: { field: 'created_at', direction: 'desc' },
-  sorts: ['name', 'created_at'],
-  filters: { tag: isRecordId },
+  sorts: ['name', 'created_at', 'lifetime_value', 'last_order_at'],
+  filters: {
+    tag: isRecordId,
+    segment: SEGMENTS,
+    lifetime_value_min: isAmount,
+    lifetime_value_max: isAmount,
+    last_order_from: isDay,
+    last_order_to: isDay,
+  },
 }
 
-/** Customers: search by name, email or phone, filter by Tag, sort, page; add a Customer. */
+/**
+ * Customers: search by name, email or phone; filter by Tag, Segment, Lifetime value and
+ * last Order date; sort; page; add a Customer.
+ */
 export function CustomersPage() {
   const { t } = useTranslation('customers')
   const can = useCan()
@@ -38,7 +53,8 @@ export function CustomersPage() {
   const customers = useCustomers(list.query)
   const tags = useCustomerTags()
   const navigate = useNavigate()
-  const { date } = useFormatters()
+  const { date, money } = useFormatters()
+  const filters = list.query.filters
   const [creating, setCreating] = useState(false)
   const container = useRef<HTMLDivElement>(null)
 
@@ -86,9 +102,34 @@ export function CustomersPage() {
           ),
       },
       {
+        id: 'segment',
+        header: t('fields.segment'),
+        cell: ({ row }) => <SegmentBadge segment={row.original.segment} />,
+      },
+      {
+        id: 'lifetime_value',
+        header: t('fields.lifetimeValue'),
+        meta: { sortField: 'lifetime_value', className: 'text-end' },
+        cell: ({ row }) => (
+          <span className="block text-end font-medium whitespace-nowrap tabular-nums">
+            {money(row.original.lifetime_value)}
+          </span>
+        ),
+      },
+      {
+        id: 'last_order_at',
+        header: t('fields.lastOrder'),
+        meta: { sortField: 'last_order_at', className: 'hidden md:table-cell' },
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap text-muted-foreground">
+            {row.original.last_order_at ? date(row.original.last_order_at) : t('noOrders')}
+          </span>
+        ),
+      },
+      {
         id: 'tags',
         header: t('fields.tags'),
-        meta: { className: 'hidden sm:table-cell' },
+        meta: { className: 'hidden xl:table-cell' },
         cell: ({ row }) => <TagList tags={row.original.tags} className="max-w-72" />,
       },
       {
@@ -102,7 +143,7 @@ export function CustomersPage() {
         ),
       },
     ],
-    [t, date],
+    [t, date, money],
   )
 
   const newButton = (
@@ -129,6 +170,48 @@ export function CustomersPage() {
             allLabel={t('allTags')}
             options={(tags.data ?? []).map((tag) => ({ value: String(tag.id), label: tag.name }))}
           />
+          <DataTableFilter
+            list={list}
+            name="segment"
+            label={t('fields.segment')}
+            allLabel={t('allSegments')}
+            options={SEGMENTS.map((segment) => ({
+              value: segment,
+              label: t(`segments.${segment}`),
+            }))}
+          />
+          <DataTableAmountFilter
+            list={list}
+            name="lifetime_value_min"
+            label={t('lifetimeValueMin')}
+          />
+          <DataTableAmountFilter
+            list={list}
+            name="lifetime_value_max"
+            label={t('lifetimeValueMax')}
+          />
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              {t('lastOrderFrom')}
+              <Input
+                type="date"
+                value={filters.last_order_from ?? ''}
+                max={filters.last_order_to}
+                onChange={(event) => list.setFilter('last_order_from', event.target.value || null)}
+                className="h-9 w-40 bg-card"
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              {t('lastOrderTo')}
+              <Input
+                type="date"
+                value={filters.last_order_to ?? ''}
+                min={filters.last_order_from}
+                onChange={(event) => list.setFilter('last_order_to', event.target.value || null)}
+                className="h-9 w-40 bg-card"
+              />
+            </label>
+          </div>
         </DataTableToolbar>
         <DataTable
           columns={columns}

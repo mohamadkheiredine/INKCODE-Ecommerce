@@ -27,6 +27,8 @@ class DemoSeeder extends Seeder
             DemoOrdersSeeder::class,
             // Payment ledgers for those Orders.
             DemoPaymentsSeeder::class,
+            // Earlier Delivered Orders, so every Segment has Customers.
+            DemoCustomerHistorySeeder::class,
         ]);
     }
 }
