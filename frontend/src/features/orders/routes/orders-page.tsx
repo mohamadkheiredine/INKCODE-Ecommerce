@@ -53,7 +53,7 @@ export function OrdersPage() {
   const list = useListQuery(LIST_CONFIG)
   const orders = useOrders(list.query)
   const warehouses = useAllWarehouses()
-  const { number, money, dateTime } = useFormatters()
+  const { money, date } = useFormatters()
   const container = useRef<HTMLDivElement>(null)
   const { filters } = list.query
 
@@ -79,12 +79,12 @@ export function OrdersPage() {
         id: 'customer',
         header: t('fields.customer'),
         cell: ({ row }) => (
-          <div className="flex min-w-36 flex-col">
-            <span dir="auto" className="font-medium">
+          <div className="flex max-w-44 min-w-36 flex-col">
+            <span dir="auto" className="truncate font-medium">
               {row.original.customer.name}
             </span>
             {row.original.customer.email && (
-              <span dir="ltr" className="text-start text-xs text-muted-foreground">
+              <span dir="ltr" className="truncate text-start text-xs text-muted-foreground">
                 {row.original.customer.email}
               </span>
             )}
@@ -112,7 +112,7 @@ export function OrdersPage() {
       {
         id: 'shipping_method',
         header: t('fields.shipping'),
-        meta: { className: 'hidden xl:table-cell' },
+        meta: { className: 'hidden 2xl:table-cell' },
         cell: ({ row }) => (
           <span dir="auto" className="whitespace-nowrap">
             {row.original.shipping_method.name}
@@ -133,18 +133,6 @@ export function OrdersPage() {
           ),
       },
       {
-        id: 'warehouse',
-        header: t('fields.warehouse'),
-        meta: { className: 'hidden lg:table-cell' },
-        cell: ({ row }) => <span dir="auto">{row.original.warehouse.name}</span>,
-      },
-      {
-        id: 'units',
-        header: t('fields.units'),
-        meta: { className: 'hidden sm:table-cell text-end' },
-        cell: ({ row }) => <span className="tabular-nums">{number(row.original.units ?? 0)}</span>,
-      },
-      {
         id: 'total',
         header: t('fields.total'),
         meta: { sortField: 'total', className: 'text-end' },
@@ -158,12 +146,12 @@ export function OrdersPage() {
         meta: { sortField: 'placed_at', className: 'hidden md:table-cell' },
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-muted-foreground">
-            {dateTime(row.original.placed_at)}
+            {date(row.original.placed_at)}
           </span>
         ),
       },
     ],
-    [t, number, money, dateTime],
+    [t, money, date],
   )
 
   const newButton = (

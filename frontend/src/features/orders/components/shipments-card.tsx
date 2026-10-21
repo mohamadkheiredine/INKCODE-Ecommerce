@@ -29,7 +29,8 @@ import i18n from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { useDeliverShipment, useShipOrder, useShipmentCarriers } from '../hooks/use-orders'
 import type { Order, Shipment } from '../types'
-import { FULFILLMENT_TONES, FulfillmentBadge } from './fulfillment-badge'
+import { FULFILLMENT_TONES } from '../fulfillment-tones'
+import { FulfillmentBadge } from './fulfillment-badge'
 
 /**
  * Shipment progress (separate from the Order status) and the Order's Shipments, each with
