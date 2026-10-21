@@ -19,6 +19,7 @@ import arProfile from '@/locales/ar/profile.json'
 import arSearch from '@/locales/ar/search.json'
 import arSettings from '@/locales/ar/settings.json'
 import arShipping from '@/locales/ar/shipping.json'
+import arReports from '@/locales/ar/reports.json'
 import arUsers from '@/locales/ar/users.json'
 import enAudit from '@/locales/en/audit.json'
 import enAuth from '@/locales/en/auth.json'
@@ -38,6 +39,7 @@ import enProfile from '@/locales/en/profile.json'
 import enSearch from '@/locales/en/search.json'
 import enSettings from '@/locales/en/settings.json'
 import enShipping from '@/locales/en/shipping.json'
+import enReports from '@/locales/en/reports.json'
 import enUsers from '@/locales/en/users.json'
 import { setApiLanguage } from './api/client'
 
@@ -71,6 +73,7 @@ export const resources = {
     search: enSearch,
     settings: enSettings,
     shipping: enShipping,
+    reports: enReports,
     users: enUsers,
   },
   ar: {
@@ -92,6 +95,7 @@ export const resources = {
     search: arSearch,
     settings: arSettings,
     shipping: arShipping,
+    reports: arReports,
     users: arUsers,
   },
 } as const
@@ -128,6 +132,7 @@ void i18n
       'inventory',
       'notifications',
       'profile',
+      'reports',
       'search',
       'settings',
       'shipping',

@@ -101,7 +101,13 @@ function KpiCard({ name, icon: Icon, kpi, value, text, formatValue, lowerIsBette
 }
 
 /** The change against the previous period; a zero baseline reads as "new", a snapshot as "now". */
-function Change({ kpi, lowerIsBetter = false }: { kpi: Kpi<unknown>; lowerIsBetter?: boolean }) {
+export function Change({
+  kpi,
+  lowerIsBetter = false,
+}: {
+  kpi: Kpi<unknown>
+  lowerIsBetter?: boolean
+}) {
   const { t } = useTranslation('dashboard')
   const format = useFormatters()
 

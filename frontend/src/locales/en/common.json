@@ -84,7 +84,8 @@
     "coupons": "Coupons",
     "coupon": "Coupon",
     "returns": "Returns",
-    "return": "Return"
+    "return": "Return",
+    "reports": "Reports"
   },
   "navGroups": {
     "dashboard": "Dashboard",

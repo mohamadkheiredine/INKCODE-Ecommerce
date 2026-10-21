@@ -11,6 +11,7 @@ import {
   warehousesNav,
 } from '@/features/inventory/nav'
 import { ordersNav } from '@/features/orders/nav'
+import { reportsNav } from '@/features/reports/nav'
 import { paymentsNav } from '@/features/payments/nav'
 import { returnsNav } from '@/features/returns/nav'
 import { settingsNav } from '@/features/settings/nav'
@@ -40,6 +41,7 @@ export const NAV_ENTRIES: readonly NavEntry[] = [
   shippingZonesNav,
   carriersNav,
   couponsNav,
+  reportsNav,
   usersNav,
   rolesNav,
   auditLogNav,
