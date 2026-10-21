@@ -1,4 +1,4 @@
-import { BellIcon, CheckIcon, type LucideIcon, SparklesIcon } from 'lucide-react'
+import { BellIcon, CheckIcon, ClipboardListIcon, type LucideIcon, SparklesIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import type { AppNotification } from '../types'
 /** The icon for each notification type; a type added by a later module gets the bell. */
 const TYPE_ICONS: Record<string, LucideIcon> = {
   welcome: SparklesIcon,
+  order_assigned: ClipboardListIcon,
 }
 
 /** Only paths inside the app are followed; anything else shows as plain text. */

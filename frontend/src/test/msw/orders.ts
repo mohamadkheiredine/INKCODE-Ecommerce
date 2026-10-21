@@ -6,6 +6,9 @@ import type {
   OrderQuote,
   SellableVariant,
   StockShortage,
+  TimelineEvent,
+  LineCancellation,
+  OrderUpdateInput,
 } from '@/features/orders/types'
 import type { Amount } from '@/lib/format'
 import { apiError } from './handlers'
@@ -16,6 +19,12 @@ let nextId = 900
 
 const fromCents = (cents: number) => (cents / 100).toFixed(2) as Amount
 const STAMP = '2026-10-20T09:00:00+00:00'
+
+/** The Users an Order may be assigned to. */
+export const ASSIGNEES = [
+  { id: 4, name: 'Sami Nassar' },
+  { id: 7, name: 'Lina Operations' },
+]
 
 const ADDRESS = {
   recipient_name: 'Rana Haddad',
@@ -29,10 +38,12 @@ const ADDRESS = {
 
 export function anOrder(overrides: Partial<Order> = {}): Order {
   const id = overrides.id ?? nextId++
-  return {
+  const order: Order = {
     id,
     number: `ORD-2026-${String(id).padStart(6, '0')}`,
     status: 'pending',
+    is_locked: false,
+    allowed_moves: ['confirmed', 'cancelled'],
     placed_at: STAMP,
     customer: { id: 1, name: 'Rana Haddad', email: 'rana@example.com', phone: null },
     warehouse: { id: 1, name: 'Beirut Central', code: 'BEY-01' },
@@ -48,6 +59,7 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
     total: '67.97',
     notes: null,
     user: { id: 4, name: 'Sami Nassar' },
+    assignee: null,
     units: 3,
     lines: [
       {
@@ -58,6 +70,7 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
         sku: 'TEE-RED-M',
         options: [{ attribute: 'Color', value: 'Red' }],
         quantity: 3,
+        cancelled_quantity: 0,
         unit_price: '19.99',
         discount_amount: '0.00',
         taxable: true,
@@ -79,6 +92,31 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
     created_at: STAMP,
     ...overrides,
   }
+  if (!overrides.allowed_moves) withStatus(order, order.status)
+  return { ...order, timeline: overrides.timeline ?? timelineOf(order) }
+}
+
+const timelineOf = (order: Order): TimelineEvent[] =>
+  (order.status_history ?? []).map((change) => ({ type: 'status' as const, ...change }))
+
+/** What the API derives from the status: the Order flow's next moves and the lock. */
+const FLOW: Order['status'][] = [
+  'pending',
+  'confirmed',
+  'preparing',
+  'ready_for_shipping',
+  'shipped',
+  'delivered',
+]
+function withStatus(order: Order, status: Order['status']) {
+  const next = FLOW[FLOW.indexOf(status) + 1]
+  const cancellable = ['pending', 'confirmed', 'preparing', 'ready_for_shipping'].includes(status)
+  order.status = status
+  order.is_locked = !['pending', 'confirmed'].includes(status)
+  order.allowed_moves = [
+    ...(status !== 'cancelled' && next ? [next] : []),
+    ...(cancellable ? (['cancelled'] as const) : []),
+  ]
 }
 
 export function aSellableVariant(overrides: Partial<SellableVariant> = {}): SellableVariant {
@@ -122,7 +160,7 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
   }
   const find = (id: unknown) => orders.find((order) => order.id === Number(id))
   const move = (order: Order, to: Order['status'], note: string | null = null) => {
-    order.status = to
+    withStatus(order, to)
     order.status_history = [
       ...(order.status_history ?? []),
       {
@@ -133,6 +171,10 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
         user: { id: 4, name: 'Sami Nassar' },
         created_at: STAMP,
       },
+    ]
+    order.timeline = [
+      ...(order.timeline ?? []),
+      { type: 'status', ...order.status_history.at(-1)! },
     ]
   }
 
@@ -151,6 +193,7 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
         },
       ),
     ),
+    http.get('*/api/v1/orders/assignees', () => HttpResponse.json({ data: ASSIGNEES })),
     http.get('*/api/v1/orders/sellable-variants', ({ request }) => {
       const search = new URL(request.url).searchParams.get('search')?.toLowerCase() ?? ''
       return HttpResponse.json({
@@ -252,6 +295,75 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
       const order = find(params.id)!
       move(order, 'cancelled', note)
       return HttpResponse.json({ data: order })
+    }),
+    http.post('*/api/v1/orders/:id/advance', async ({ request, params }) => {
+      await record('advance', request.clone())
+      const { status } = (await request.json()) as { status: Order['status'] }
+      const order = find(params.id)!
+      if (!order.allowed_moves.includes(status)) {
+        const response = apiError(
+          409,
+          'invalid_transition',
+          `Order ${order.number} cannot become ${status}.`,
+        )
+        const body = (await response.json()) as Record<string, unknown>
+        return HttpResponse.json(
+          { ...body, details: { allowed: order.allowed_moves } },
+          { status: 409 },
+        )
+      }
+      move(order, status)
+      return HttpResponse.json({ data: order })
+    }),
+    http.put('*/api/v1/orders/:id', async ({ request, params }) => {
+      await record('update', request.clone())
+      const input = (await request.json()) as OrderUpdateInput
+      const order = find(params.id)!
+      if (order.is_locked) {
+        return apiError(409, 'order_locked', `Order ${order.number} is locked.`)
+      }
+      order.lines = (order.lines ?? []).map((line) => ({
+        ...line,
+        quantity: input.lines.find((item) => item.variant_id === line.variant_id)?.quantity ?? 0,
+      }))
+      return HttpResponse.json({ data: order })
+    }),
+    http.post('*/api/v1/orders/:id/cancel-lines', async ({ request, params }) => {
+      await record('cancel-lines', request.clone())
+      const input = (await request.json()) as { lines: LineCancellation[]; note: string | null }
+      const order = find(params.id)!
+      order.lines = (order.lines ?? []).map((line) => {
+        const cancelled = input.lines.find((item) => item.line_id === line.id)?.quantity ?? 0
+        return {
+          ...line,
+          quantity: line.quantity - cancelled,
+          cancelled_quantity: line.cancelled_quantity + cancelled,
+        }
+      })
+      return HttpResponse.json({ data: order })
+    }),
+    http.put('*/api/v1/orders/:id/assignee', async ({ request, params }) => {
+      await record('assignee', request.clone())
+      const { assignee_id } = (await request.json()) as { assignee_id: number | null }
+      const order = find(params.id)!
+      order.assignee = ASSIGNEES.find((user) => user.id === assignee_id) ?? null
+      return HttpResponse.json({ data: order })
+    }),
+    http.post('*/api/v1/orders/:id/notes', async ({ request, params }) => {
+      await record('note', request.clone())
+      const { body } = (await request.json()) as { body: string }
+      const order = find(params.id)!
+      order.timeline = [
+        ...(order.timeline ?? []),
+        {
+          type: 'note',
+          id: nextId++,
+          body,
+          user: { id: 4, name: 'Sami Nassar' },
+          created_at: STAMP,
+        },
+      ]
+      return HttpResponse.json({ data: order }, { status: 201 })
     }),
   )
 

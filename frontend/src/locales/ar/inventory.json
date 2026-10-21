@@ -40,6 +40,8 @@
     "receipt": "استلام",
     "reservation": "حجز",
     "release": "تحرير حجز",
+    "deduction": "خصم",
+    "cancellation_return": "إرجاع بعد إلغاء",
     "adjustment": "تعديل",
     "transfer_out": "تحويل صادر",
     "transfer_in": "تحويل وارد"

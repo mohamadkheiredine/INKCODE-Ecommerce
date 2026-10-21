@@ -139,6 +139,16 @@ export const routes: RouteObject[] = [
                   ),
                 }),
               },
+              {
+                path: ':orderId/invoice',
+                handle: crumb('invoice'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'orders.view',
+                    (await import('@/features/orders/routes/invoice-page')).InvoicePage,
+                  ),
+                }),
+              },
             ],
           },
           {

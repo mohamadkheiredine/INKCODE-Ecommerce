@@ -41,6 +41,8 @@ export type OrderLine = {
   sku: string
   options: VariantOption[]
   quantity: number
+  /** Units removed by Partial cancellation. */
+  cancelled_quantity: number
   unit_price: Amount
   discount_amount: Amount
   taxable: boolean
@@ -58,11 +60,28 @@ export type OrderStatusChange = {
   created_at: string
 }
 
+/** One entry of an Order's timeline (oldest first): a status change or a note. */
+export type TimelineEvent =
+  | ({ type: 'status' } & OrderStatusChange)
+  | {
+      type: 'note'
+      id: number
+      body: string
+      user: { id: number; name: string } | null
+      created_at: string
+    }
+
+export type UserRef = { id: number; name: string }
+
 /** Amounts are decimal strings. The list has `units`; one Order has `lines` and history. */
 export type Order = {
   id: number
   number: string
   status: OrderStatus
+  /** From Preparing onward (and once Cancelled): lines, quantities and addresses are fixed. */
+  is_locked: boolean
+  /** The statuses the Order flow lets it move to next. */
+  allowed_moves: OrderStatus[]
   placed_at: string
   customer: { id: number; name: string; email: string | null; phone: string | null }
   warehouse: WarehouseRef
@@ -77,14 +96,30 @@ export type Order = {
   shipping_total: Amount
   total: Amount
   notes: string | null
-  user?: { id: number; name: string } | null
+  user?: UserRef | null
+  assignee?: UserRef | null
   units?: number
   lines?: OrderLine[]
   status_history?: OrderStatusChange[]
+  timeline?: TimelineEvent[]
   created_at: string
 }
 
 export type OrderLineInput = { variant_id: number; quantity: number }
+
+/** The new lines, addresses and Shipping method of a Pending or Confirmed Order. */
+export type OrderUpdateInput = {
+  billing_address_id: number
+  shipping_address_id: number
+  shipping_method_id: number
+  lines: OrderLineInput[]
+}
+
+/** Partial cancellation: units of each line to cancel. */
+export type LineCancellation = { line_id: number; quantity: number }
+
+/** The statuses an Order moves forward to by hand (Shipped comes with Shipments). */
+export const ADVANCE_STATUSES: readonly OrderStatus[] = ['preparing', 'ready_for_shipping']
 
 export type OrderInput = {
   customer_id: number
@@ -112,7 +147,7 @@ export type OrderQuote = {
   vat_total: Amount
   shipping_total: Amount
   total: Amount
-  lines: Omit<OrderLine, 'id' | 'product_id'>[]
+  lines: Omit<OrderLine, 'id' | 'product_id' | 'cancelled_quantity'>[]
   warehouses: (WarehouseRef & { is_sufficient: boolean; shortages: StockShortage[] })[]
 }
 

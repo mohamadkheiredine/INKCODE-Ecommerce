@@ -1,8 +1,12 @@
 import {
   ArrowLeftIcon,
+  ArrowRightIcon,
   BanIcon,
   CheckCircle2Icon,
-  CircleDotIcon,
+  ListXIcon,
+  LockIcon,
+  PencilIcon,
+  PrinterIcon,
   ShoppingCartIcon,
   TriangleAlertIcon,
 } from 'lucide-react'
@@ -47,10 +51,12 @@ import { apiErrorMessage } from '@/lib/forms'
 import i18n from '@/lib/i18n'
 import { useEntranceAnimation } from '@/lib/motion'
 import { AddressBlock } from '../components/address-block'
+import { EditOrderDialog } from '../components/edit-order-dialog'
+import { AssigneeCard, CancelLinesDialog, TimelineCard } from '../components/order-flow'
 import { OrderStatusBadge } from '../components/order-status-badge'
 import { OrderTotals } from '../components/order-totals'
-import { useCancelOrder, useConfirmOrder, useOrder } from '../hooks/use-orders'
-import { CANCELLABLE_STATUSES, type Order, type StockShortage } from '../types'
+import { useAdvanceOrder, useCancelOrder, useConfirmOrder, useOrder } from '../hooks/use-orders'
+import { ADVANCE_STATUSES, CANCELLABLE_STATUSES, type Order, type StockShortage } from '../types'
 
 /** One Order: its lines and totals, Customer and addresses, fulfilment, and status history. */
 export function OrderPage() {
@@ -95,10 +101,14 @@ function OrderDetail({ order }: { order: Order }) {
   const can = useCan()
   const { number, money, dateTime } = useFormatters()
   const confirm = useConfirmOrder()
+  const advance = useAdvanceOrder()
   const [refusal, setRefusal] = useState<Refusal | null>(null)
   const [cancelling, setCancelling] = useState(false)
+  const [cancellingLines, setCancellingLines] = useState(false)
+  const [editing, setEditing] = useState(false)
   // One key per attempt: a retried click is applied once, a new attempt gets a new key.
   const [confirmKey, setConfirmKey] = useState(() => crypto.randomUUID())
+  const [advanceKey, setAdvanceKey] = useState(() => crypto.randomUUID())
   const container = useRef<HTMLDivElement>(null)
   const lines = order.lines ?? []
 
@@ -106,6 +116,30 @@ function OrderDetail({ order }: { order: Order }) {
 
   const canConfirm = order.status === 'pending' && can('orders.update')
   const canCancel = CANCELLABLE_STATUSES.includes(order.status) && can('orders.cancel')
+  const canEdit = !order.is_locked && can('orders.update')
+  const nextStep = order.allowed_moves.find((status) => ADVANCE_STATUSES.includes(status))
+  const canAdvance = nextStep !== undefined && can('orders.transition')
+
+  const advanceOrder = async () => {
+    if (!nextStep) return
+    try {
+      const moved = await advance.mutateAsync({
+        id: order.id,
+        status: nextStep,
+        idempotencyKey: advanceKey,
+      })
+      toast.success(
+        i18n.t('orders:advance.done', {
+          number: moved.number,
+          status: i18n.t(`orders:statuses.${moved.status}`),
+        }),
+      )
+    } catch (error) {
+      toast.error(apiErrorMessage(error))
+    } finally {
+      setAdvanceKey(crypto.randomUUID())
+    }
+  }
 
   const confirmOrder = async () => {
     setRefusal(null)
@@ -133,10 +167,42 @@ function OrderDetail({ order }: { order: Order }) {
         actions={
           <>
             <BackLink />
+            <Button asChild variant="outline" className="gap-2">
+              <Link to={`/orders/${order.id}/invoice`}>
+                <PrinterIcon className="size-4" aria-hidden="true" />
+                {t('invoice.action')}
+              </Link>
+            </Button>
+            {canEdit && (
+              <Button variant="outline" className="gap-2" onClick={() => setEditing(true)}>
+                <PencilIcon className="size-4" aria-hidden="true" />
+                {t('edit.action')}
+              </Button>
+            )}
+            {canCancel && (
+              <Button variant="outline" className="gap-2" onClick={() => setCancellingLines(true)}>
+                <ListXIcon className="size-4" aria-hidden="true" />
+                {t('cancelLines.action')}
+              </Button>
+            )}
             {canCancel && (
               <Button variant="outline" className="gap-2" onClick={() => setCancelling(true)}>
                 <BanIcon className="size-4" aria-hidden="true" />
                 {t('cancel.action')}
+              </Button>
+            )}
+            {canAdvance && (
+              <Button
+                className="gap-2"
+                disabled={advance.isPending}
+                onClick={() => void advanceOrder()}
+              >
+                {advance.isPending ? (
+                  <InlineSpinner className="size-4" />
+                ) : (
+                  <ArrowRightIcon className="size-4 rtl:rotate-180" aria-hidden="true" />
+                )}
+                {t('advance.action', { status: t(`statuses.${nextStep}`) })}
               </Button>
             )}
             {canConfirm && (
@@ -188,7 +254,18 @@ function OrderDetail({ order }: { order: Order }) {
           <Card className="js-reveal rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between gap-3">
               <CardTitle className="text-base">{t('lines')}</CardTitle>
-              <OrderStatusBadge status={order.status} />
+              <div className="flex items-center gap-2">
+                {order.is_locked && order.status !== 'cancelled' && (
+                  <span
+                    className="flex items-center gap-1 text-xs text-muted-foreground"
+                    title={t('lockedHint')}
+                  >
+                    <LockIcon className="size-3.5" aria-hidden="true" />
+                    {t('locked')}
+                  </span>
+                )}
+                <OrderStatusBadge status={order.status} />
+              </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="overflow-x-auto" data-lenis-prevent>
@@ -231,7 +308,16 @@ function OrderDetail({ order }: { order: Order }) {
                           </div>
                         </TableCell>
                         <TableCell className="text-end tabular-nums">
-                          {number(line.quantity)}
+                          <span className="flex flex-col">
+                            <span>{number(line.quantity)}</span>
+                            {line.cancelled_quantity > 0 && (
+                              <span className="text-xs text-muted-foreground">
+                                {t('cancelledUnits', {
+                                  formatted: number(line.cancelled_quantity),
+                                })}
+                              </span>
+                            )}
+                          </span>
                         </TableCell>
                         <TableCell className="text-end tabular-nums">
                           {money(line.unit_price)}
@@ -262,44 +348,11 @@ function OrderDetail({ order }: { order: Order }) {
             </CardContent>
           </Card>
 
-          <Card className="js-reveal rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-base">{t('history')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="flex flex-col gap-4">
-                {(order.status_history ?? []).map((change) => (
-                  <li key={change.id} className="flex gap-3">
-                    <CircleDotIcon
-                      className="mt-0.5 size-4 shrink-0 text-primary"
-                      aria-hidden="true"
-                    />
-                    <div className="flex min-w-0 flex-col gap-0.5">
-                      <span className="text-sm font-medium">
-                        {change.from_status === null
-                          ? t('historyCreated')
-                          : t('historyMoved', { status: t(`statuses.${change.to_status}`) })}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {t('historyBy', {
-                          user: change.user?.name ?? t('system'),
-                          when: dateTime(change.created_at),
-                        })}
-                      </span>
-                      {change.note && (
-                        <p dir="auto" className="text-sm text-muted-foreground">
-                          {change.note}
-                        </p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+          <TimelineCard order={order} />
         </div>
 
         <div className="flex flex-col gap-6">
+          <AssigneeCard order={order} />
           <Card className="js-reveal rounded-2xl">
             <CardHeader>
               <CardTitle className="text-base">{t('fields.customer')}</CardTitle>
@@ -377,6 +430,14 @@ function OrderDetail({ order }: { order: Order }) {
       </div>
 
       <CancelOrderDialog order={cancelling ? order : null} onClose={() => setCancelling(false)} />
+      <CancelLinesDialog
+        order={order}
+        open={cancellingLines}
+        onClose={() => setCancellingLines(false)}
+      />
+      {canEdit && (
+        <EditOrderDialog order={order} open={editing} onClose={() => setEditing(false)} />
+      )}
     </div>
   )
 }

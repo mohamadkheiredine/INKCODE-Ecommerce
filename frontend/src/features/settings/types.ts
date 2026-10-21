@@ -32,5 +32,8 @@ export type StoreSettingsInput = Omit<StoreSettings, 'logo_url' | 'updated_at'>
 export type StoreProfile = {
   name: string
   logo_url: string | null
+  contact_email: string | null
+  contact_phone: string | null
+  address: string | null
   currency: StoreCurrency
 }
