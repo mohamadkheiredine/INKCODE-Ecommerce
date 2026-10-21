@@ -13,13 +13,13 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
 /**
- * One worker of {@see DemoRace}: waits for the shared start time, then confirms one Order
+ * One worker of {@see DemoRaceCommand}: waits for the shared start time, then confirms one Order
  * exactly as the API does. Prints `confirmed` or the refusal's error code.
  */
 #[Signature('demo:race-worker {order} {startAt} {user=0}')]
 #[Description('Confirm one Order at a given moment (used by demo:race)')]
 #[Hidden]
-class DemoRaceWorker extends Command
+class DemoRaceWorkerCommand extends Command
 {
     public function handle(ConfirmOrder $confirmOrder, AuthFactory $auth): int
     {

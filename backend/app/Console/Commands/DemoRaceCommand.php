@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
  */
 #[Signature('demo:race {--workers=20 : Simultaneous confirmations} {--available=5 : Units in stock}')]
 #[Description('Confirm many Orders for the last units at once and show that none oversells')]
-class DemoRace extends Command
+class DemoRaceCommand extends Command
 {
     /** Seconds the workers get to boot before they all confirm at the same moment. */
     private const int START_DELAY = 5;

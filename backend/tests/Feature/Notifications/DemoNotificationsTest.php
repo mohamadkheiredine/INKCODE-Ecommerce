@@ -7,12 +7,15 @@ it('greets every demo account with an unread welcome in demo mode', function (st
 
     signInFromNewBrowser("{$role}@inkcode.test", 'password')->assertOk();
 
-    $this->getJson('/api/v1/notifications')
-        ->assertOk()
-        ->assertJsonPath('meta.unread_count', 1)
-        ->assertJsonPath('data.0.type', 'welcome')
-        ->assertJsonPath('data.0.message', "Welcome to Inkcode Commerce, {$name}. Your language and theme are kept on your profile.")
-        ->assertJsonPath('data.0.link', '/profile');
+    // Admin and Inventory also get the low-stock alerts the demo Orders' reservations raise.
+    $notifications = $this->getJson('/api/v1/notifications')->assertOk()->json('data');
+    $welcome = collect($notifications)->firstWhere('type', 'welcome');
+
+    expect($welcome)->toMatchArray([
+        'message' => "Welcome to Inkcode Commerce, {$name}. Your language and theme are kept on your profile.",
+        'link' => '/profile',
+        'read_at' => null,
+    ]);
 })->with([
     ['admin', 'Ahmed Ali'],
     ['operations', 'Rania Khoury'],

@@ -93,6 +93,20 @@ class Transfer extends Model implements Auditable
         $this->save();
     }
 
+    /**
+     * Loads what one Transfer's page shows: both Warehouses, its creator and its lines.
+     */
+    public function loadForDisplay(): static
+    {
+        return $this->load([
+            'sourceWarehouse:id,name,code',
+            'destinationWarehouse:id,name,code',
+            'user:id,name',
+            'lines.variant:id,product_id,sku',
+            'lines.variant.product:id,name',
+        ]);
+    }
+
     public function auditLabel(): string
     {
         return (string) $this->number;
