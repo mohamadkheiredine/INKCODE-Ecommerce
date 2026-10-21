@@ -18,6 +18,7 @@
     "number": "الطلب",
     "customer": "العميل",
     "status": "الحالة",
+    "paymentStatus": "الدفع",
     "warehouse": "المستودع المنفِّذ",
     "units": "الوحدات",
     "total": "الإجمالي",
@@ -76,7 +77,9 @@
     "reason": "السبب (اختياري)",
     "keep": "الإبقاء على الطلب",
     "submit": "إلغاء الطلب",
-    "done": "تم إلغاء {{number}}."
+    "done": "تم إلغاء {{number}}.",
+    "refundNeeded": "مطلوب استرداد: {{amount}}",
+    "refundNeededHint": "يُعاد المبلغ المحصَّل كاسترداد في الخطوة نفسها."
   },
   "newDescription": "اختر العميل، وأضف المتغيّرات، ثم اختر المستودع المنفِّذ وطريقة الشحن. يتحدّث عرض السعر أثناء الإدخال.",
   "customerHint": "ابحث عن عميل بالاسم أو البريد أو الهاتف، أو أنشئ عميلاً هنا.",
@@ -168,6 +171,9 @@
     "addNote": "أضف ملاحظة",
     "submitNote": "إضافة ملاحظة",
     "noteAdded": "أُضيفت الملاحظة.",
+    "payment": "دفعة بقيمة {{amount}} · {{method}}",
+    "refund": "استرداد بقيمة {{amount}} · {{method}}",
+    "paymentFailed": "دفعة بطاقة مرفوضة بقيمة {{amount}}",
     "shipmentShipped": "شُحنت الشحنة {{number}}",
     "shipmentDelivered": "سُلّمت الشحنة {{number}}"
   },

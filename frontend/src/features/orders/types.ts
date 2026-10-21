@@ -1,4 +1,5 @@
 import type { WarehouseRef, VariantOption } from '@/features/inventory/types'
+import type { Payment, PaymentStatus } from '@/features/payments/types'
 import type { Amount } from '@/lib/format'
 
 /** Where an Order is in its life, mirroring `App\Enums\OrderStatus`. */
@@ -104,10 +105,14 @@ export type ShipmentInput = {
   lines: { line_id: number; quantity: number }[]
 }
 
-/** One entry of an Order's timeline (oldest first): a status change, a Shipment step or a note. */
+/**
+ * One entry of an Order's timeline (oldest first): a status change, a Shipment step, a
+ * payment or Refund (for Roles with payments.view) or a note.
+ */
 export type TimelineEvent =
   | ({ type: 'status' } & OrderStatusChange)
   | ({ type: 'shipment'; shipment: { id: number; number: string } } & ShipmentStatusChange)
+  | ({ type: 'payment' } & Payment)
   | {
       type: 'note'
       id: number
@@ -155,6 +160,12 @@ export type Order = {
   vat_total: Amount
   shipping_total: Amount
   total: Amount
+  /** Read from the Payment ledger after every write. */
+  payment_status: PaymentStatus
+  captured_amount: Amount
+  refunded_amount: Amount
+  /** What is still to be paid; nothing once Cancelled. */
+  amount_due: Amount
   notes: string | null
   user?: UserRef | null
   assignee?: UserRef | null
@@ -164,6 +175,8 @@ export type Order = {
   shipments?: Shipment[]
   fulfillment?: Fulfillment
   timeline?: TimelineEvent[]
+  /** The Payment ledger, oldest first; only for Roles with payments.view. */
+  payments?: Payment[]
   created_at: string
 }
 

@@ -3,11 +3,13 @@
 namespace App\Http\Resources;
 
 use App\Enums\OrderStatus;
+use App\Enums\Permission;
 use App\Enums\ShipmentStatus;
 use App\Models\Order;
 use App\Models\OrderLine;
 use App\Models\OrderNote;
 use App\Models\OrderStatusChange;
+use App\Models\Payment;
 use App\Models\Shipment;
 use App\Models\ShipmentLine;
 use App\Models\ShipmentStatusChange;
@@ -55,6 +57,10 @@ class OrderResource extends JsonResource
             'vat_total' => $this->vat_total,
             'shipping_total' => $this->shipping_total,
             'total' => $this->total,
+            'payment_status' => $this->payment_status->value,
+            'captured_amount' => $this->captured_amount,
+            'refunded_amount' => $this->refunded_amount,
+            'amount_due' => $this->amountDue(),
             'notes' => $this->notes,
             'user' => $this->whenLoaded('user', fn (): ?array => $this->user?->only('id', 'name')),
             'assignee' => $this->whenLoaded('assignee', fn (): ?array => $this->assignee?->only('id', 'name')),
@@ -83,6 +89,10 @@ class OrderResource extends JsonResource
             'status_history' => $this->whenLoaded('statusChanges', fn (): array => $this->statusChanges
                 ->map(fn (OrderStatusChange $change): array => $this->statusChange($change))
                 ->all()),
+            'payments' => $this->when(
+                $this->relationLoaded('payments') && $this->seesPayments($request),
+                fn (): array => PaymentResource::collection($this->payments)->resolve($request),
+            ),
             'fulfillment' => $this->when($this->relationLoaded('lines') && $this->relationLoaded('shipments'), fn (): array => $this->fulfillment()),
             'shipments' => $this->whenLoaded('shipments', fn (): array => $this->shipments
                 ->map(fn (Shipment $shipment): array => [
@@ -102,21 +112,25 @@ class OrderResource extends JsonResource
                 ->all()),
             'timeline' => $this->when(
                 $this->relationLoaded('statusChanges') && $this->relationLoaded('orderNotes'),
-                fn (): array => $this->timeline(),
+                fn (): array => $this->timeline($request),
             ),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 
     /**
-     * Status changes, Shipment status changes and notes merged, oldest first (in the same
-     * second: status change, then Shipment, then note). Later tickets add payments and Returns.
+     * Status changes, Shipment status changes, (for Users with payments.view) Payment ledger
+     * rows and notes merged, oldest first (in the same second: status change, then Shipment,
+     * then payment, then note). Returns come with a later ticket.
      *
      * @return list<array<string, mixed>>
      */
-    private function timeline(): array
+    private function timeline(Request $request): array
     {
         $events = [
+            ...($this->relationLoaded('payments') && $this->seesPayments($request)
+                ? $this->payments->map(fn (Payment $payment): array => ['type' => 'payment', ...(new PaymentResource($payment))->resolve($request)])
+                : []),
             ...$this->statusChanges->map(fn (OrderStatusChange $change): array => ['type' => 'status', ...$this->statusChange($change)]),
             ...($this->relationLoaded('shipments') ? $this->shipments->flatMap(fn (Shipment $shipment) => $shipment->statusChanges->map(fn (ShipmentStatusChange $change): array => [
                 'type' => 'shipment',
@@ -131,10 +145,16 @@ class OrderResource extends JsonResource
                 'created_at' => $note->created_at->toIso8601String(),
             ]),
         ];
-        $rank = ['status' => 0, 'shipment' => 1, 'note' => 2];
+        $rank = ['status' => 0, 'shipment' => 1, 'payment' => 2, 'note' => 3];
         usort($events, fn (array $a, array $b): int => [$a['created_at'], $rank[$a['type']], $a['id']] <=> [$b['created_at'], $rank[$b['type']], $b['id']]);
 
         return $events;
+    }
+
+    /** The Payment ledger is shown only to Roles with payments.view. */
+    private function seesPayments(Request $request): bool
+    {
+        return $request->user()?->hasPermissionTo(Permission::PaymentsView->value) ?? false;
     }
 
     /**

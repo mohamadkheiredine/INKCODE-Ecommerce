@@ -79,6 +79,8 @@
     "order": "Order",
     "invoice": "Invoice",
     "transfers": "Transfers",
+    "payments": "Payments",
+    "reconciliation": "Reconciliation",
     "coupons": "Coupons",
     "coupon": "Coupon"
   },

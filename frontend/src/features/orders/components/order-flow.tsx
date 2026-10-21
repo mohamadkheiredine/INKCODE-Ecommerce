@@ -1,4 +1,10 @@
-import { CircleDotIcon, MessageSquareTextIcon, TruckIcon } from 'lucide-react'
+import {
+  CircleDotIcon,
+  MessageSquareTextIcon,
+  TruckIcon,
+  Undo2Icon,
+  WalletIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -19,6 +25,8 @@ import { Label } from '@/components/ui/label'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea'
 import { useCan } from '@/features/auth/hooks/use-can'
+import { RefundNeeded } from '@/features/payments/components/refund-needed'
+import { totalAfterCancellingCents } from '@/features/payments/money'
 import { isApiError } from '@/lib/api/api-error'
 import { useFormatters } from '@/lib/format'
 import { apiErrorMessage } from '@/lib/forms'
@@ -29,7 +37,9 @@ import {
   useCancelOrderLines,
   useOrderAssignees,
 } from '../hooks/use-orders'
-import type { Order } from '../types'
+import { cn } from '@/lib/utils'
+import type { Order, TimelineEvent } from '../types'
+import type { Amount } from '@/lib/format'
 
 const NOTE_MAX_LENGTH = 2000
 
@@ -73,6 +83,10 @@ export function CancelLinesDialog({
     const value = quantities[line.id]?.trim() ?? ''
     return value !== '' && (!/^\d+$/.test(value) || Number(value) > line.quantity)
   })
+  // Cancelling every unit (none shipped) cancels the whole Order, which then owes nothing.
+  const cancelsEverything =
+    chosen.reduce((sum, line) => sum + line.quantity, 0) ===
+    (order.lines ?? []).reduce((sum, line) => sum + line.quantity, 0)
 
   const submit = async () => {
     setError(null)
@@ -146,6 +160,12 @@ export function CancelLinesDialog({
             </li>
           ))}
         </ul>
+        {!invalid && chosen.length > 0 && (
+          <RefundNeeded
+            order={order}
+            owedAfterCents={cancelsEverything ? 0 : totalAfterCancellingCents(order, chosen)}
+          />
+        )}
         <div className="flex flex-col gap-2">
           <Label htmlFor="cancel-lines-note">{t('cancel.reason')}</Label>
           <Textarea
@@ -250,11 +270,56 @@ export function AssigneeCard({ order }: { order: Order }) {
   )
 }
 
-/** Status changes and notes, oldest first; Users who edit Orders add notes (Locked ones too). */
+/** The headline of one timeline entry. */
+function timelineTitle(event: TimelineEvent, money: (amount: Amount) => string): string {
+  const t = i18n.t.bind(i18n)
+  switch (event.type) {
+    case 'note':
+      return t('orders:timeline.note')
+    case 'payment':
+      return event.status === 'failed'
+        ? t('orders:timeline.paymentFailed', { amount: money(event.amount) })
+        : t(`orders:timeline.${event.kind}`, {
+            amount: money(event.amount),
+            method: t(`payments:methods.${event.method}`),
+          })
+    case 'shipment':
+      return t(
+        event.to_status === 'delivered'
+          ? 'orders:timeline.shipmentDelivered'
+          : 'orders:timeline.shipmentShipped',
+        { number: event.shipment.number },
+      )
+    case 'status':
+      return event.from_status === null
+        ? t('orders:historyCreated')
+        : t('orders:historyMoved', { status: t(`orders:statuses.${event.to_status}`) })
+  }
+}
+
+/** The note shown under an entry: a note's body, or the reason a status or payment carries. */
+function timelineNote(event: TimelineEvent): string | null {
+  if (event.type === 'note') return event.body
+  if (event.type === 'shipment') return null
+  return event.note
+}
+
+const TIMELINE_ICONS = {
+  status: { icon: CircleDotIcon, className: 'text-primary' },
+  shipment: { icon: TruckIcon, className: 'text-chart-3' },
+  note: { icon: MessageSquareTextIcon, className: 'text-muted-foreground' },
+  payment: { icon: WalletIcon, className: 'text-success' },
+  refund: { icon: Undo2Icon, className: 'text-destructive' },
+} as const
+
+/**
+ * Status changes, payments and Refunds (for Roles that see the Payment ledger) and notes,
+ * oldest first; Users who edit Orders add notes (Locked ones too).
+ */
 export function TimelineCard({ order }: { order: Order }) {
   const { t } = useTranslation('orders')
   const can = useCan()
-  const { dateTime } = useFormatters()
+  const { dateTime, money } = useFormatters()
   const addNote = useAddOrderNote()
   const [body, setBody] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -285,47 +350,37 @@ export function TimelineCard({ order }: { order: Order }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <ol className="flex flex-col gap-4">
-          {(order.timeline ?? []).map((event) => (
-            <li key={`${event.type}-${event.id}`} className="flex gap-3">
-              {event.type === 'status' ? (
-                <CircleDotIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-              ) : event.type === 'shipment' ? (
-                <TruckIcon className="mt-0.5 size-4 shrink-0 text-chart-3" aria-hidden="true" />
-              ) : (
-                <MessageSquareTextIcon
-                  className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+          {(order.timeline ?? []).map((event) => {
+            const { icon: Icon, className } =
+              TIMELINE_ICONS[event.type === 'payment' ? event.kind : event.type]
+            return (
+              <li key={`${event.type}-${event.id}`} className="flex gap-3">
+                <Icon
+                  className={cn(
+                    'mt-0.5 size-4 shrink-0',
+                    event.type === 'payment' && event.status === 'failed'
+                      ? 'text-destructive'
+                      : className,
+                  )}
                   aria-hidden="true"
                 />
-              )}
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-sm font-medium">
-                  {event.type === 'note'
-                    ? t('timeline.note')
-                    : event.type === 'shipment'
-                      ? t(
-                          event.to_status === 'delivered'
-                            ? 'timeline.shipmentDelivered'
-                            : 'timeline.shipmentShipped',
-                          { number: event.shipment.number },
-                        )
-                      : event.from_status === null
-                        ? t('historyCreated')
-                        : t('historyMoved', { status: t(`statuses.${event.to_status}`) })}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {t('historyBy', {
-                    user: event.user?.name ?? t('system'),
-                    when: dateTime(event.created_at),
-                  })}
-                </span>
-                {event.type !== 'shipment' && (event.type === 'note' ? event.body : event.note) && (
-                  <p dir="auto" className="text-sm whitespace-pre-line text-muted-foreground">
-                    {event.type === 'note' ? event.body : event.note}
-                  </p>
-                )}
-              </div>
-            </li>
-          ))}
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-sm font-medium">{timelineTitle(event, money)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('historyBy', {
+                      user: event.user?.name ?? t('system'),
+                      when: dateTime(event.created_at),
+                    })}
+                  </span>
+                  {timelineNote(event) && (
+                    <p dir="auto" className="text-sm whitespace-pre-line text-muted-foreground">
+                      {timelineNote(event)}
+                    </p>
+                  )}
+                </div>
+              </li>
+            )
+          })}
         </ol>
         {can('orders.update') && (
           <div className="flex flex-col gap-2 border-t pt-4">

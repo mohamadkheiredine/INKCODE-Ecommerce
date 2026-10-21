@@ -12,6 +12,7 @@ use App\Services\AuditTrail;
 use App\Services\CouponRedemptions;
 use App\Services\OrderPricing;
 use App\Services\OrderStock;
+use App\Services\PaymentLedger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -19,7 +20,9 @@ use Illuminate\Validation\ValidationException;
  * Partial cancellation: cancels some units of some lines before the Order ships. The units
  * move to each line's `cancelled_quantity`, their stock is released (or put back On-hand
  * past the Deduction stage), and the Order is re-priced at its own VAT rate and Coupon
- * terms (the redemption keeps the new discount); shipping is kept. The reason, when given, is added to the timeline as a note. Cancelling every
+ * terms (the redemption keeps the new discount); shipping is kept; money received beyond
+ * the new total is given back as a Refund in the same step. The reason, when given, is
+ * added to the timeline as a note. Cancelling every
  * remaining unit cancels the whole Order instead ({@see CancelOrder}). Shipped units cannot
  * be cancelled; when only shipped units are left, the Order follows its Shipments.
  */
@@ -32,6 +35,7 @@ final class CancelOrderLines
         private readonly OrderStock $orderStock,
         private readonly CouponRedemptions $couponRedemptions,
         private readonly AuditTrail $auditTrail,
+        private readonly PaymentLedger $paymentLedger,
         private readonly FollowShipments $followShipments,
     ) {}
 
@@ -91,6 +95,7 @@ final class CancelOrderLines
 
             $this->couponRedemptions->sync($order);
             $this->auditTrail->updated($order->load('lines'), $before);
+            $this->paymentLedger->settle($order, $note);
             $order = $this->followShipments->handle($order);
             if ($note !== null) {
                 $this->addOrderNote->handle($order, $user, $note);

@@ -1,0 +1,101 @@
+{
+  "description": "Every payment and Refund recorded against Orders, and how Order totals compare with their ledgers.",
+  "views": "Payment views",
+  "search": "Search by Order number or gateway reference",
+  "loading": "Loading payments",
+  "emptyTitle": "No payments yet",
+  "emptyDescription": "Payments and Refunds appear here once they are recorded on an Order.",
+  "goToOrders": "Go to Orders",
+  "allKinds": "All kinds",
+  "allMethods": "All Payment methods",
+  "allOutcomes": "Any outcome",
+  "system": "System",
+  "cancel": "Cancel",
+  "statuses": {
+    "unpaid": "Unpaid",
+    "partially_paid": "Partially paid",
+    "paid": "Paid",
+    "partially_refunded": "Partially refunded",
+    "refunded": "Refunded"
+  },
+  "methods": {
+    "cash_on_delivery": "Cash on delivery",
+    "manual": "Manual",
+    "card": "Card"
+  },
+  "kinds": {
+    "payment": "Payment",
+    "refund": "Refund"
+  },
+  "outcomes": {
+    "succeeded": "Succeeded",
+    "failed": "Failed"
+  },
+  "cardOutcomes": {
+    "approve": "Approve",
+    "decline": "Decline"
+  },
+  "fields": {
+    "order": "Order",
+    "customer": "Customer",
+    "kind": "Kind",
+    "method": "Payment method",
+    "amount": "Amount",
+    "outcome": "Outcome",
+    "reference": "Gateway reference",
+    "user": "Recorded by",
+    "recordedAt": "Recorded",
+    "note": "Note (optional)",
+    "cardOutcome": "Test card outcome",
+    "orderStatus": "Order status",
+    "paymentStatus": "Payment status",
+    "placedAt": "Placed"
+  },
+  "ledger": {
+    "title": "Payment ledger",
+    "all": "Payment ledger",
+    "captured": "Captured amount",
+    "refunded": "Refunded",
+    "due": "Still due",
+    "by": "{{user}} · {{when}}",
+    "emptyTitle": "Nothing recorded yet",
+    "emptyDescription": "Record a Cash on delivery, Manual or Card payment.",
+    "emptyDescriptionReadOnly": "Payments and Refunds appear here once Finance records them."
+  },
+  "record": {
+    "action": "Record payment",
+    "title": "Record a payment on {{number}}",
+    "description": "Up to {{due}} is still due.",
+    "cardHint": "The mock gateway approves or declines as you choose. No card details are asked for or stored.",
+    "submit": "Record payment",
+    "done": "Payment of {{amount}} recorded",
+    "declined": "The Card payment of {{amount}} was declined"
+  },
+  "refund": {
+    "action": "Issue Refund",
+    "title": "Refund on {{number}}",
+    "description": "At most {{refundable}} can be refunded (the Captured amount minus earlier Refunds).",
+    "submit": "Issue Refund",
+    "done": "Refund of {{amount}} recorded"
+  },
+  "validation": {
+    "amount": "Enter an amount above zero with at most two decimals.",
+    "aboveDue": "A payment can be at most {{due}}, the amount still due.",
+    "aboveRefundable": "A Refund can be at most {{refundable}}."
+  },
+  "reconciliation": {
+    "title": "Reconciliation",
+    "search": "Search by Order number",
+    "balance": "Balance",
+    "allBalances": "Any difference",
+    "balances": {
+      "due": "Money still due",
+      "over": "Ledger holds more"
+    },
+    "owed": "Owed",
+    "ledger": "Ledger total",
+    "difference": "Difference",
+    "emptyTitle": "Every Order is reconciled",
+    "emptyDescription": "Each Order's ledger total matches what it owes."
+  }
+}

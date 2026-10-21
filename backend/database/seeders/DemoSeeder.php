@@ -25,6 +25,8 @@ class DemoSeeder extends Seeder
             DemoCouponsSeeder::class,
             // Orders need the stocked Products, the Customers, the Shipping methods and Coupons.
             DemoOrdersSeeder::class,
+            // Payment ledgers for those Orders.
+            DemoPaymentsSeeder::class,
         ]);
     }
 }

@@ -79,6 +79,8 @@
     "order": "طلب",
     "invoice": "فاتورة",
     "transfers": "التحويلات",
+    "payments": "المدفوعات",
+    "reconciliation": "المطابقة",
     "coupons": "القسائم",
     "coupon": "القسيمة"
   },

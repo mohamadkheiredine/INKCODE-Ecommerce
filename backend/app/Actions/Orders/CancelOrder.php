@@ -8,12 +8,14 @@ use App\Models\Order;
 use App\Models\OrderLine;
 use App\Services\CouponRedemptions;
 use App\Services\OrderStock;
+use App\Services\PaymentLedger;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Cancels a whole Order before it is Shipped, with an optional reason kept in its status
  * history. In the same transaction an Order still holding Reserved units releases them,
- * and one past the Deduction stage puts its units back On-hand ({@see OrderStock}); its
+ * and one past the Deduction stage puts its units back On-hand ({@see OrderStock}); money
+ * already received is given back as a Refund ({@see PaymentLedger::settle()}); its
  * Coupon's redemption is released, so the use counts towards the limits again.
  */
 final class CancelOrder
@@ -21,6 +23,7 @@ final class CancelOrder
     public function __construct(
         private readonly MoveOrderStatus $moveOrderStatus,
         private readonly OrderStock $orderStock,
+        private readonly PaymentLedger $paymentLedger,
         private readonly CouponRedemptions $couponRedemptions,
     ) {}
 
@@ -39,6 +42,7 @@ final class CancelOrder
             $this->orderStock->cancel($order, $from, $order->lines
                 ->mapWithKeys(fn (OrderLine $line): array => [$line->id => $line->quantity])
                 ->all(), $note);
+            $this->paymentLedger->settle($order, $note);
             $this->couponRedemptions->release($order);
 
             return $order;

@@ -17,6 +17,8 @@ enum NotificationType: string
 
     case OrderAssigned = 'order_assigned';
 
+    case PaymentDeclined = 'payment_declined';
+
     /**
      * The message in the current language, filled with the values saved when it was sent.
      *

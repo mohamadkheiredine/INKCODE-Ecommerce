@@ -18,6 +18,7 @@
     "number": "Order",
     "customer": "Customer",
     "status": "Status",
+    "paymentStatus": "Payment",
     "warehouse": "Fulfilling warehouse",
     "units": "Units",
     "total": "Total",
@@ -76,7 +77,9 @@
     "reason": "Reason (optional)",
     "keep": "Keep the Order",
     "submit": "Cancel Order",
-    "done": "{{number}} is Cancelled."
+    "done": "{{number}} is Cancelled.",
+    "refundNeeded": "Refund needed: {{amount}}",
+    "refundNeededHint": "Money already received is given back as a Refund in the same step."
   },
   "newDescription": "Choose the Customer, add Variants, then pick the Fulfilling warehouse and Shipping method. The quote updates as you go.",
   "customerHint": "Find a Customer by name, email or phone, or create one here.",
@@ -164,6 +167,9 @@
     "addNote": "Add a note",
     "submitNote": "Add note",
     "noteAdded": "The note was added.",
+    "payment": "Payment of {{amount}} · {{method}}",
+    "refund": "Refund of {{amount}} · {{method}}",
+    "paymentFailed": "Declined Card payment of {{amount}}",
     "shipmentShipped": "Shipment {{number}} shipped",
     "shipmentDelivered": "Shipment {{number}} delivered"
   },

@@ -1,4 +1,11 @@
-import { BellIcon, CheckIcon, ClipboardListIcon, type LucideIcon, SparklesIcon } from 'lucide-react'
+import {
+  BellIcon,
+  CheckIcon,
+  ClipboardListIcon,
+  CreditCardIcon,
+  type LucideIcon,
+  SparklesIcon,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
@@ -10,6 +17,7 @@ import type { AppNotification } from '../types'
 const TYPE_ICONS: Record<string, LucideIcon> = {
   welcome: SparklesIcon,
   order_assigned: ClipboardListIcon,
+  payment_declined: CreditCardIcon,
 }
 
 /** Only paths inside the app are followed; anything else shows as plain text. */

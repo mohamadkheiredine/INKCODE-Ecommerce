@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useCan } from '@/features/auth/hooks/use-can'
 import { useAllWarehouses } from '@/features/inventory/hooks/use-inventory'
+import { PaymentStatusBadge } from '@/features/payments/components/payment-status-badge'
 import { useListQuery } from '@/hooks/use-list-query'
 import { useFormatters } from '@/lib/format'
 import { isId, type ListQueryConfig } from '@/lib/list-query'
@@ -80,6 +81,12 @@ export function OrdersPage() {
         id: 'status',
         header: t('fields.status'),
         cell: ({ row }) => <OrderStatusBadge status={row.original.status} />,
+      },
+      {
+        id: 'payment_status',
+        header: t('fields.paymentStatus'),
+        meta: { className: 'hidden md:table-cell' },
+        cell: ({ row }) => <PaymentStatusBadge status={row.original.payment_status} />,
       },
       {
         id: 'warehouse',
