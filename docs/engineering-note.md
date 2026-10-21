@@ -157,6 +157,11 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - Partial cancellation moves units to `order_lines.cancelled_quantity` (the CHECK became `quantity + cancelled_quantity > 0`), so cancelled lines stay visible; cancelling every remaining unit cancels the whole Order.
   - Assigning notifies the Assignee in the bell (not when they assign themselves); timeline notes are their own audited `order_note` records, allowed on Locked orders.
   - Corrected in review: a teammate session found `OrderController::loadForDisplay` broke the Laravel arch preset and `LeastPrivilegeTest` lacked an `{order}` record; both fixed here (`Order::loadForDisplay()`).
+- **Shipments, Partial fulfillment and stock deduction (#18).**
+  - Deducting "at the Deduction stage" by status alone breaks when the setting changes mid-flight (an Order past the new stage would look deducted when it is not). Each Order line now counts `deducted_quantity` and `shipped_quantity` (CHECK `shipped ≤ deducted ≤ quantity`), and `OrderStock` works from those counts: reaching the stage deducts what is left, a Shipment deducts only the units it carries that were not deducted yet, and cancelling releases Reserved units first, then puts deducted ones back. The migration backfills Orders already past the stage.
+  - Shipped and Delivered are reached only through Shipments (`FollowShipments`): Shipped when every unit still ordered is in a Shipment (also when the last unshipped units are cancelled), Delivered when all Shipments are delivered. Shipped units cannot be cancelled, and a partly shipped Order is cancelled by line (409 `order_partly_shipped` for a full cancel).
+  - Shipment status (Shipped → Delivered) has its own enum, history table and audit entries; the Order resource adds `fulfillment` (progress) next to its status. Tracking numbers are unique per Carrier.
+  - Demo data ships some Orders partially and fully and delivers a few, through the same actions as the API.
 
 ## Known limitations
 

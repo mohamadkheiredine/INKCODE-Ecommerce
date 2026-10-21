@@ -31,14 +31,14 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Customers: list, profile, addresses, order history, lifetime value, notes, segments, activity/value filters (list with search and Tag filter, profile, addresses with default billing and shipping, Tags and notes are done, #13; order history on the profile is done, #16; Lifetime value and Segments with #22)
 - [x] Warehouses (3+): on-hand, reserved, available per variant per warehouse; stock per Variant per Warehouse on the Product page (#11)
 - [x] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation (#11: Stock movement ledger, Receipts with weighted Average cost, Stock value and low-stock filter; #12: Adjustments with a reason, two-step Transfers (Draft → In transit → Received, cancellable before sending), low-stock bell alerts sent once until stock recovers)
-- [ ] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice (reserve on Confirm and release on Cancel done, #16; deduction with Shipments, #18)
+- [x] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice (reserve on Confirm and release on Cancel, #16; each line counts its deducted and shipped units, so a unit leaves On-hand once even if the Deduction stage changes mid-flight, #18)
 - [x] Concurrency safe: no overselling under simultaneous orders (row locks + transactions; `php artisan demo:race` and its Pest test, #16)
 - [ ] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee (search, status/Warehouse/date filters, sorts and Customer done, #16; payment status #19, Assignee #17)
-- [ ] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice (lines, VAT, shipping, addresses, timeline of status changes and notes, Assignee and the print-ready Invoice done, #16 #17; tracking #18)
+- [x] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice (lines, VAT, shipping, addresses, timeline of status changes and notes, Assignee and the print-ready Invoice, #16 #17; Shipments with Carrier tracking links and their steps in the timeline, #18)
 - [x] Status flow enforced: Pending → Confirmed → Preparing → Ready for Shipping → Shipped → Delivered, plus valid cancellation paths (`OrderStatus` is the one machine; skipped or backward moves get 409 `invalid_transition` with `details.allowed`, #16 #17; Shipped and Delivered arrive with Shipments, #18)
-- [ ] Order, payment and shipment statuses kept separate
+- [ ] Order, payment and shipment statuses kept separate (Shipment status and Shipment progress are separate from the Order status, #18; payment status #19)
 - [x] Orders locked against unauthorized edits once preparation starts (409 `order_locked` from Preparing; edits before that re-reserve the differences in one transaction, #17)
-- [ ] Partial fulfillment, partial cancellation (Partial cancellation done, #17; partial fulfillment with Shipments, #18)
+- [x] Partial fulfillment, partial cancellation (Partial cancellation, #17; Partial fulfillment in several Shipments, checked against unshipped, uncancelled units, #18)
 - [x] Order items store historical snapshots (name, SKU, price, attributes, VAT rate and amount; #16)
 
 ## Phase 3: Payments, shipping, promotions, returns
@@ -46,9 +46,9 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Payment transaction ledger, manual payment, cash on delivery, reconciliation
 - [ ] Mock payment gateway adapter (no live gateway) with idempotency keys
 - [ ] Coupons: percentage / fixed, validity dates, usage limits, eligible items, stacking rules
-- [ ] Shipping zones, carriers, rates, tracking references, shipment history, partial shipments
+- [x] Shipping zones, carriers, rates, tracking references, shipment history, partial shipments
   - [x] Shipping zones (countries or cities), flat-price Shipping methods, Carriers with tracking link templates, and the address quote (#14)
-  - [ ] Shipments: tracking numbers, status history, partial shipments (#18)
+  - [x] Shipments: tracking numbers, status history, partial shipments (#18)
 - [ ] Returns: request → approval → physical receipt → restock decision → eligible refund (no automatic restock)
 - [ ] Refunds can never exceed the captured amount; partial refunds supported
 
