@@ -22,6 +22,7 @@ import { useFormatters } from '@/lib/format'
 import { apiErrorMessage, showServerErrors } from '@/lib/forms'
 import i18n from '@/lib/i18n'
 import { useEntranceAnimation } from '@/lib/motion'
+import { CouponField } from '../components/coupon-field'
 import { OrderTotals } from '../components/order-totals'
 import { ShippingMethodField } from '../components/order-form-parts'
 import { addressOptions, useCustomerProfile, useVariantSearch } from '../hooks/use-order-form'
@@ -43,13 +44,15 @@ const SERVER_FIELDS = [
   'warehouse_id',
   'shipping_method_id',
   'notes',
+  'coupon_code',
   'lines',
 ] as const satisfies readonly FieldPath<OrderFormValues>[]
 
 /**
  * Enters a Pending Order: the Customer (or a new one) and their addresses, the Variants,
  * the Fulfilling warehouse (pre-selected to one with enough Available stock) and a
- * Shipping method, with a live quote priced by the API exactly as the Order will be.
+ * Shipping method and an optional Coupon, with a live quote priced by the API exactly as
+ * the Order will be.
  */
 export function NewOrderPage() {
   const { t } = useTranslation('orders')
@@ -60,6 +63,7 @@ export function NewOrderPage() {
   const [idempotencyKey] = useState(() => crypto.randomUUID())
   const [formError, setFormError] = useState<string | null>(null)
   const [warehouseChosen, setWarehouseChosen] = useState(false)
+  const [appliedCoupon, setAppliedCoupon] = useState('')
   const container = useRef<HTMLDivElement>(null)
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema),
@@ -74,7 +78,10 @@ export function NewOrderPage() {
     [watched.lines],
   )
   const quoteLines = useMemo(() => quotableLines(watchedLines), [watchedLines])
-  const quote = useOrderQuote(quoteLines, shippingMethodId)
+  const quote = useOrderQuote(quoteLines, shippingMethodId, {
+    code: appliedCoupon,
+    customerId,
+  })
   const addresses = useCustomerProfile(customerId).data?.addresses
   const chooseShippingMethod = useCallback(
     (id: string) => form.setValue('shipping_method_id', id),
@@ -362,6 +369,16 @@ export function NewOrderPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-5">
+              <CouponField
+                control={form.control}
+                name="coupon_code"
+                idPrefix="order"
+                onApply={() => {
+                  form.clearErrors('coupon_code')
+                  setAppliedCoupon(form.getValues('coupon_code').trim().toUpperCase())
+                }}
+                status={appliedCoupon === '' ? null : quote.data?.coupon}
+              />
               <div aria-live="polite" aria-busy={quote.isFetching}>
                 <OrderTotals
                   totals={

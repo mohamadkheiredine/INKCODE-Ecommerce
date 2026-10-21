@@ -45,6 +45,8 @@ export type OrderLine = {
   cancelled_quantity: number
   unit_price: Amount
   discount_amount: Amount
+  /** Whether the Order's Coupon discounts this line. */
+  coupon_eligible: boolean
   taxable: boolean
   vat_rate: Amount
   vat_amount: Amount
@@ -71,6 +73,19 @@ export type TimelineEvent =
       created_at: string
     }
 
+export const COUPON_TYPES = ['percentage', 'fixed'] as const
+export type CouponType = (typeof COUPON_TYPES)[number]
+
+/** What an Order keeps of its Coupon. */
+export type OrderCoupon = { id: number; code: string; type: CouponType; value: Amount }
+
+/** The Coupon code to try in the quote, and the Customer (for the per-Customer limit). */
+export type QuoteCouponInput = { code: string; customerId: number }
+
+export type QuoteCoupon =
+  | { code: string; is_valid: true; type: CouponType; value: Amount }
+  | { code: string; is_valid: false; reason: string; message: string }
+
 export type UserRef = { id: number; name: string }
 
 /** Amounts are decimal strings. The list has `units`; one Order has `lines` and history. */
@@ -86,6 +101,8 @@ export type Order = {
   customer: { id: number; name: string; email: string | null; phone: string | null }
   warehouse: WarehouseRef
   shipping_method: { id: number; name: string }
+  /** The Coupon the Order uses (a snapshot of its code, type and value), if any. */
+  coupon: OrderCoupon | null
   billing_address: OrderAddress
   shipping_address: OrderAddress
   currency_code: string
@@ -112,6 +129,8 @@ export type OrderUpdateInput = {
   billing_address_id: number
   shipping_address_id: number
   shipping_method_id: number
+  /** None removes the Coupon. */
+  coupon_code: string | null
   lines: OrderLineInput[]
 }
 
@@ -128,6 +147,7 @@ export type OrderInput = {
   warehouse_id: number
   shipping_method_id: number
   notes: string
+  coupon_code: string | null
   lines: OrderLineInput[]
 }
 
@@ -148,6 +168,8 @@ export type OrderQuote = {
   shipping_total: Amount
   total: Amount
   lines: Omit<OrderLine, 'id' | 'product_id' | 'cancelled_quantity'>[]
+  /** Whether the Coupon code applies; when it does not, the lines are priced without it. */
+  coupon: QuoteCoupon | null
   warehouses: (WarehouseRef & { is_sufficient: boolean; shortages: StockShortage[] })[]
 }
 

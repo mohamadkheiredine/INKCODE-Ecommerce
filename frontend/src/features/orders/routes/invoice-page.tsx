@@ -172,7 +172,11 @@ function Invoice({ order, store }: { order: Order; store: StoreProfile }) {
         </Table>
 
         <div className="ms-auto w-full max-w-xs">
-          <OrderTotals totals={order} shippingLabel={order.shipping_method.name} />
+          <OrderTotals
+            totals={order}
+            shippingLabel={order.shipping_method.name}
+            couponCode={order.coupon?.code}
+          />
         </div>
 
         <footer className="border-t pt-4 text-xs text-muted-foreground">

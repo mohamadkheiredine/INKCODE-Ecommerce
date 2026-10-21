@@ -290,6 +290,31 @@ export const routes: RouteObject[] = [
             }),
           },
           {
+            path: 'coupons',
+            handle: crumb('coupons'),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: withPermission(
+                    'coupons.view',
+                    (await import('@/features/coupons/routes/coupons-page')).CouponsPage,
+                  ),
+                }),
+              },
+              {
+                path: ':couponId',
+                handle: crumb('coupon'),
+                lazy: async () => ({
+                  Component: withPermission(
+                    'coupons.view',
+                    (await import('@/features/coupons/routes/coupon-page')).CouponPage,
+                  ),
+                }),
+              },
+            ],
+          },
+          {
             path: 'settings',
             handle: crumb('settings'),
             lazy: async () => ({

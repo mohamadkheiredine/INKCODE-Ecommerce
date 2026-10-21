@@ -5,6 +5,7 @@ import arAudit from '@/locales/ar/audit.json'
 import arAuth from '@/locales/ar/auth.json'
 import arCatalog from '@/locales/ar/catalog.json'
 import arCommon from '@/locales/ar/common.json'
+import arCoupons from '@/locales/ar/coupons.json'
 import arCustomers from '@/locales/ar/customers.json'
 import arErrors from '@/locales/ar/errors.json'
 import arHome from '@/locales/ar/home.json'
@@ -19,6 +20,7 @@ import enAudit from '@/locales/en/audit.json'
 import enAuth from '@/locales/en/auth.json'
 import enCatalog from '@/locales/en/catalog.json'
 import enCommon from '@/locales/en/common.json'
+import enCoupons from '@/locales/en/coupons.json'
 import enCustomers from '@/locales/en/customers.json'
 import enErrors from '@/locales/en/errors.json'
 import enHome from '@/locales/en/home.json'
@@ -47,6 +49,7 @@ export const resources = {
     auth: enAuth,
     audit: enAudit,
     catalog: enCatalog,
+    coupons: enCoupons,
     customers: enCustomers,
     errors: enErrors,
     home: enHome,
@@ -63,6 +66,7 @@ export const resources = {
     auth: arAuth,
     audit: arAudit,
     catalog: arCatalog,
+    coupons: arCoupons,
     customers: arCustomers,
     errors: arErrors,
     home: arHome,
@@ -100,6 +104,7 @@ void i18n
       'common',
       'auth',
       'catalog',
+      'coupons',
       'customers',
       'errors',
       'home',
