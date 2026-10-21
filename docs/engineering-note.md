@@ -193,7 +193,7 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
 
 - **Lifetime value and Segments (#22).**
   - Computed in SQL on every read, never stored: `Customer::withValue()` joins two grouped subqueries (Counted orders: Revenue, first and last placed date; succeeded Refunds in those Orders' Payment ledgers) and wraps the result as the `customers` table, so the list filters, sorts and paginates by `lifetime_value`, `segment` and `last_order_at` like any column. Nothing can drift, and there is no recalculation job to forget.
-  - "Counted order" is defined once (`OrderStatus::counted()`, ADR 0006), so the Customer list, and later the dashboard and reports, use the same rule. Refunds on a Cancelled Order are not subtracted, because its Revenue was never counted.
+  - "Counted order" is defined once (`Order::countedStatuses()` and the `counted()` scope, ADR 0006), shared by the dashboard (#23) and the Customer list. Refunds on a Cancelled Order are not subtracted, because its Revenue was never counted.
   - Segment rules live in one enum (`Segment::sqlCase()`), checked in order with the first match winning: New (first Counted order ≤ 30 days ago), VIP (Lifetime value ≥ $1,000), At risk (last Counted order ≥ 90 days ago), Regular. The order was our call where the glossary was silent (a $2,000 first Order is New; a lapsed big spender stays VIP). Pest tests pin each boundary to the second (30 days, 90 days, $999.99 vs $1,000.00).
 
 ## Known limitations

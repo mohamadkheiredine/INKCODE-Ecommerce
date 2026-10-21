@@ -69,7 +69,7 @@ class Customer extends Model implements Auditable
     #[Scope]
     protected function withValue(Builder $query): void
     {
-        $counted = array_map(fn (OrderStatus $status): string => $status->value, OrderStatus::counted());
+        $counted = array_map(fn (OrderStatus $status): string => $status->value, Order::countedStatuses());
 
         $orders = DB::table('orders')
             ->whereIn('status', $counted)
