@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * A new Order: the Customer, two of that Customer's addresses (billing and shipping), an
- * active Fulfilling warehouse, a Shipping method, optional notes, and one line per Variant
+ * active Fulfilling warehouse, a Shipping method, optional notes and Coupon code, and one line per Variant
  * of an Active Product. Whether the method delivers to the shipping address is checked
  * when the Order is priced. It is safe to retry with an `Idempotency-Key`.
  */
@@ -41,6 +41,7 @@ class StoreOrderRequest extends FormRequest
             'warehouse_id' => ['required', 'integer', Rule::exists('warehouses', 'id')->where('is_active', true)],
             'shipping_method_id' => ['required', 'integer', 'exists:shipping_methods,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'coupon_code' => ['nullable', 'string', 'max:40'],
             ...self::lineRules(),
         ];
     }
@@ -94,6 +95,7 @@ class StoreOrderRequest extends FormRequest
             'shipping_address_id' => __('orders.attributes.shipping_address_id'),
             'warehouse_id' => __('orders.attributes.warehouse_id'),
             'shipping_method_id' => __('orders.attributes.shipping_method_id'),
+            'coupon_code' => __('orders.attributes.coupon_code'),
             ...self::lineAttributes(),
         ];
     }
@@ -111,7 +113,7 @@ class StoreOrderRequest extends FormRequest
     }
 
     /**
-     * @return array{customer_id: int, billing_address_id: int, shipping_address_id: int, warehouse_id: int, shipping_method_id: int, notes: string|null, lines: list<array{variant_id: int, quantity: int}>}
+     * @return array{customer_id: int, billing_address_id: int, shipping_address_id: int, warehouse_id: int, shipping_method_id: int, notes: string|null, coupon_code: string|null, lines: list<array{variant_id: int, quantity: int}>}
      */
     public function values(): array
     {
@@ -122,8 +124,19 @@ class StoreOrderRequest extends FormRequest
             'warehouse_id' => $this->integer('warehouse_id'),
             'shipping_method_id' => $this->integer('shipping_method_id'),
             'notes' => $this->filled('notes') ? $this->string('notes')->toString() : null,
+            'coupon_code' => self::couponCodeFrom($this),
             'lines' => self::linesFrom($this),
         ];
+    }
+
+    /**
+     * The Coupon code typed in the form, if any (at most one per Order).
+     */
+    public static function couponCodeFrom(FormRequest $request): ?string
+    {
+        $code = trim($request->string('coupon_code')->toString());
+
+        return $code === '' ? null : $code;
     }
 
     /**

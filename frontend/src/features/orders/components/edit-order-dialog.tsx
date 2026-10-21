@@ -26,16 +26,18 @@ import i18n from '@/lib/i18n'
 import { useUpdateOrder } from '../hooks/use-orders'
 import type { Order, OrderAddress, SellableVariant } from '../types'
 import { addressOptions, useCustomerProfile, useVariantSearch } from '../hooks/use-order-form'
+import { CouponField } from './coupon-field'
 import { ShippingMethodField } from './order-form-parts'
 import { SearchPicker } from './search-picker'
 
 const QUANTITY = /^[1-9]\d{0,4}$/
 
-/** As UpdateOrderRequest: two of the Customer's addresses, a Shipping method, the lines. */
+/** As UpdateOrderRequest: two of the Customer's addresses, a Shipping method, the Coupon code, the lines. */
 const editSchema = z.object({
   billing_address_id: z.string().min(1, 'orders:validation.addressRequired'),
   shipping_address_id: z.string().min(1, 'orders:validation.addressRequired'),
   shipping_method_id: z.string().min(1, 'orders:validation.shippingMethodRequired'),
+  coupon_code: z.string().trim().max(40, 'orders:validation.couponTooLong'),
   lines: z
     .array(
       z.object({
@@ -126,6 +128,7 @@ function EditOrderForm({
       billing_address_id: matchingAddress(addresses, order.billing_address),
       shipping_address_id: matchingAddress(addresses, order.shipping_address),
       shipping_method_id: String(order.shipping_method.id),
+      coupon_code: order.coupon?.code ?? '',
       lines: (order.lines ?? [])
         .filter((line) => line.quantity > 0)
         .map((line) => ({
@@ -170,6 +173,7 @@ function EditOrderForm({
           billing_address_id: Number(values.billing_address_id),
           shipping_address_id: Number(values.shipping_address_id),
           shipping_method_id: Number(values.shipping_method_id),
+          coupon_code: values.coupon_code.trim() || null,
           lines: values.lines.map((line) => ({
             variant_id: line.variant_id,
             quantity: Number(line.quantity),
@@ -184,6 +188,7 @@ function EditOrderForm({
         'billing_address_id',
         'shipping_address_id',
         'shipping_method_id',
+        'coupon_code',
         'lines',
         ...values.lines.flatMap((_, index) => [
           `lines.${index}.variant_id` as const,
@@ -216,6 +221,9 @@ function EditOrderForm({
           label={t('fields.billingAddress')}
           options={addressOptions(addresses, t('chooseAddress'))}
         />
+        <div className="sm:col-span-2">
+          <CouponField control={form.control} name="coupon_code" idPrefix="edit-order" />
+        </div>
         <div className="sm:col-span-2">
           <ShippingMethodField
             customerId={order.customer.id}

@@ -45,7 +45,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 
 - [ ] Payment transaction ledger, manual payment, cash on delivery, reconciliation
 - [ ] Mock payment gateway adapter (no live gateway) with idempotency keys
-- [ ] Coupons: percentage / fixed, validity dates, usage limits, eligible items, stacking rules
+- [x] Coupons: percentage / fixed, validity dates, usage limits, eligible items, stacking rules (#20)
 - [ ] Shipping zones, carriers, rates, tracking references, shipment history, partial shipments
   - [x] Shipping zones (countries or cities), flat-price Shipping methods, Carriers with tracking link templates, and the address quote (#14)
   - [ ] Shipments: tracking numbers, status history, partial shipments (#18)

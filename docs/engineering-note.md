@@ -157,6 +157,12 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - Partial cancellation moves units to `order_lines.cancelled_quantity` (the CHECK became `quantity + cancelled_quantity > 0`), so cancelled lines stay visible; cancelling every remaining unit cancels the whole Order.
   - Assigning notifies the Assignee in the bell (not when they assign themselves); timeline notes are their own audited `order_note` records, allowed on Locked orders.
   - Corrected in review: a teammate session found `OrderController::loadForDisplay` broke the Laravel arch preset and `LeastPrivilegeTest` lacked an `{order}` record; both fixed here (`Order::loadForDisplay()`).
+- **Coupons (#20).**
+  - One `CouponValidator` decides whether a code applies, for the quote, create, edit and Confirm; a refusal is 422 `coupon_invalid` with `details.reason` and `details.field`, so the SPA puts it under the Coupon field. The quote reports the reason instead of failing, and prices without the Coupon.
+  - `OrderPricing` spreads the discount over the eligible lines by value: shares are cut to the cent and the leftover cents go to the largest line (never beyond a line's own value); VAT is then charged per line on the discounted amount.
+  - The Order keeps a snapshot of its Coupon (code, type, value) and each line's `coupon_eligible`, so Partial cancellation re-prices with the terms it was sold with even after the Coupon is edited.
+  - Uses are `coupon_redemptions` rows made at Confirm under a lock on the Coupon row (Order → Coupon → stock, the same order everywhere), released (kept, with `released_at`) on full cancellation; a multi-process test confirms 8 Orders at once against a limit of 3 and gets exactly 3. Editing a Confirmed Order moves or releases its use; an Order that already holds a use is not re-checked against dates and limits.
+  - A Coupon that Orders use cannot be deleted (restricting foreign keys, 409 `in_use`); ending it is the way to stop it.
 
 ## Known limitations
 

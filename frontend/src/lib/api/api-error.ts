@@ -51,9 +51,12 @@ export class ApiError extends Error {
     this.details = details
   }
 
-  /** First server message for a field, if the API rejected it. */
+  /**
+   * First server message for a field, if the API rejected it: a validation error, or a
+   * business refusal that names the field in `details.field` (`coupon_invalid`).
+   */
   fieldError(field: string): string | undefined {
-    return this.fieldErrors[field]?.[0]
+    return this.fieldErrors[field]?.[0] ?? (this.details.field === field ? this.message : undefined)
   }
 }
 
