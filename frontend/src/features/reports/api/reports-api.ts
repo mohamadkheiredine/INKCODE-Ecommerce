@@ -34,6 +34,7 @@ export const reportsApi = {
     document.body.append(link)
     link.click()
     link.remove()
-    URL.revokeObjectURL(url)
+    // Revoked a tick later: some browsers cancel a download whose URL is revoked at once.
+    setTimeout(() => URL.revokeObjectURL(url), 0)
   },
 }

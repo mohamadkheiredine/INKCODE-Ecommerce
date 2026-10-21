@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { fromCents, toCents } from '@/features/payments/money'
 import { isApiError } from '@/lib/api/api-error'
 import { useFormatters } from '@/lib/format'
 import { useEntranceAnimation } from '@/lib/motion'
@@ -63,7 +64,9 @@ function ReceiptDetail({ receipt }: { receipt: Receipt }) {
   const container = useRef<HTMLDivElement>(null)
   const lines = receipt.lines ?? []
   const units = lines.reduce((sum, line) => sum + line.quantity, 0)
-  const totalCents = lines.reduce((sum, line) => sum + Math.round(Number(line.line_cost) * 100), 0)
+  // The API's own total; added up in cents as a fallback, never through floats.
+  const total =
+    receipt.total_cost ?? fromCents(lines.reduce((sum, line) => sum + toCents(line.line_cost), 0))
 
   useEntranceAnimation(container, [{ targets: '.js-reveal', stagger: 0.06 }])
 
@@ -151,7 +154,7 @@ function ReceiptDetail({ receipt }: { receipt: Receipt }) {
                 <TableCell className="text-end tabular-nums">{number(units)}</TableCell>
                 <TableCell />
                 <TableCell className="text-end font-semibold tabular-nums">
-                  {money(totalCents / 100)}
+                  {money(total)}
                 </TableCell>
               </TableRow>
             </TableFooter>

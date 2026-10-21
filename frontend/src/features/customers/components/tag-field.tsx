@@ -113,7 +113,10 @@ export function TagField({ control }: { control: Control<CustomerFormValues> }) 
             )}
             <FieldDescription id="customer-tags-description">{t('tags.hint')}</FieldDescription>
             <FieldError>
-              {fieldState.error?.message && t(fieldState.error.message as never)}
+              {fieldState.error?.message &&
+                (fieldState.error.type === 'server'
+                  ? fieldState.error.message
+                  : t(fieldState.error.message as never))}
             </FieldError>
           </Field>
         )
