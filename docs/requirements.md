@@ -54,9 +54,9 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 
 ## Phase 4: Reporting, permissions, notifications, settings
 
-- [ ] Executive dashboard: revenue, net sales, orders, pending fulfillment, AOV, customers, cancellations, returns, low stock
-- [ ] Time ranges + period comparison, revenue chart, order-status breakdown, top products, recent orders, alerts
-- [ ] Conversion rate shown only if visit/session tracking exists (otherwise omitted)
+- [x] Executive dashboard: revenue, net sales, orders, pending fulfillment, AOV, customers, cancellations, returns, low stock
+- [x] Time ranges + period comparison, revenue chart, order-status breakdown, top products, recent orders, alerts
+- [x] Conversion rate shown only if visit/session tracking exists (otherwise omitted; visits are not tracked, so it is omitted, #23)
 - [ ] Reports: sales, customers, products, categories, returns, inventory, with date filters, comparisons, CSV/Excel export
 - [ ] Every KPI and report computed from database records, never hard-coded
 - [x] Roles: Admin, Operations, Inventory, Sales, Support, Finance, Viewer, with granular permissions enforced by Policies; Users & Roles administration (#25): create a User with a Role and a temporary password, edit, change Role, deactivate (sessions end at once) and reactivate, no self-demotion and never without an active Admin, audited; read-only Roles & permissions matrix; the Viewer is refused every changing endpoint

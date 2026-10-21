@@ -1,5 +1,6 @@
 import { HttpResponse, http } from 'msw/http'
 import type { CurrentUser, DemoAccount } from '@/features/auth/types'
+import { anEmptyDashboard } from './dashboard'
 
 /** Error bodies exactly as the API's envelope shapes them. */
 export function apiError(
@@ -47,4 +48,6 @@ export const handlers = [
     apiError(404, 'not_found', 'The requested resource was not found.'),
   ),
   http.post('*/api/v1/auth/logout', () => new HttpResponse(null, { status: 204 })),
+  // A signed-in User lands on the dashboard; by default the store has no Counted orders.
+  http.get('*/api/v1/dashboard', () => HttpResponse.json({ data: anEmptyDashboard() })),
 ]

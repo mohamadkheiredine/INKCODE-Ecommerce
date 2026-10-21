@@ -10,6 +10,8 @@ use App\Enums\ReturnStatus;
 use App\Models\Concerns\Audited;
 use App\Services\OrderPricing;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -213,6 +215,31 @@ class Order extends Model implements Auditable
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class)->orderBy('id');
+    }
+
+    /**
+     * Counted orders: Confirmed or later and not Cancelled. The one scope the dashboard,
+     * the reports and Lifetime value build on, so their numbers always agree.
+     *
+     * @param  Builder<self>  $query
+     */
+    #[Scope]
+    protected function counted(Builder $query): void
+    {
+        $query->whereIn('orders.status', array_map(
+            fn (OrderStatus $status): string => $status->value,
+            self::countedStatuses(),
+        ));
+    }
+
+    /**
+     * The statuses of a Counted order, in flow order.
+     *
+     * @return list<OrderStatus>
+     */
+    public static function countedStatuses(): array
+    {
+        return array_values(array_filter(OrderStatus::flow(), fn (OrderStatus $status): bool => $status !== OrderStatus::Pending));
     }
 
     /**
