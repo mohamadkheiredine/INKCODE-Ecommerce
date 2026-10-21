@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api/v1"
+            "url": "http://localhost:8004/api/v1"
         }
     ],
     "paths": {
@@ -2358,6 +2358,665 @@
                 }
             }
         },
+        "/coupons": {
+            "get": {
+                "operationId": "coupons.index",
+                "tags": [
+                    "Coupon"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "code",
+                                "starts_on",
+                                "ends_on",
+                                "times_used",
+                                "created_at",
+                                "-code",
+                                "-starts_on",
+                                "-ends_on",
+                                "-times_used",
+                                "-created_at",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/CouponType"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[state]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "active",
+                                "scheduled",
+                                "expired",
+                                null
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `CouponResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CouponResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "coupons.store",
+                "tags": [
+                    "Coupon"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreCouponRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`CouponResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CouponResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/coupons/{coupon}": {
+            "get": {
+                "operationId": "coupons.show",
+                "summary": "Authorized by the route (`can:view,coupon`)",
+                "tags": [
+                    "Coupon"
+                ],
+                "parameters": [
+                    {
+                        "name": "coupon",
+                        "in": "path",
+                        "required": true,
+                        "description": "The coupon ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CouponResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CouponResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "coupons.update",
+                "tags": [
+                    "Coupon"
+                ],
+                "parameters": [
+                    {
+                        "name": "coupon",
+                        "in": "path",
+                        "required": true,
+                        "description": "The coupon ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCouponRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CouponResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CouponResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "coupons.destroy",
+                "summary": "A Coupon that Orders use is refused with 409 `in_use`. Authorized by the route\n(`can:delete,coupon`)",
+                "tags": [
+                    "Coupon"
+                ],
+                "parameters": [
+                    {
+                        "name": "coupon",
+                        "in": "path",
+                        "required": true,
+                        "description": "The coupon ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/coupons/{coupon}/redemptions": {
+            "get": {
+                "operationId": "coupons.redemptions.index",
+                "summary": "The Orders and Customers that used the Coupon",
+                "tags": [
+                    "CouponRedemption"
+                ],
+                "parameters": [
+                    {
+                        "name": "coupon",
+                        "in": "path",
+                        "required": true,
+                        "description": "The coupon ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "redeemed_at",
+                                "discount_amount",
+                                "-redeemed_at",
+                                "-discount_amount",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[state]",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "counted",
+                                "released",
+                                null
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `CouponRedemptionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CouponRedemptionResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/auth/me": {
             "get": {
                 "operationId": "auth.me",
@@ -3910,6 +4569,168 @@
                 }
             }
         },
+        "/orders/{order}/advance": {
+            "post": {
+                "operationId": "orders.advance",
+                "summary": "Moves the Order one step forward (Preparing, Ready for shipping). A skipped or\nbackward move is refused with 409 `invalid_transition` and `details.allowed`. Safe\nto retry with an `Idempotency-Key` header",
+                "tags": [
+                    "OrderAdvance"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdvanceOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/assignees": {
+            "get": {
+                "operationId": "orders.assignees",
+                "summary": "The Users an Order may be assigned to. Authorized by the route (orders.assign)",
+                "tags": [
+                    "OrderAssignee"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/assignee": {
+            "put": {
+                "operationId": "orders.assign",
+                "summary": "Sets (or clears, with null) the Order's Assignee, who is notified in their bell",
+                "tags": [
+                    "OrderAssignee"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/orders/{order}/cancel": {
             "post": {
                 "operationId": "orders.cancel",
@@ -4020,112 +4841,12 @@
                 }
             }
         },
-        "/orders/assignees": {
-            "get": {
-                "operationId": "orders.assignees",
-                "summary": "The Users an Order may be assigned to. Authorized by the route (orders.assign)",
-                "tags": [
-                    "OrderFlow"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/orders/{order}/advance": {
-            "post": {
-                "operationId": "orders.advance",
-                "summary": "Moves the Order one step forward (Preparing, Ready for shipping). A skipped or\nbackward move is refused with 409 `invalid_transition` and `details.allowed`. Safe\nto retry with an `Idempotency-Key` header",
-                "tags": [
-                    "OrderFlow"
-                ],
-                "parameters": [
-                    {
-                        "name": "order",
-                        "in": "path",
-                        "required": true,
-                        "description": "The order ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AdvanceOrderRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "`OrderResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/OrderResource"
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
         "/orders/{order}/cancel-lines": {
             "post": {
                 "operationId": "orders.cancel-lines",
-                "summary": "Cancels some units of some lines before the Order ships, releasing their stock and\nre-pricing the Order. Safe to retry with an `Idempotency-Key` header",
+                "summary": "Partial cancellation: cancels some units of some lines before the Order ships,\nreleasing their stock and re-pricing the Order. Safe to retry with an\n`Idempotency-Key` header",
                 "tags": [
-                    "OrderFlow"
+                    "OrderLineCancellation"
                 ],
                 "parameters": [
                     {
@@ -4182,74 +4903,12 @@
                 }
             }
         },
-        "/orders/{order}/assignee": {
-            "put": {
-                "operationId": "orders.assign",
-                "summary": "Sets (or clears, with null) the Order's Assignee, who is notified in their bell",
-                "tags": [
-                    "OrderFlow"
-                ],
-                "parameters": [
-                    {
-                        "name": "order",
-                        "in": "path",
-                        "required": true,
-                        "description": "The order ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AssignOrderRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "`OrderResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/OrderResource"
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
         "/orders/{order}/notes": {
             "post": {
                 "operationId": "orders.notes.store",
-                "summary": "Adds a note to the Order's timeline (Locked orders too)",
+                "summary": "Adds a note to the Order's timeline (Locked orders too) and answers with the Order",
                 "tags": [
-                    "OrderFlow"
+                    "OrderNote"
                 ],
                 "parameters": [
                     {
@@ -4309,7 +4968,7 @@
         "/orders/quote": {
             "post": {
                 "operationId": "orders.quote",
-                "summary": "Prices lines before the Order exists (VAT per line, shipping, total) and lists each\nactive Warehouse with the lines it lacks stock for. Nothing is saved",
+                "summary": "Prices lines before the Order exists (VAT per line, shipping, total) and lists each\nactive Warehouse with the lines it lacks stock for. A Coupon code is applied when it is\nvalid; otherwise `coupon` gives the reason. Nothing is saved",
                 "tags": [
                     "OrderQuote"
                 ],
@@ -4356,6 +5015,32 @@
                                                     "type": "array",
                                                     "items": {}
                                                 },
+                                                "coupon": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "code": {
+                                                            "type": "string"
+                                                        },
+                                                        "is_valid": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "code",
+                                                        "is_valid",
+                                                        "reason",
+                                                        "message"
+                                                    ]
+                                                },
                                                 "warehouses": {
                                                     "type": "array",
                                                     "items": {
@@ -4371,6 +5056,7 @@
                                                 "shipping_total",
                                                 "total",
                                                 "lines",
+                                                "coupon",
                                                 "warehouses"
                                             ]
                                         }
@@ -9837,6 +10523,179 @@
                 ],
                 "title": "ChangePasswordRequest"
             },
+            "CouponRedemptionResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "order": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "number": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "total": {
+                                "type": "string"
+                            },
+                            "currency_code": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "number",
+                            "status",
+                            "total",
+                            "currency_code"
+                        ]
+                    },
+                    "customer": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "discount_amount": {
+                        "type": "string"
+                    },
+                    "redeemed_at": {
+                        "type": "string"
+                    },
+                    "released_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "order",
+                    "customer",
+                    "discount_amount",
+                    "redeemed_at",
+                    "released_at"
+                ],
+                "title": "CouponRedemptionResource"
+            },
+            "CouponResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "starts_on": {
+                        "type": "string"
+                    },
+                    "ends_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "state": {
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "expired",
+                            "active"
+                        ]
+                    },
+                    "usage_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "per_customer_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "minimum_order_amount": {
+                        "type": "string"
+                    },
+                    "times_used": {
+                        "type": "integer"
+                    },
+                    "products_count": {
+                        "type": "integer"
+                    },
+                    "categories_count": {
+                        "type": "integer"
+                    },
+                    "products": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "code",
+                    "type",
+                    "value",
+                    "starts_on",
+                    "ends_on",
+                    "state",
+                    "usage_limit",
+                    "per_customer_limit",
+                    "minimum_order_amount",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "CouponResource"
+            },
+            "CouponType": {
+                "type": "string",
+                "description": "How a Coupon discounts an Order: a percentage of the eligible lines, or a fixed amount (never more than the eligible lines are worth).\n",
+                "enum": [
+                    "percentage",
+                    "fixed"
+                ],
+                "title": "CouponType"
+            },
             "CurrentUserResource": {
                 "type": "object",
                 "properties": {
@@ -10196,6 +11055,44 @@
                             "name"
                         ]
                     },
+                    "coupon": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "type": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "value": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "code",
+                            "type",
+                            "value"
+                        ]
+                    },
                     "billing_address": {
                         "type": "object",
                         "properties": {
@@ -10474,6 +11371,7 @@
                     "allowed_moves",
                     "placed_at",
                     "shipping_method",
+                    "coupon",
                     "billing_address",
                     "shipping_address",
                     "currency_code",
@@ -10698,9 +11596,22 @@
             },
             "QuoteOrderRequest": {
                 "type": "object",
-                "description": "The lines of an Order being filled in, and optionally its Shipping method, to quote.\nOpen to Roles that create Orders.",
+                "description": "The lines of an Order being filled in, and optionally its Shipping method, Coupon code\nand Customer (for the Coupon's per-Customer limit), to quote. Open to Roles that create\nOrders.",
                 "properties": {
                     "shipping_method_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "coupon_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 40
+                    },
+                    "customer_id": {
                         "type": [
                             "integer",
                             "null"
@@ -11464,6 +12375,89 @@
                 ],
                 "title": "StoreCategoryRequest"
             },
+            "StoreCouponRequest": {
+                "type": "object",
+                "description": "A new Coupon: a unique code (letters, digits, - and _; kept in capitals), a percentage\n(up to 100) or fixed amount, a start date and optional end date, optional total and\nper-Customer usage limits, a minimum order amount, and optional eligible Products and\nCategories (none means every line).",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9_-]+$",
+                        "minLength": 3,
+                        "maxLength": 40
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CouponType"
+                    },
+                    "value": {
+                        "type": "number",
+                        "maximum": 9999999999
+                    },
+                    "starts_on": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "ends_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "usage_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 1000000
+                    },
+                    "per_customer_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 1000000
+                    },
+                    "minimum_order_amount": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 9999999999
+                    },
+                    "product_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    },
+                    "category_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "code",
+                    "type",
+                    "value",
+                    "starts_on"
+                ],
+                "title": "StoreCouponRequest"
+            },
             "StoreCustomerAddressRequest": {
                 "type": "object",
                 "description": "An address for a Customer: who receives it, where, and whether it becomes the default\nbilling or shipping address. The country is an ISO code (\"LB\"), in any case.",
@@ -11842,7 +12836,7 @@
             },
             "StoreOrderRequest": {
                 "type": "object",
-                "description": "A new Order: the Customer, two of that Customer's addresses (billing and shipping), an\nactive Fulfilling warehouse, a Shipping method, optional notes, and one line per Variant\nof an Active Product. Whether the method delivers to the shipping address is checked\nwhen the Order is priced. It is safe to retry with an `Idempotency-Key`.",
+                "description": "A new Order: the Customer, two of that Customer's addresses (billing and shipping), an\nactive Fulfilling warehouse, a Shipping method, optional notes and Coupon code, and one line per Variant\nof an Active Product. Whether the method delivers to the shipping address is checked\nwhen the Order is priced. It is safe to retry with an `Idempotency-Key`.",
                 "properties": {
                     "customer_id": {
                         "type": "integer"
@@ -11865,6 +12859,13 @@
                             "null"
                         ],
                         "maxLength": 1000
+                    },
+                    "coupon_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 40
                     },
                     "lines": {
                         "type": "array",
@@ -12857,6 +13858,89 @@
                 ],
                 "title": "UpdateCategoryRequest"
             },
+            "UpdateCouponRequest": {
+                "type": "object",
+                "description": "A Coupon's new terms. Orders that already use it keep the terms they were priced with.",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9_-]+$",
+                        "minLength": 3,
+                        "maxLength": 40
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CouponType"
+                    },
+                    "value": {
+                        "type": "number",
+                        "maximum": 9999999999
+                    },
+                    "starts_on": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "ends_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "usage_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 1000000
+                    },
+                    "per_customer_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 1000000
+                    },
+                    "minimum_order_amount": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 9999999999
+                    },
+                    "product_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    },
+                    "category_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "code",
+                    "type",
+                    "value",
+                    "starts_on"
+                ],
+                "title": "UpdateCouponRequest"
+            },
             "UpdateCustomerRequest": {
                 "type": "object",
                 "description": "A Customer's new details. Tags are replaced when `tags` is sent and kept otherwise.",
@@ -12896,7 +13980,7 @@
             },
             "UpdateOrderRequest": {
                 "type": "object",
-                "description": "The new lines, addresses and Shipping method of a Pending or Confirmed Order. The\nCustomer and Fulfilling warehouse stay. The lines replace the Order's lines: one per\nVariant, each one already on the Order or a Variant of an Active Product.",
+                "description": "The new lines, addresses, Shipping method and Coupon code (none removes the Coupon) of\na Pending or Confirmed Order. The\nCustomer and Fulfilling warehouse stay. The lines replace the Order's lines: one per\nVariant, each one already on the Order or a Variant of an Active Product.",
                 "properties": {
                     "billing_address_id": {
                         "type": "integer"
@@ -12906,6 +13990,13 @@
                     },
                     "shipping_method_id": {
                         "type": "integer"
+                    },
+                    "coupon_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 40
                     }
                 },
                 "required": [
