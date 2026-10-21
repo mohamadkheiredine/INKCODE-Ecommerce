@@ -61,6 +61,10 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Opt-in for Docker Desktop on Windows: its port proxy adds ~40 ms to every
+                // round trip of a native prepared statement, which turns seeding the demo
+                // store into an hour. Emulated prepares send each query in one round trip.
+                PDO::ATTR_EMULATE_PREPARES => (bool) env('DB_EMULATE_PREPARES', false),
             ]) : [],
         ],
 
