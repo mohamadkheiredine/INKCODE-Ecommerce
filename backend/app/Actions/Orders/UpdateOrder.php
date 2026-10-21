@@ -114,6 +114,9 @@ final class UpdateOrder
             }
 
             $priced = $this->pricing->reprice($snapshots, $order->vat_rate, $shippingTotal, $applied?->terms());
+            // Reserve or release first: it locks the Variants, and lines referencing them may
+            // only be written after that (ADR 0008), or two edits of the same Variant deadlock.
+            $this->orderStock->adjust($order, $order->status, $deltas);
             foreach ($snapshots as $index => $snapshot) {
                 $order->lines()->updateOrCreate(['variant_id' => $snapshot['variant_id']], [...$snapshot, ...$priced['lines'][$index]]);
             }
@@ -126,7 +129,6 @@ final class UpdateOrder
                 ...array_intersect_key($priced, array_flip(['items_total', 'discount_total', 'vat_total', 'shipping_total', 'total'])),
             ]);
 
-            $this->orderStock->adjust($order, $order->status, $deltas);
             $this->couponRedemptions->sync($order);
             $this->auditTrail->updated($order->load('lines'), $before);
             $this->paymentLedger->settle($order);

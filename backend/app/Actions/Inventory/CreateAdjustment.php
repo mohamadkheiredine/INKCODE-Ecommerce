@@ -6,6 +6,7 @@ use App\Enums\AdjustmentReason;
 use App\Enums\StockMovementType;
 use App\Exceptions\BusinessRuleViolation;
 use App\Models\Adjustment;
+use App\Models\Variant;
 use App\Services\AuditTrail;
 use App\Services\Stock;
 use App\Services\StockChange;
@@ -32,6 +33,9 @@ final class CreateAdjustment
     public function handle(array $values): Adjustment
     {
         return DB::transaction(function () use ($values): Adjustment {
+            // The Adjustment references the Variant, so it is inserted only once the Variant is
+            // locked (ADR 0008); otherwise two Adjustments of one Variant deadlock.
+            Variant::query()->whereKey($values['variant_id'])->lockForUpdate()->firstOrFail();
             $userId = $this->auth->guard()->id();
             $adjustment = Adjustment::query()->create([
                 ...$values,
