@@ -1,7 +1,7 @@
 import { PlusIcon, UsersIcon } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import type { DataTableColumn } from '@/components/data-table/columns'
 import { DataTable } from '@/components/data-table/data-table'
 import {
@@ -39,8 +39,23 @@ export function CustomersPage() {
   const tags = useCustomerTags()
   const navigate = useNavigate()
   const { date } = useFormatters()
+  // The "New customer" quick action links here with ?new=1 to open the form at once.
+  const [searchParams, setSearchParams] = useSearchParams()
   const [creating, setCreating] = useState(false)
+  const createRequested = canManage && searchParams.get('new') === '1'
   const container = useRef<HTMLDivElement>(null)
+
+  const handleCreatingChange = (open: boolean) => {
+    setCreating(open)
+    if (open || !createRequested) return
+    setSearchParams(
+      (params) => {
+        params.delete('new')
+        return params
+      },
+      { replace: true },
+    )
+  }
 
   useEntranceAnimation(container, [{ targets: '.js-reveal', stagger: 0.06 }])
 
@@ -151,9 +166,9 @@ export function CustomersPage() {
       </div>
 
       <CustomerFormDialog
-        open={creating}
+        open={creating || createRequested}
         customer={null}
-        onOpenChange={setCreating}
+        onOpenChange={handleCreatingChange}
         onSaved={(customer) => void navigate(`/customers/${customer.id}`)}
       />
     </div>
