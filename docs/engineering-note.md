@@ -150,6 +150,13 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - A key reused with a different body is now 409 (it was 422), as the ticket asks; ADR 0008 is updated.
   - Corrected in review: MySQL's JSON type reorders object keys, so line options are rebuilt in reading order; the Order form's search hook was first called inside a callback (rules of hooks) and an address effect depended on an unstable callback.
   - Security pass (inline): every route authorizes (Form Request, Policy or route `can`); addresses must belong to the chosen Customer; only Active Products can be ordered; the Shipping method must deliver to the shipping address; `LIKE` terms are escaped; confirm, cancel and create take an `Idempotency-Key`.
+- **Order flow, editing lock, Partial cancellation and Invoice (#17).**
+  - `OrderStatus` stays the one state machine: `allowedMoves()` feeds both the 409 `invalid_transition` refusal (`details.allowed`) and the API's `allowed_moves`, and `isEditable()` defines the Locked order (Preparing onward, 409 `order_locked`).
+  - Stock side effects live in one service, `OrderStock`: more or fewer units reserve or release while the Order holds a reservation; reaching the Deduction stage writes a `deduction` movement (On-hand and Reserved both drop); cancelling units after that puts them back with a `cancellation_return` movement, since they never left the Warehouse. Full cancellation now goes through the same service.
+  - Editing re-prices from the lines' own snapshots and the Order's VAT rate (`OrderPricing::reprice()`), so a later price or VAT change never leaks into an existing Order; only new lines take today's price. Shipping is quoted again only when the method or destination changes.
+  - Partial cancellation moves units to `order_lines.cancelled_quantity` (the CHECK became `quantity + cancelled_quantity > 0`), so cancelled lines stay visible; cancelling every remaining unit cancels the whole Order.
+  - Assigning notifies the Assignee in the bell (not when they assign themselves); timeline notes are their own audited `order_note` records, allowed on Locked orders.
+  - Corrected in review: a teammate session found `OrderController::loadForDisplay` broke the Laravel arch preset and `LeastPrivilegeTest` lacked an `{order}` record; both fixed here (`Order::loadForDisplay()`).
 
 ## Known limitations
 
