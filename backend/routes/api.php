@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Enums\TransferStatus;
 use App\Http\Controllers\Access\RoleController;
 use App\Http\Controllers\Access\UserActivationController;
 use App\Http\Controllers\Access\UserController;
@@ -28,13 +29,18 @@ use App\Http\Controllers\Inventory\ReceiptController;
 use App\Http\Controllers\Inventory\StockLevelController;
 use App\Http\Controllers\Inventory\StockMovementController;
 use App\Http\Controllers\Inventory\TransferController;
+use App\Http\Controllers\Inventory\TransferStatusController;
 use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Notifications\ReadAllNotificationsController;
 use App\Http\Controllers\Notifications\ReadNotificationController;
+use App\Http\Controllers\Orders\OrderAdvanceController;
+use App\Http\Controllers\Orders\OrderAssigneeController;
 use App\Http\Controllers\Orders\OrderCancellationController;
 use App\Http\Controllers\Orders\OrderConfirmationController;
 use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\Orders\OrderLineCancellationController;
+use App\Http\Controllers\Orders\OrderNoteController;
 use App\Http\Controllers\Orders\OrderQuoteController;
 use App\Http\Controllers\Orders\SellableVariantController;
 use App\Http\Controllers\Profile\PasswordController;
@@ -152,20 +158,24 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->only(['index', 'store', 'show'])
         ->middlewareFor('show', 'can:view,transfer')
         ->middlewareFor('store', 'idempotent');
-    foreach (['send', 'receive', 'cancel'] as $step) {
-        Route::post("/transfers/{transfer}/$step", [TransferController::class, $step])
+    foreach (['send' => TransferStatus::InTransit, 'receive' => TransferStatus::Received, 'cancel' => TransferStatus::Cancelled] as $step => $status) {
+        Route::post("/transfers/{transfer}/$step", TransferStatusController::class)
+            ->defaults('status', $status->value)
             ->middleware(['can:update,transfer', 'idempotent'])
             ->name("transfers.$step");
     }
 
-    // Orders: Roles with orders.view look; OrderPolicy decides who creates, confirms and
-    // cancels. Every change is safe to retry with an Idempotency-Key.
+    // Orders: Roles with orders.view look; OrderPolicy decides who creates, confirms, edits,
+    // moves, cancels and assigns. Every stock change is safe to retry with an Idempotency-Key.
     Route::post('/orders/quote', [OrderQuoteController::class, 'store'])->name('orders.quote');
     Route::get('/orders/sellable-variants', [SellableVariantController::class, 'index'])->name('orders.sellable-variants');
+    Route::get('/orders/assignees', [OrderAssigneeController::class, 'index'])
+        ->can(Permission::OrdersAssign->value)
+        ->name('orders.assignees');
     Route::apiResource('orders', OrderController::class)
-        ->only(['index', 'store', 'show'])
+        ->only(['index', 'store', 'show', 'update'])
         ->middlewareFor('show', 'can:view,order')
-        ->middlewareFor('store', 'idempotent');
+        ->middlewareFor(['store', 'update'], 'idempotent');
     Route::post('/orders/{order}/confirm', [OrderConfirmationController::class, 'store'])
         ->can('confirm', 'order')
         ->middleware('idempotent')
@@ -173,6 +183,14 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
     Route::post('/orders/{order}/cancel', [OrderCancellationController::class, 'store'])
         ->middleware('idempotent')
         ->name('orders.cancel');
+    Route::post('/orders/{order}/advance', [OrderAdvanceController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.advance');
+    Route::post('/orders/{order}/cancel-lines', [OrderLineCancellationController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.cancel-lines');
+    Route::put('/orders/{order}/assignee', [OrderAssigneeController::class, 'update'])->name('orders.assign');
+    Route::post('/orders/{order}/notes', [OrderNoteController::class, 'store'])->name('orders.notes.store');
 
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])

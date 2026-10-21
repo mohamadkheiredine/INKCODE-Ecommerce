@@ -25,6 +25,7 @@ export const RECORD_TYPES = {
   customer: { link: (entry) => `/customers/${entry.record_id}` },
   customer_address: { link: null },
   customer_note: { link: null },
+  order_note: { link: null },
   shipping_zone: { link: (entry) => `/shipping/zones/${entry.record_id}` },
   shipping_method: { link: null },
   carrier: { link: searchedList('/shipping/carriers') },

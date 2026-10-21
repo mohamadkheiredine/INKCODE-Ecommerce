@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * The public part of the settings: what every signed-in User's screens show.
+ * The public part of the settings: what every signed-in User's screens show (the Invoice
+ * prints the contact details too).
  *
  * @mixin StoreSettings
  */
@@ -21,6 +22,9 @@ class StoreProfileResource extends JsonResource
         return [
             'name' => $this->name,
             'logo_url' => $this->logoUrl(),
+            'contact_email' => $this->contact_email,
+            'contact_phone' => $this->contact_phone,
+            'address' => $this->address,
             'currency' => [
                 'code' => $this->currency_code,
                 'symbol' => $this->currency_symbol,

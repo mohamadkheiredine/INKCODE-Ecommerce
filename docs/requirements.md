@@ -34,11 +34,11 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [ ] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice (reserve on Confirm and release on Cancel done, #16; deduction with Shipments, #18)
 - [x] Concurrency safe: no overselling under simultaneous orders (row locks + transactions; `php artisan demo:race` and its Pest test, #16)
 - [ ] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee (search, status/Warehouse/date filters, sorts and Customer done, #16; payment status #19, Assignee #17)
-- [ ] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice (lines, VAT, shipping, addresses, status history and notes done, #16; invoice #17, tracking #18)
-- [ ] Status flow enforced: Pending → Confirmed → Preparing → Ready for Shipping → Shipped → Delivered, plus valid cancellation paths (the flow lives in `OrderStatus`; Confirm and Cancel are wired, #16; the other moves #17)
+- [ ] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice (lines, VAT, shipping, addresses, timeline of status changes and notes, Assignee and the print-ready Invoice done, #16 #17; tracking #18)
+- [x] Status flow enforced: Pending → Confirmed → Preparing → Ready for Shipping → Shipped → Delivered, plus valid cancellation paths (`OrderStatus` is the one machine; skipped or backward moves get 409 `invalid_transition` with `details.allowed`, #16 #17; Shipped and Delivered arrive with Shipments, #18)
 - [ ] Order, payment and shipment statuses kept separate
-- [ ] Orders locked against unauthorized edits once preparation starts
-- [ ] Partial fulfillment, partial cancellation
+- [x] Orders locked against unauthorized edits once preparation starts (409 `order_locked` from Preparing; edits before that re-reserve the differences in one transaction, #17)
+- [ ] Partial fulfillment, partial cancellation (Partial cancellation done, #17; partial fulfillment with Shipments, #18)
 - [x] Order items store historical snapshots (name, SKU, price, attributes, VAT rate and amount; #16)
 
 ## Phase 3: Payments, shipping, promotions, returns

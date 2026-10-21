@@ -16,6 +16,6 @@ class OrderCancellationController extends Controller
      */
     public function store(CancelOrderRequest $request, Order $order, CancelOrder $cancelOrder): OrderResource
     {
-        return new OrderResource(OrderController::loadForDisplay($cancelOrder->handle($order, $request->note())));
+        return new OrderResource($cancelOrder->handle($order, $request->note())->loadForDisplay());
     }
 }

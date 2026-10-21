@@ -192,3 +192,19 @@
     translate: 300% 0;
   }
 }
+
+/* The Invoice prints alone: everything but `.print-area` is hidden on paper. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+  }
+}

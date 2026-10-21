@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
 import { MapPinPlusIcon, Trash2Icon, TriangleAlertIcon, UserPlusIcon, XIcon } from 'lucide-react'
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type FieldPath, useFieldArray, useForm, useWatch } from 'react-hook-form'
@@ -16,18 +15,18 @@ import { FieldError, FieldGroup } from '@/components/ui/field'
 import { useCan } from '@/features/auth/hooks/use-can'
 import { AddressFormDialog } from '@/features/customers/components/address-form-dialog'
 import { CustomerFormDialog } from '@/features/customers/components/customer-form-dialog'
-import { customerKeys, customersApi } from '@/features/customers/api/customers-api'
 import { useCustomers } from '@/features/customers/hooks/use-customers'
 import type { Customer, CustomerAddress } from '@/features/customers/types'
 import { optionsLabel } from '@/features/inventory/types'
-import { useShippingQuote } from '@/features/shipping/hooks/use-shipping-zones'
 import { useFormatters } from '@/lib/format'
 import { apiErrorMessage, showServerErrors } from '@/lib/forms'
 import i18n from '@/lib/i18n'
 import { useEntranceAnimation } from '@/lib/motion'
 import { OrderTotals } from '../components/order-totals'
+import { ShippingMethodField } from '../components/order-form-parts'
+import { addressOptions, useCustomerProfile, useVariantSearch } from '../hooks/use-order-form'
 import { SearchPicker } from '../components/search-picker'
-import { useCreateOrder, useOrderQuote, useSellableVariants } from '../hooks/use-orders'
+import { useCreateOrder, useOrderQuote } from '../hooks/use-orders'
 import {
   EMPTY_ORDER,
   type OrderFormValues,
@@ -394,16 +393,6 @@ export function NewOrderPage() {
   )
 }
 
-function addressOptions(addresses: CustomerAddress[], placeholder: string) {
-  return [
-    { value: '', label: placeholder },
-    ...addresses.map((address) => ({
-      value: String(address.id),
-      label: `${address.label} · ${address.line1}, ${address.city}`,
-    })),
-  ]
-}
-
 /** Who the Order is for: find a Customer, or create one here (with their first address). */
 function CustomerSection({
   customerId,
@@ -525,20 +514,6 @@ function CustomerSection({
   )
 }
 
-/** The chosen Customer's profile (with addresses); idle until one is chosen. */
-function useCustomerProfile(customerId: number) {
-  return useQuery({
-    queryKey: customerKeys.detail(customerId),
-    queryFn: () => customersApi.get(customerId),
-    enabled: customerId !== 0,
-  })
-}
-
-function useVariantSearch(search: string) {
-  const variants = useSellableVariants(search)
-  return { data: variants.data, isFetching: variants.isFetching }
-}
-
 function useCustomerSearch(search: string) {
   const customers = useCustomers({
     search,
@@ -551,50 +526,4 @@ function useCustomerSearch(search: string) {
     data: search === '' ? undefined : customers.data?.data,
     isFetching: customers.isFetching && search !== '',
   }
-}
-
-/**
- * The Shipping methods that deliver to the chosen shipping address (cheapest first), the
- * cheapest pre-selected; explains when none does.
- */
-function ShippingMethodField({
-  customerId,
-  shippingAddressId,
-  current,
-  onDefault,
-  field,
-}: {
-  customerId: number
-  shippingAddressId: string
-  current: string
-  onDefault: (id: string) => void
-  field: (options: { value: string; label: string }[], hint: string | null) => ReactNode
-}) {
-  const { t } = useTranslation('orders')
-  const { money } = useFormatters()
-  const customer = useCustomerProfile(customerId)
-  const address = customer.data?.addresses.find((item) => String(item.id) === shippingAddressId)
-  const quote = useShippingQuote(
-    address ? { country_code: address.country_code, city: address.city } : null,
-  )
-  const methods = address ? (quote.data?.methods ?? []) : []
-
-  const cheapest = methods.at(0)
-  const currentOffered = methods.some((method) => String(method.id) === current)
-  useEffect(() => {
-    if (cheapest && !currentOffered) onDefault(String(cheapest.id))
-  }, [cheapest, currentOffered, onDefault])
-
-  return field(
-    [
-      { value: '', label: address ? t('chooseShippingMethod') : t('chooseAddressFirst') },
-      ...methods.map((method) => ({
-        value: String(method.id),
-        label: `${method.name} · ${money(method.price)}`,
-      })),
-    ],
-    address && quote.data && methods.length === 0
-      ? (quote.data.message ?? t('noShippingMethods'))
-      : null,
-  )
 }

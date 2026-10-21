@@ -17,7 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $product_name
  * @property string $sku
  * @property list<array{attribute: string, value: string}> $options
- * @property int $quantity
+ * @property int $quantity the units still ordered
+ * @property int $cancelled_quantity the units removed by Partial cancellation
  * @property string $unit_price
  * @property string $discount_amount
  * @property bool $taxable
@@ -28,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read Variant $variant
  */
 #[Fillable([
-    'variant_id', 'product_name', 'sku', 'options', 'quantity', 'unit_price', 'discount_amount',
+    'variant_id', 'product_name', 'sku', 'options', 'quantity', 'cancelled_quantity', 'unit_price', 'discount_amount',
     'taxable', 'vat_rate', 'vat_amount', 'line_total',
 ])]
 class OrderLine extends Model
@@ -43,6 +44,7 @@ class OrderLine extends Model
         return [
             'options' => 'array',
             'quantity' => 'integer',
+            'cancelled_quantity' => 'integer',
             'unit_price' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'taxable' => 'boolean',

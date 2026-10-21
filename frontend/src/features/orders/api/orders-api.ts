@@ -1,6 +1,16 @@
 import { http } from '@/lib/api/client'
 import { type ListPage, type ListQuery, toApiParams } from '@/lib/list-query'
-import type { Order, OrderInput, OrderLineInput, OrderQuote, SellableVariant } from '../types'
+import type {
+  LineCancellation,
+  Order,
+  OrderInput,
+  OrderLineInput,
+  OrderQuote,
+  OrderStatus,
+  OrderUpdateInput,
+  SellableVariant,
+  UserRef,
+} from '../types'
 
 export const orderKeys = {
   all: ['orders'] as const,
@@ -9,6 +19,7 @@ export const orderKeys = {
   quote: (lines: OrderLineInput[], shippingMethodId: number | null) =>
     [...orderKeys.all, 'quote', lines, shippingMethodId] as const,
   sellableVariants: (search: string) => [...orderKeys.all, 'sellable-variants', search] as const,
+  assignees: () => [...orderKeys.all, 'assignees'] as const,
 }
 
 /** Order changes take an Idempotency-Key, so a retried click is applied once. */
@@ -45,6 +56,55 @@ export const ordersApi = {
       { note: note || null },
       idempotent(idempotencyKey),
     )
+    return data.data
+  },
+
+  async update(id: number, input: OrderUpdateInput, idempotencyKey: string): Promise<Order> {
+    const { data } = await http.put<{ data: Order }>(
+      `/orders/${id}`,
+      input,
+      idempotent(idempotencyKey),
+    )
+    return data.data
+  },
+
+  async advance(id: number, status: OrderStatus, idempotencyKey: string): Promise<Order> {
+    const { data } = await http.post<{ data: Order }>(
+      `/orders/${id}/advance`,
+      { status },
+      idempotent(idempotencyKey),
+    )
+    return data.data
+  },
+
+  async cancelLines(
+    id: number,
+    lines: LineCancellation[],
+    note: string,
+    idempotencyKey: string,
+  ): Promise<Order> {
+    const { data } = await http.post<{ data: Order }>(
+      `/orders/${id}/cancel-lines`,
+      { lines, note: note || null },
+      idempotent(idempotencyKey),
+    )
+    return data.data
+  },
+
+  async assign(id: number, assigneeId: number | null): Promise<Order> {
+    const { data } = await http.put<{ data: Order }>(`/orders/${id}/assignee`, {
+      assignee_id: assigneeId,
+    })
+    return data.data
+  },
+
+  async assignees(): Promise<UserRef[]> {
+    const { data } = await http.get<{ data: UserRef[] }>('/orders/assignees')
+    return data.data
+  },
+
+  async addNote(id: number, body: string): Promise<Order> {
+    const { data } = await http.post<{ data: Order }>(`/orders/${id}/notes`, { body })
     return data.data
   },
 

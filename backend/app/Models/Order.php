@@ -36,6 +36,7 @@ use Illuminate\Support\Carbon;
  * @property string $total
  * @property string|null $notes
  * @property int|null $user_id
+ * @property int|null $assignee_id
  * @property Carbon $placed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -43,13 +44,15 @@ use Illuminate\Support\Carbon;
  * @property-read Warehouse $warehouse
  * @property-read ShippingMethod $shippingMethod
  * @property-read User|null $user
+ * @property-read User|null $assignee
  * @property-read Collection<int, OrderLine> $lines
  * @property-read Collection<int, OrderStatusChange> $statusChanges
+ * @property-read Collection<int, OrderNote> $orderNotes
  */
 #[Fillable([
     'number', 'status', 'customer_id', 'warehouse_id', 'shipping_method_id',
     'billing_address', 'shipping_address', 'shipping_method_name', 'currency_code', 'vat_rate',
-    'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes', 'user_id', 'placed_at',
+    'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes', 'user_id', 'assignee_id', 'placed_at',
 ])]
 class Order extends Model implements Auditable
 {
@@ -111,6 +114,27 @@ class Order extends Model implements Auditable
     }
 
     /**
+     * The User responsible for handling it (an active Admin, Operations or Sales User).
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assignee_id');
+    }
+
+    /**
+     * The notes Users added to its timeline, oldest first (`notes` is the column the
+     * Order was created with).
+     *
+     * @return HasMany<OrderNote, $this>
+     */
+    public function orderNotes(): HasMany
+    {
+        return $this->hasMany(OrderNote::class)->orderBy('id');
+    }
+
+    /**
      * @return HasMany<OrderLine, $this>
      */
     public function lines(): HasMany
@@ -128,6 +152,23 @@ class Order extends Model implements Auditable
         return $this->hasMany(OrderStatusChange::class)->orderBy('id');
     }
 
+    /**
+     * Loads what one Order's page shows: Customer, Warehouse, creator, Assignee, lines,
+     * status history and notes.
+     */
+    public function loadForDisplay(): static
+    {
+        return $this->load([
+            'customer:id,name,email,phone',
+            'warehouse:id,name,code',
+            'user:id,name',
+            'assignee:id,name',
+            'orderNotes.user:id,name',
+            'lines.variant:id,product_id',
+            'statusChanges.user:id,name',
+        ]);
+    }
+
     public function auditLabel(): string
     {
         return $this->number;
@@ -141,11 +182,11 @@ class Order extends Model implements Auditable
         return [
             ...$this->only(
                 'number', 'customer_id', 'warehouse_id', 'shipping_method_id', 'billing_address', 'shipping_address',
-                'vat_rate', 'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes',
+                'vat_rate', 'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes', 'assignee_id',
             ),
             'status' => $this->status->value,
             'lines' => $this->lines
-                ->map(fn (OrderLine $line): array => $line->only('variant_id', 'sku', 'quantity', 'unit_price', 'vat_amount', 'line_total'))
+                ->map(fn (OrderLine $line): array => $line->only('variant_id', 'sku', 'quantity', 'cancelled_quantity', 'unit_price', 'vat_amount', 'line_total'))
                 ->all(),
         ];
     }

@@ -40,6 +40,8 @@
     "receipt": "Receipt",
     "reservation": "Reservation",
     "release": "Release",
+    "deduction": "Deduction",
+    "cancellation_return": "Cancellation return",
     "adjustment": "Adjustment",
     "transfer_out": "Transfer out",
     "transfer_in": "Transfer in"

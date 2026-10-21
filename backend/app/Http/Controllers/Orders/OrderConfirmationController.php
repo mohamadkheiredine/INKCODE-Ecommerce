@@ -15,6 +15,6 @@ class OrderConfirmationController extends Controller
      */
     public function store(Order $order, ConfirmOrder $confirmOrder): OrderResource
     {
-        return new OrderResource(OrderController::loadForDisplay($confirmOrder->handle($order)));
+        return new OrderResource($confirmOrder->handle($order)->loadForDisplay());
     }
 }

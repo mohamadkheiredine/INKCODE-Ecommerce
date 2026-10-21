@@ -42,6 +42,7 @@
     "customer": "Customer",
     "customer_address": "Customer address",
     "customer_note": "Customer note",
+    "order_note": "Order note",
     "shipping_zone": "Shipping zone",
     "shipping_method": "Shipping method",
     "carrier": "Carrier",

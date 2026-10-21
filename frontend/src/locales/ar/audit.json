@@ -42,6 +42,7 @@
     "customer": "عميل",
     "customer_address": "عنوان عميل",
     "customer_note": "ملاحظة عميل",
+    "order_note": "ملاحظة طلب",
     "shipping_zone": "منطقة شحن",
     "shipping_method": "طريقة شحن",
     "carrier": "شركة شحن",

@@ -27,6 +27,9 @@ export function aStoreSettings(overrides: Partial<StoreSettings> = {}): StoreSet
 export const toStoreProfile = (settings: StoreSettings): StoreProfile => ({
   name: settings.name,
   logo_url: settings.logo_url,
+  contact_email: settings.contact_email,
+  contact_phone: settings.contact_phone,
+  address: settings.address,
   currency: { code: settings.currency_code, symbol: settings.currency_symbol },
 })
 
