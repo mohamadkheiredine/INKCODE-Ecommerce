@@ -28,6 +28,10 @@ return [
 
     'demo_mode' => (bool) env('DEMO_MODE', false),
 
+    // With demo mode: grow the demo store to the brief's volumes (200 Products, 1,000
+    // Orders). Feature tests turn it off and keep the small hand-written store.
+    'demo_full_scale' => (bool) env('DEMO_FULL_SCALE', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

@@ -32,6 +32,7 @@
         <env name="DB_DATABASE" value="inkcode_testing"/>
         <env name="DB_URL" value=""/>
         <env name="DEMO_MODE" value="false"/>
+        <env name="DEMO_FULL_SCALE" value="false"/>
         <env name="FRONTEND_URL" value="http://localhost:5173"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

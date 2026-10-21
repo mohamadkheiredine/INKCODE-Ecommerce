@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 /**
- * The demo store for local and review environments. Later tickets add the
- * catalog, stock, Customers and Orders here.
+ * The demo store for local and review environments: the hand-written demo records, then
+ * (unless DEMO_FULL_SCALE=false) the brief's full volumes on top.
  */
 class DemoSeeder extends Seeder
 {
@@ -32,5 +32,10 @@ class DemoSeeder extends Seeder
             // Earlier Delivered Orders, so every Segment has Customers.
             DemoCustomerHistorySeeder::class,
         ]);
+
+        // Last: the seeders above skip themselves once Orders exist.
+        if (config('app.demo_full_scale')) {
+            $this->call(DemoScaleSeeder::class);
+        }
     }
 }
