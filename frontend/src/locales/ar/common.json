@@ -82,7 +82,9 @@
     "payments": "المدفوعات",
     "reconciliation": "المطابقة",
     "coupons": "القسائم",
-    "coupon": "القسيمة"
+    "coupon": "القسيمة",
+    "returns": "المرتجعات",
+    "return": "الإرجاع"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

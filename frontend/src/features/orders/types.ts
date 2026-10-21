@@ -1,5 +1,6 @@
 import type { WarehouseRef, VariantOption } from '@/features/inventory/types'
 import type { Payment, PaymentStatus } from '@/features/payments/types'
+import type { OrderReturnSummary } from '@/features/returns/types'
 import type { Amount } from '@/lib/format'
 
 /** Where an Order is in its life, mirroring `App\Enums\OrderStatus`. */
@@ -46,6 +47,8 @@ export type OrderLine = {
   cancelled_quantity: number
   /** Units already in the Order's Shipments. */
   shipped_quantity: number
+  /** Units claimed by Returns that were not Rejected (one Order only). */
+  returned_quantity?: number | null
   unit_price: Amount
   discount_amount: Amount
   /** Whether the Order's Coupon discounts this line. */
@@ -177,6 +180,9 @@ export type Order = {
   timeline?: TimelineEvent[]
   /** The Payment ledger, oldest first; only for Roles with payments.view. */
   payments?: Payment[]
+  returns?: OrderReturnSummary[]
+  /** The last moment a Return may be Requested; null unless Delivered. */
+  return_window_ends_at?: string | null
   created_at: string
 }
 

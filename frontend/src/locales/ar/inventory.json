@@ -44,7 +44,8 @@
     "cancellation_return": "إرجاع بعد إلغاء",
     "adjustment": "تعديل",
     "transfer_out": "تحويل صادر",
-    "transfer_in": "تحويل وارد"
+    "transfer_in": "تحويل وارد",
+    "return_restock": "إعادة تخزين مرتجع"
   },
   "warehouses": {
     "description": "الأماكن التي تحفظ المخزون وتشحن الطلبات.",

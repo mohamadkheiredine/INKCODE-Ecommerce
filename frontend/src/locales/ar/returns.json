@@ -1,0 +1,117 @@
+{
+  "title": "المرتجعات",
+  "description": "العناصر التي يعيدها العملاء، من الطلب إلى قرار إعادة التخزين والاسترداد.",
+  "detailDescription": "اقبل الإرجاع واستلمه وقرّر إعادة تخزين كل عنصر، ثم استرد ما دفعه العميل.",
+  "search": "ابحث برقم الإرجاع أو الطلب أو العميل",
+  "allStatuses": "كل الحالات",
+  "allReasons": "كل الأسباب",
+  "loading": "جارٍ تحميل المرتجعات…",
+  "emptyTitle": "لا توجد مرتجعات بعد",
+  "emptyDescription": "يُطلب الإرجاع من صفحة طلب مُسلَّم، ضمن مهلة الإرجاع.",
+  "goToDelivered": "الانتقال إلى الطلبات المُسلَّمة",
+  "notFound": "هذا الإرجاع غير موجود أو أُزيل.",
+  "noneOnOrder": "لا توجد مرتجعات على هذا الطلب.",
+  "details": "التفاصيل",
+  "items": "العناصر المرتجعة",
+  "paid": "المدفوع",
+  "cancel": "إلغاء",
+  "returnedOf_zero": "{{returned}} من {{ordered}} مرتجعة",
+  "returnedOf_one": "{{returned}} من {{ordered}} مرتجعة",
+  "returnedOf_two": "{{returned}} من {{ordered}} مرتجعة",
+  "returnedOf_few": "{{returned}} من {{ordered}} مرتجعة",
+  "returnedOf_many": "{{returned}} من {{ordered}} مرتجعة",
+  "returnedOf_other": "{{returned}} من {{ordered}} مرتجعة",
+  "window": {
+    "openUntil": "مهلة الإرجاع مفتوحة حتى {{date}}",
+    "closed": "انتهت مهلة الإرجاع."
+  },
+  "statuses": {
+    "requested": "مطلوب",
+    "approved": "مقبول",
+    "rejected": "مرفوض",
+    "received": "مستلَم",
+    "completed": "مكتمل"
+  },
+  "reasons": {
+    "damaged": "تالف",
+    "wrong_item": "عنصر خاطئ",
+    "not_as_described": "غير مطابق للوصف",
+    "changed_mind": "غيّر رأيه",
+    "other": "أخرى"
+  },
+  "decisions": {
+    "restock": "إعادة إلى المخزون",
+    "write_off": "شطب"
+  },
+  "fields": {
+    "number": "الإرجاع",
+    "order": "الطلب",
+    "customer": "العميل",
+    "reason": "السبب",
+    "note": "الملاحظة",
+    "units": "الوحدات",
+    "status": "الحالة",
+    "requestedAt": "تاريخ الطلب",
+    "approvedAt": "تاريخ القبول",
+    "rejectedAt": "تاريخ الرفض",
+    "receivedAt": "تاريخ الاستلام",
+    "completedAt": "تاريخ الإكمال",
+    "refund": "الاسترداد",
+    "refundAmount": "مبلغ الاسترداد"
+  },
+  "request": {
+    "action": "طلب إرجاع",
+    "title": "إرجاع عناصر من {{number}}",
+    "description": "اختر عدد الوحدات العائدة من كل عنصر وسبب الإرجاع. لا يتغير المخزون حتى قرار إعادة التخزين لكل عنصر.",
+    "returnable_zero": "لا وحدات قابلة للإرجاع",
+    "returnable_one": "وحدة واحدة قابلة للإرجاع",
+    "returnable_two": "وحدتان قابلتان للإرجاع",
+    "returnable_few": "{{count}} وحدات قابلة للإرجاع",
+    "returnable_many": "{{count}} وحدة قابلة للإرجاع",
+    "returnable_other": "{{count}} وحدة قابلة للإرجاع",
+    "quantityFor": "وحدات {{sku}} المراد إرجاعها",
+    "submit": "طلب الإرجاع",
+    "done": "طُلب الإرجاع {{number}}."
+  },
+  "decide": {
+    "approve": "قبول",
+    "reject": "رفض",
+    "approveTitle": "قبول {{number}}",
+    "rejectTitle": "رفض {{number}}",
+    "approveDescription": "يمكن للعميل إعادة العناصر. أضف ملاحظة إن لزم.",
+    "rejectDescription": "لن يعود شيء ويمكن طلب الوحدات مجدداً. اذكر السبب.",
+    "approveDone": "قُبل الإرجاع {{number}}.",
+    "rejectDone": "رُفض الإرجاع {{number}}."
+  },
+  "receive": {
+    "action": "تأكيد الاستلام",
+    "done": "استُلم الإرجاع {{number}}."
+  },
+  "restock": {
+    "notYet": "يُتخذ قرار إعادة التخزين لكل عنصر بعد استلام الإرجاع.",
+    "choose": "اختر…",
+    "decisionFor": "قرار إعادة التخزين للعنصر {{sku}}",
+    "save": "حفظ القرارات",
+    "chooseFirst": "اختر قرار إعادة التخزين لعنصر واحد على الأقل.",
+    "pending": "القرار معلّق",
+    "done": "حُفظت قرارات إعادة التخزين."
+  },
+  "refund": {
+    "title": "الاسترداد",
+    "items": "المدفوع مقابل العناصر",
+    "shipping": "الشحن",
+    "shippingRefunded": "استُرد مسبقاً",
+    "refundable": "المتاح للاسترداد في الطلب",
+    "alsoShipping": "استرداد الشحن أيضاً",
+    "cap": "الحد الأقصى {{cap}}. يمكنك تخفيضه؛ و0 يُكمل الإرجاع دون استرداد.",
+    "submit": "إكمال مع الاسترداد",
+    "withShipping": "يشمل الشحن",
+    "done": "اكتمل الإرجاع {{number}} باسترداد {{amount}}."
+  },
+  "validation": {
+    "chooseItems": "أدخل عدد الوحدات العائدة لعنصر واحد على الأقل.",
+    "tooMany": "أرجِع على الأكثر {{max}} وحدات من العنصر.",
+    "amount": "أدخل مبلغاً بخانتين عشريتين على الأكثر.",
+    "aboveCap": "أقصى مبلغ للاسترداد هو {{cap}}."
+  }
+}
