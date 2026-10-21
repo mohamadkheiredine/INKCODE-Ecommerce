@@ -33,25 +33,11 @@ class ReturnController extends Controller
     {
         $return = $requestReturn->handle($order, $request->returnRequest(), $request->user());
 
-        return (new ReturnResource(self::loadForDisplay($return)))->response()->setStatusCode(201);
+        return (new ReturnResource($return->loadForDisplay()))->response()->setStatusCode(201);
     }
 
     public function show(Request $request, OrderReturn $orderReturn): ReturnResource
     {
-        return new ReturnResource(self::loadForDisplay($orderReturn));
-    }
-
-    /**
-     * Loads what one Return's page shows: its Order and Customer, lines, requester and Refund.
-     */
-    public static function loadForDisplay(OrderReturn $return): OrderReturn
-    {
-        return $return->refresh()->load([
-            'order',
-            'order.customer:id,name',
-            'lines.orderLine',
-            'user:id,name',
-            'refund.user:id,name',
-        ]);
+        return new ReturnResource($orderReturn->loadForDisplay());
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Enums\ReturnStatus;
 use App\Enums\TransferStatus;
 use App\Http\Controllers\Access\RoleController;
 use App\Http\Controllers\Access\UserActivationController;
@@ -52,7 +53,10 @@ use App\Http\Controllers\Payments\ReconciliationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
 use App\Http\Controllers\Returns\ReturnController;
-use App\Http\Controllers\Returns\ReturnStepController;
+use App\Http\Controllers\Returns\ReturnDecisionController;
+use App\Http\Controllers\Returns\ReturnReceiptController;
+use App\Http\Controllers\Returns\ReturnRefundController;
+use App\Http\Controllers\Returns\ReturnRestockController;
 use App\Http\Controllers\Settings\StoreLogoController;
 use App\Http\Controllers\Settings\StoreProfileController;
 use App\Http\Controllers\Settings\StoreSettingsController;
@@ -231,15 +235,19 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
     Route::post('/orders/{order}/returns', [ReturnController::class, 'store'])
         ->middleware('idempotent')
         ->name('orders.returns.store');
-    Route::post('/returns/{orderReturn}/approve', [ReturnStepController::class, 'approve'])->name('returns.approve');
-    Route::post('/returns/{orderReturn}/reject', [ReturnStepController::class, 'reject'])->name('returns.reject');
-    Route::post('/returns/{orderReturn}/receive', [ReturnStepController::class, 'receive'])
+    Route::post('/returns/{orderReturn}/approve', [ReturnDecisionController::class, 'store'])
+        ->defaults('status', ReturnStatus::Approved->value)
+        ->name('returns.approve');
+    Route::post('/returns/{orderReturn}/reject', [ReturnDecisionController::class, 'store'])
+        ->defaults('status', ReturnStatus::Rejected->value)
+        ->name('returns.reject');
+    Route::post('/returns/{orderReturn}/receive', [ReturnReceiptController::class, 'store'])
         ->can(Permission::ReturnsReceive->value)
         ->name('returns.receive');
-    Route::post('/returns/{orderReturn}/restock', [ReturnStepController::class, 'restock'])
+    Route::post('/returns/{orderReturn}/restock', [ReturnRestockController::class, 'store'])
         ->middleware('idempotent')
         ->name('returns.restock');
-    Route::post('/returns/{orderReturn}/refund', [ReturnStepController::class, 'refund'])
+    Route::post('/returns/{orderReturn}/refund', [ReturnRefundController::class, 'store'])
         ->middleware('idempotent')
         ->name('returns.refund');
 

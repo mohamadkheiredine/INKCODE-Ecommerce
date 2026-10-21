@@ -7178,19 +7178,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/ReturnResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "order",
-                                                        "refund",
-                                                        "lines"
-                                                    ]
-                                                }
-                                            ]
+                                            "$ref": "#/components/schemas/ReturnResource"
                                         }
                                     },
                                     "required": [
@@ -7249,19 +7237,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/ReturnResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "order",
-                                                        "refund",
-                                                        "lines"
-                                                    ]
-                                                }
-                                            ]
+                                            "$ref": "#/components/schemas/ReturnResource"
                                         }
                                     },
                                     "required": [
@@ -7289,9 +7265,8 @@
         "/returns/{orderReturn}/approve": {
             "post": {
                 "operationId": "returns.approve",
-                "summary": "Requested \u2192 Approved (returns.approve)",
                 "tags": [
-                    "ReturnStep"
+                    "ReturnDecision"
                 ],
                 "parameters": [
                     {
@@ -7322,19 +7297,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/ReturnResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "order",
-                                                        "refund",
-                                                        "lines"
-                                                    ]
-                                                }
-                                            ]
+                                            "$ref": "#/components/schemas/ReturnResource"
                                         }
                                     },
                                     "required": [
@@ -7362,9 +7325,8 @@
         "/returns/{orderReturn}/reject": {
             "post": {
                 "operationId": "returns.reject",
-                "summary": "Requested \u2192 Rejected (returns.approve); its units may be requested again",
                 "tags": [
-                    "ReturnStep"
+                    "ReturnDecision"
                 ],
                 "parameters": [
                     {
@@ -7395,6 +7357,115 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/receive": {
+            "post": {
+                "operationId": "returns.receive",
+                "tags": [
+                    "ReturnReceipt"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/refund": {
+            "post": {
+                "operationId": "returns.refund",
+                "tags": [
+                    "ReturnRefund"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RefundReturnRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
                                             "allOf": [
                                                 {
                                                     "$ref": "#/components/schemas/ReturnResource"
@@ -7402,8 +7473,6 @@
                                                 {
                                                     "type": "object",
                                                     "required": [
-                                                        "order",
-                                                        "refund",
                                                         "lines"
                                                     ]
                                                 }
@@ -7432,73 +7501,11 @@
                 }
             }
         },
-        "/returns/{orderReturn}/receive": {
-            "post": {
-                "operationId": "returns.receive",
-                "summary": "Approved \u2192 Received, when the items arrive (returns.receive). Stock does not change",
-                "tags": [
-                    "ReturnStep"
-                ],
-                "parameters": [
-                    {
-                        "name": "orderReturn",
-                        "in": "path",
-                        "required": true,
-                        "description": "The order return ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "`ReturnResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/ReturnResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "order",
-                                                        "refund",
-                                                        "lines"
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
         "/returns/{orderReturn}/restock": {
             "post": {
                 "operationId": "returns.restock",
-                "summary": "Restock decisions for lines of a Received Return (returns.receive). Refused with 409\n`return_not_received` or `restock_already_decided`",
                 "tags": [
-                    "ReturnStep"
+                    "ReturnRestock"
                 ],
                 "parameters": [
                     {
@@ -7538,81 +7545,6 @@
                                                     "type": "object",
                                                     "required": [
                                                         "order",
-                                                        "refund",
-                                                        "lines"
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
-        "/returns/{orderReturn}/refund": {
-            "post": {
-                "operationId": "returns.refund",
-                "summary": "Received \u2192 Completed with its Refund (refunds.issue). Refused with 409\n`restock_decisions_pending`, `shipping_already_refunded` or `refund_exceeds_cap`",
-                "tags": [
-                    "ReturnStep"
-                ],
-                "parameters": [
-                    {
-                        "name": "orderReturn",
-                        "in": "path",
-                        "required": true,
-                        "description": "The order return ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RefundReturnRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "`ReturnResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/components/schemas/ReturnResource"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "order",
-                                                        "refund",
                                                         "lines"
                                                     ]
                                                 }

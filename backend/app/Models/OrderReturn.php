@@ -124,6 +124,21 @@ class OrderReturn extends Model implements Auditable
         return $withShipping ? bcadd($items, $this->order->shipping_total, 2) : $items;
     }
 
+    /**
+     * Reloads it with what one Return's page shows: its Order and Customer, lines,
+     * requester and Refund.
+     */
+    public function loadForDisplay(): static
+    {
+        return $this->refresh()->load([
+            'order',
+            'order.customer:id,name',
+            'lines.orderLine',
+            'user:id,name',
+            'refund.user:id,name',
+        ]);
+    }
+
     public function auditRecordType(): string
     {
         return 'return';
