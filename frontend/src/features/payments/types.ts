@@ -35,6 +35,8 @@ export type Payment = {
   note: string | null
   idempotency_key: string | null
   user?: { id: number; name: string } | null
+  /** The Return this Refund completed, if any. */
+  return?: { id: number; number: string } | null
   order?: { id: number; number: string; currency_code: string; payment_status: PaymentStatus }
   created_at: string
 }

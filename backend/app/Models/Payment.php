@@ -11,6 +11,7 @@ use App\Services\PaymentLedger;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property-read Order $order
  * @property-read User|null $user
+ * @property-read OrderReturn|null $orderReturn
  */
 #[Fillable(['order_id', 'kind', 'method', 'amount', 'status', 'gateway_reference', 'note', 'user_id', 'idempotency_key', 'created_at'])]
 class Payment extends Model implements Auditable
@@ -68,6 +70,16 @@ class Payment extends Model implements Auditable
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The Return this Refund completed, if any.
+     *
+     * @return HasOne<OrderReturn, $this>
+     */
+    public function orderReturn(): HasOne
+    {
+        return $this->hasOne(OrderReturn::class, 'refund_id');
     }
 
     public function auditLabel(): string

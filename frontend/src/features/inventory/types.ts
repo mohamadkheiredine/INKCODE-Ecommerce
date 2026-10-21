@@ -43,6 +43,7 @@ export const MOVEMENT_TYPES = [
   'release',
   'deduction',
   'cancellation_return',
+  'return_restock',
 ] as const
 export type StockMovementType = (typeof MOVEMENT_TYPES)[number]
 

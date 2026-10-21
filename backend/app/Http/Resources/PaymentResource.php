@@ -29,6 +29,7 @@ class PaymentResource extends JsonResource
             'note' => $this->note,
             'idempotency_key' => $this->idempotency_key,
             'user' => $this->whenLoaded('user', fn (): ?array => $this->user?->only('id', 'name')),
+            'return' => $this->whenLoaded('orderReturn', fn (): ?array => $this->orderReturn?->only('id', 'number')),
             'order' => $this->whenLoaded('order', fn (): array => [
                 'id' => $this->order->id,
                 'number' => $this->order->number,

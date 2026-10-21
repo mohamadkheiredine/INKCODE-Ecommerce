@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\ReturnStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * One Variant on an Order, with a snapshot of what it was sold as: the Product name, SKU,
@@ -30,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $line_total
  * @property-read Order $order
  * @property-read Variant $variant
+ * @property-read Collection<int, ReturnLine> $returnLines
  */
 #[Fillable([
     'variant_id', 'product_name', 'sku', 'options', 'quantity', 'cancelled_quantity', 'deducted_quantity', 'shipped_quantity', 'unit_price', 'discount_amount',
@@ -74,5 +78,33 @@ class OrderLine extends Model
     public function variant(): BelongsTo
     {
         return $this->belongsTo(Variant::class);
+    }
+
+    /**
+     * Its units sent back in Returns (any status).
+     *
+     * @return HasMany<ReturnLine, $this>
+     */
+    public function returnLines(): HasMany
+    {
+        return $this->hasMany(ReturnLine::class);
+    }
+
+    /**
+     * The units claimed by Returns that were not Rejected.
+     */
+    public function returnedQuantity(): int
+    {
+        return (int) $this->returnLines
+            ->filter(fn (ReturnLine $line): bool => $line->orderReturn->status !== ReturnStatus::Rejected)
+            ->sum('quantity');
+    }
+
+    /**
+     * The units a new Return may still claim: delivered minus already returned.
+     */
+    public function returnableQuantity(): int
+    {
+        return max(0, $this->shipped_quantity - $this->returnedQuantity());
     }
 }

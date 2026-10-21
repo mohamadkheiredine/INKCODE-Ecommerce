@@ -82,7 +82,9 @@
     "payments": "Payments",
     "reconciliation": "Reconciliation",
     "coupons": "Coupons",
-    "coupon": "Coupon"
+    "coupon": "Coupon",
+    "returns": "Returns",
+    "return": "Return"
   },
   "navGroups": {
     "dashboard": "Dashboard",

@@ -47,6 +47,7 @@ import { useCan } from '@/features/auth/hooks/use-can'
 import { optionsLabel } from '@/features/inventory/types'
 import { PaymentLedgerCard } from '@/features/payments/components/payment-ledger-card'
 import { RefundNeeded } from '@/features/payments/components/refund-needed'
+import { OrderReturnsCard } from '@/features/returns/components/order-returns-card'
 import { isApiError } from '@/lib/api/api-error'
 import { useFormatters } from '@/lib/format'
 import { apiErrorMessage } from '@/lib/forms'
@@ -363,6 +364,7 @@ function OrderDetail({ order }: { order: Order }) {
 
           {can('payments.view') && <PaymentLedgerCard order={order} />}
           {SHIPMENT_STATUSES.includes(order.status) && <ShipmentsCard order={order} />}
+          {can('returns.view') && <OrderReturnsCard order={order} />}
 
           <TimelineCard order={order} />
         </div>
