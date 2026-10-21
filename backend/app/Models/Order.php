@@ -6,6 +6,7 @@ use App\Contracts\Auditable;
 use App\Enums\CouponType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\ReturnStatus;
 use App\Models\Concerns\Audited;
 use App\Services\OrderPricing;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -61,6 +62,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, OrderNote> $orderNotes
  * @property-read Collection<int, Payment> $payments
  * @property-read Collection<int, Shipment> $shipments
+ * @property-read Collection<int, OrderReturn> $returns
  */
 #[Fillable([
     'number', 'status', 'payment_status', 'customer_id', 'warehouse_id', 'shipping_method_id', 'coupon_id', 'coupon_code', 'coupon_type', 'coupon_value',
@@ -260,8 +262,45 @@ class Order extends Model implements Auditable
     }
 
     /**
-     * Loads what one Order's page shows: Customer, Warehouse, creator, Assignee, lines,
-     * status history, notes, Shipments and Payment ledger.
+     * Its Returns, oldest first.
+     *
+     * @return HasMany<OrderReturn, $this>
+     */
+    public function returns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class)->orderBy('id');
+    }
+
+    /**
+     * When it became Delivered (the latest time, from its status history), or null.
+     */
+    public function deliveredAt(): ?Carbon
+    {
+        $changes = $this->relationLoaded('statusChanges') ? $this->statusChanges : $this->statusChanges()->get();
+
+        return $changes->where('to_status', OrderStatus::Delivered)->sortByDesc('id')->first()?->created_at;
+    }
+
+    /**
+     * The last moment a Return may be Requested: delivery plus the Return window, or null
+     * when it is not Delivered.
+     */
+    public function returnWindowEndsAt(int $windowDays): ?Carbon
+    {
+        return $this->status === OrderStatus::Delivered ? $this->deliveredAt()?->copy()->addDays($windowDays) : null;
+    }
+
+    /**
+     * Whether a Completed Return already refunded its shipping.
+     */
+    public function shippingRefunded(): bool
+    {
+        return $this->returns()->where('refund_shipping', true)->where('status', ReturnStatus::Completed)->exists();
+    }
+
+    /**
+     * Loads what one Order's page shows: Customer, Warehouse, creator, Assignee, lines (with
+     * their Returns), status history, notes, Shipments, Returns and Payment ledger.
      */
     public function loadForDisplay(): static
     {
@@ -272,8 +311,11 @@ class Order extends Model implements Auditable
             'assignee:id,name',
             'orderNotes.user:id,name',
             'lines.variant:id,product_id',
+            'lines.returnLines.orderReturn:id,status',
+            'returns:id,order_id,number,status,reason,refund_shipping,requested_at',
             'statusChanges.user:id,name',
             'payments.user:id,name',
+            'payments.orderReturn:id,number,refund_id',
             'shipments.carrier:id,name,tracking_url_template',
             'shipments.lines',
             'shipments.statusChanges.user:id,name',

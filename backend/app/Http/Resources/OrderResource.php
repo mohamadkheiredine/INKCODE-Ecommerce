@@ -8,11 +8,13 @@ use App\Enums\ShipmentStatus;
 use App\Models\Order;
 use App\Models\OrderLine;
 use App\Models\OrderNote;
+use App\Models\OrderReturn;
 use App\Models\OrderStatusChange;
 use App\Models\Payment;
 use App\Models\Shipment;
 use App\Models\ShipmentLine;
 use App\Models\ShipmentStatusChange;
+use App\Services\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -77,6 +79,7 @@ class OrderResource extends JsonResource
                     'quantity' => $line->quantity,
                     'cancelled_quantity' => $line->cancelled_quantity,
                     'shipped_quantity' => $line->shipped_quantity,
+                    'returned_quantity' => $line->relationLoaded('returnLines') ? $line->returnedQuantity() : null,
                     'unit_price' => $line->unit_price,
                     'discount_amount' => $line->discount_amount,
                     'coupon_eligible' => $line->coupon_eligible,
@@ -110,6 +113,19 @@ class OrderResource extends JsonResource
                         ->all(),
                 ])
                 ->all()),
+            'returns' => $this->whenLoaded('returns', fn (): array => $this->returns
+                ->map(fn (OrderReturn $return): array => [
+                    'id' => $return->id,
+                    'number' => $return->number,
+                    'status' => $return->status->value,
+                    'reason' => $return->reason->value,
+                    'requested_at' => $return->requested_at->toIso8601String(),
+                ])
+                ->all()),
+            'return_window_ends_at' => $this->when(
+                $this->relationLoaded('statusChanges'),
+                fn (): ?string => $this->returnWindowEndsAt(app(Settings::class)->returnWindowDays())?->toIso8601String(),
+            ),
             'timeline' => $this->when(
                 $this->relationLoaded('statusChanges') && $this->relationLoaded('orderNotes'),
                 fn (): array => $this->timeline($request),

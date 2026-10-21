@@ -27,6 +27,8 @@ class DemoSeeder extends Seeder
             DemoOrdersSeeder::class,
             // Payment ledgers for those Orders.
             DemoPaymentsSeeder::class,
+            // Returns on the Delivered Orders, after their payments (for the Refunds).
+            DemoReturnsSeeder::class,
         ]);
     }
 }

@@ -29,4 +29,7 @@ enum StockMovementType: string
 
     /** A received Transfer arriving at its destination Warehouse: adds On-hand. */
     case TransferIn = 'transfer_in';
+
+    /** A Received Return line whose Restock decision puts it back: adds On-hand. */
+    case ReturnRestock = 'return_restock';
 }

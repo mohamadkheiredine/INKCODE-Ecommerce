@@ -6,4 +6,5 @@ return [
     'low_stock' => 'مخزون منخفض: :sku في :warehouse، المتاح :available فقط.',
     'order_assigned' => 'أُسند إليك الطلب :number.',
     'payment_declined' => 'رُفضت دفعة بالبطاقة بقيمة :amount على الطلب :number.',
+    'return_requested' => 'طُلب الإرجاع :number على الطلب :order.',
 ];

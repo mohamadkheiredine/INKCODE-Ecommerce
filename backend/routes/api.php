@@ -51,6 +51,8 @@ use App\Http\Controllers\Payments\PaymentController;
 use App\Http\Controllers\Payments\ReconciliationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
+use App\Http\Controllers\Returns\ReturnController;
+use App\Http\Controllers\Returns\ReturnStepController;
 use App\Http\Controllers\Settings\StoreLogoController;
 use App\Http\Controllers\Settings\StoreProfileController;
 use App\Http\Controllers\Settings\StoreSettingsController;
@@ -217,6 +219,29 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->middlewareFor('show', 'can:view,coupon')
         ->middlewareFor('destroy', 'can:delete,coupon');
     Route::get('/coupons/{coupon}/redemptions', [CouponRedemptionController::class, 'index'])->name('coupons.redemptions.index');
+
+    // Returns: Roles with returns.view look; returns.request asks for one on a Delivered
+    // Order, returns.approve approves or rejects it, returns.receive marks it Received and
+    // makes each Restock decision, refunds.issue completes it with its Refund. Stock and
+    // money steps are safe to retry with an Idempotency-Key.
+    Route::get('/returns', [ReturnController::class, 'index'])->name('returns.index');
+    Route::get('/returns/{orderReturn}', [ReturnController::class, 'show'])
+        ->can(Permission::ReturnsView->value)
+        ->name('returns.show');
+    Route::post('/orders/{order}/returns', [ReturnController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.returns.store');
+    Route::post('/returns/{orderReturn}/approve', [ReturnStepController::class, 'approve'])->name('returns.approve');
+    Route::post('/returns/{orderReturn}/reject', [ReturnStepController::class, 'reject'])->name('returns.reject');
+    Route::post('/returns/{orderReturn}/receive', [ReturnStepController::class, 'receive'])
+        ->can(Permission::ReturnsReceive->value)
+        ->name('returns.receive');
+    Route::post('/returns/{orderReturn}/restock', [ReturnStepController::class, 'restock'])
+        ->middleware('idempotent')
+        ->name('returns.restock');
+    Route::post('/returns/{orderReturn}/refund', [ReturnStepController::class, 'refund'])
+        ->middleware('idempotent')
+        ->name('returns.refund');
 
     // Shipments: shipments.manage ships a Ready for shipping Order and marks Shipments delivered.
     Route::post('/orders/{order}/shipments', [ShipmentController::class, 'store'])

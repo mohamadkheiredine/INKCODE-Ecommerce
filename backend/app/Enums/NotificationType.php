@@ -19,6 +19,8 @@ enum NotificationType: string
 
     case PaymentDeclined = 'payment_declined';
 
+    case ReturnRequested = 'return_requested';
+
     /**
      * The message in the current language, filled with the values saved when it was sent.
      *

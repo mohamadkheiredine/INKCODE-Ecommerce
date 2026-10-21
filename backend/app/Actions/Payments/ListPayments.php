@@ -23,7 +23,7 @@ final class ListPayments
      */
     public function handle(ListParameters $parameters): LengthAwarePaginator
     {
-        $query = Payment::query()->with(['order:id,number,currency_code,payment_status', 'user:id,name']);
+        $query = Payment::query()->with(['order:id,number,currency_code,payment_status', 'user:id,name', 'orderReturn:id,number,refund_id']);
 
         if ($parameters->search !== null) {
             $query->where(function (Builder $query) use ($parameters): void {

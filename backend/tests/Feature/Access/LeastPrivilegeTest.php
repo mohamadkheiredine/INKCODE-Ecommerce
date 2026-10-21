@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\ReturnReason;
+use App\Enums\ReturnStatus;
 use App\Enums\Role;
 use App\Enums\ShipmentStatus;
 use App\Models\Attribute;
@@ -9,6 +11,7 @@ use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
+use App\Models\OrderReturn;
 use App\Models\Product;
 use App\Models\ShippingMethod;
 use App\Models\ShippingZone;
@@ -68,6 +71,13 @@ function recordsForRouteParameters(): array
         'transfer' => Transfer::query()->create([
             'source_warehouse_id' => Warehouse::factory()->create()->id,
             'destination_warehouse_id' => Warehouse::factory()->create()->id,
+        ]),
+        'orderReturn' => OrderReturn::query()->create([
+            'number' => 'RET-2026-000001',
+            'order_id' => $order->id,
+            'status' => ReturnStatus::Requested,
+            'reason' => ReturnReason::Damaged,
+            'requested_at' => now(),
         ]),
     ];
 
