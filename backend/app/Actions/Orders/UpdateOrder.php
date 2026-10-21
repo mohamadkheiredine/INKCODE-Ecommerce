@@ -3,11 +3,15 @@
 namespace App\Actions\Orders;
 
 use App\Actions\Shipping\QuoteShipping;
+use App\Enums\OrderStatus;
 use App\Exceptions\BusinessRuleViolation;
 use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Variant;
+use App\Services\AppliedCoupon;
 use App\Services\AuditTrail;
+use App\Services\CouponRedemptions;
+use App\Services\CouponValidator;
 use App\Services\OrderPricing;
 use App\Services\OrderStock;
 use Illuminate\Support\Facades\DB;
@@ -25,15 +29,18 @@ final class UpdateOrder
         private readonly QuoteShipping $quoteShipping,
         private readonly OrderPricing $pricing,
         private readonly OrderStock $orderStock,
+        private readonly CouponValidator $couponValidator,
+        private readonly CouponRedemptions $couponRedemptions,
         private readonly AuditTrail $auditTrail,
     ) {}
 
     /**
-     * @param  array{billing_address_id: int, shipping_address_id: int, shipping_method_id: int, lines: list<array{variant_id: int, quantity: int}>}  $values
+     * @param  array{billing_address_id: int, shipping_address_id: int, shipping_method_id: int, coupon_code?: string|null, lines: list<array{variant_id: int, quantity: int}>}  $values
      *
      * @throws BusinessRuleViolation 409 `order_locked` from Preparing onward, 409
      *                               `insufficient_stock` when the extra units are not
-     *                               Available, 422 `shipping_method_unavailable`
+     *                               Available, 422 `shipping_method_unavailable`,
+     *                               422 `coupon_invalid` when the Coupon does not apply
      */
     public function handle(Order $order, array $values): Order
     {
@@ -85,11 +92,30 @@ final class UpdateOrder
                 $snapshots[] = OrderPricing::snapshot($variant, $wanted[$variantId]);
             }
 
-            $priced = $this->pricing->reprice($snapshots, $order->vat_rate, $shippingTotal);
+            // The Coupon is checked again against the new lines; a Confirmed Order's Coupon row
+            // stays locked until its redemption is updated below.
+            $couponCode = $values['coupon_code'] ?? null;
+            $applied = $couponCode === null ? null : $this->couponValidator->validate(
+                $couponCode,
+                array_map(fn (array $snapshot): array => [
+                    'variant_id' => $snapshot['variant_id'],
+                    'quantity' => $snapshot['quantity'],
+                    'unit_price' => $snapshot['unit_price'],
+                ], $snapshots),
+                $order->customer_id,
+                $order,
+                lock: $order->status !== OrderStatus::Pending,
+            );
+            foreach ($snapshots as $index => $snapshot) {
+                $snapshots[$index]['coupon_eligible'] = $applied?->isEligible($snapshot['variant_id']) ?? false;
+            }
+
+            $priced = $this->pricing->reprice($snapshots, $order->vat_rate, $shippingTotal, $applied?->terms());
             foreach ($snapshots as $index => $snapshot) {
                 $order->lines()->updateOrCreate(['variant_id' => $snapshot['variant_id']], [...$snapshot, ...$priced['lines'][$index]]);
             }
             $order->update([
+                ...($applied?->orderSnapshot() ?? AppliedCoupon::none()),
                 'billing_address' => CreateOrder::snapshot($billing),
                 'shipping_address' => CreateOrder::snapshot($shipping),
                 'shipping_method_id' => $values['shipping_method_id'],
@@ -98,6 +124,7 @@ final class UpdateOrder
             ]);
 
             $this->orderStock->adjust($order, $order->status, $deltas);
+            $this->couponRedemptions->sync($order);
             $this->auditTrail->updated($order->load('lines'), $before);
 
             return $order;

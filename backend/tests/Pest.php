@@ -122,11 +122,12 @@ function sessionOf(TestResponse $response): string
 
 /**
  * Creates a Pending Order, as the API does, for a new Customer in Beirut shipped by a $5
- * Standard method: one line per `[Variant, quantity]`, fulfilled from the Warehouse.
+ * Standard method: one line per `[Variant, quantity]`, fulfilled from the Warehouse, with
+ * an optional Coupon code.
  *
  * @param  list<array{Variant, int}>  $lines
  */
-function placeOrder(Warehouse $warehouse, array $lines, ?Customer $customer = null): Order
+function placeOrder(Warehouse $warehouse, array $lines, ?Customer $customer = null, ?string $couponCode = null): Order
 {
     $customer ??= Customer::factory()->create();
     $address = $customer->addresses()->where('is_default_shipping', true)->first()
@@ -144,6 +145,7 @@ function placeOrder(Warehouse $warehouse, array $lines, ?Customer $customer = nu
         'warehouse_id' => $warehouse->id,
         'shipping_method_id' => $method->id,
         'notes' => null,
+        'coupon_code' => $couponCode,
         'lines' => array_map(fn (array $line): array => ['variant_id' => $line[0]->id, 'quantity' => $line[1]], $lines),
     ]);
 }
