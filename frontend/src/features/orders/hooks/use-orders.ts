@@ -4,6 +4,7 @@ import { customerKeys } from '@/features/customers/api/customers-api'
 import { dashboardKeys } from '@/features/dashboard/api/dashboard-api'
 import { reportKeys } from '@/features/reports/api/reports-api'
 import { inventoryKeys } from '@/features/inventory/api/inventory-api'
+import { paymentKeys } from '@/features/payments/api/payments-api'
 import type { ListQuery } from '@/lib/list-query'
 import { carrierKeys, carriersApi } from '@/features/shipping/api/carriers-api'
 import { orderKeys, ordersApi } from '../api/orders-api'
@@ -54,8 +55,9 @@ export function useSellableVariants(search: string) {
 }
 
 /**
- * An Order change moves stock too, so the stock screens and Products refresh with it, and
- * it changes what the Customer spent and the sales figures.
+ * An Order change moves stock too, so the stock screens and Products refresh with it; a
+ * cancellation can give money back (a Refund in the ledger); and it changes what the
+ * Customer spent and the sales figures.
  */
 function useOrderChanged() {
   const queryClient = useQueryClient()
@@ -65,6 +67,7 @@ function useOrderChanged() {
       queryClient.invalidateQueries({ queryKey: orderKeys.all }),
       queryClient.invalidateQueries({ queryKey: inventoryKeys.all }),
       queryClient.invalidateQueries({ queryKey: productKeys.all }),
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all }),
       queryClient.invalidateQueries({ queryKey: customerKeys.all }),
       queryClient.invalidateQueries({ queryKey: dashboardKeys.all }),
       queryClient.invalidateQueries({ queryKey: reportKeys.all }),
