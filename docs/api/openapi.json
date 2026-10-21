@@ -3934,6 +3934,161 @@
                 }
             }
         },
+        "/dashboard": {
+            "get": {
+                "operationId": "dashboard.show",
+                "summary": "The executive dashboard for `from`\u2013`to`: KPIs from Counted orders compared with the\nprevious period, daily Revenue, the Order-status breakdown, top Products, recent\nOrders and alerts",
+                "tags": [
+                    "Dashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "range": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "from": {
+                                                            "type": "string"
+                                                        },
+                                                        "to": {
+                                                            "type": "string"
+                                                        },
+                                                        "previous_from": {
+                                                            "type": "string"
+                                                        },
+                                                        "previous_to": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "from",
+                                                        "to",
+                                                        "previous_from",
+                                                        "previous_to"
+                                                    ]
+                                                },
+                                                "kpis": {
+                                                    "type": "string"
+                                                },
+                                                "revenue_by_day": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "date": {
+                                                                "type": "string"
+                                                            },
+                                                            "revenue": {
+                                                                "type": "string"
+                                                            },
+                                                            "previous_revenue": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "date",
+                                                            "revenue",
+                                                            "previous_revenue"
+                                                        ]
+                                                    }
+                                                },
+                                                "status_breakdown": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "top_products": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "product_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "units": {
+                                                                "type": "integer"
+                                                            },
+                                                            "sales": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "product_id",
+                                                            "name",
+                                                            "units",
+                                                            "sales"
+                                                        ]
+                                                    }
+                                                },
+                                                "recent_orders": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "alerts": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "range",
+                                                "kpis",
+                                                "revenue_by_day",
+                                                "status_breakdown",
+                                                "top_products",
+                                                "recent_orders",
+                                                "alerts"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/auth/demo-accounts": {
             "get": {
                 "operationId": "auth.demo-accounts",
