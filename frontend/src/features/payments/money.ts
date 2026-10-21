@@ -25,19 +25,59 @@ export function netCapturedCents(order: Order): number {
 }
 
 /**
+ * Each line's share of the Order's Coupon discount, in cents, as
+ * `OrderPricing::discounts()` spreads it: a percentage of the eligible lines (half up) or
+ * a fixed amount (at most what they are worth), shared by value and cut to the cent, with
+ * the cents left over going to the largest lines first.
+ */
+function couponShares(order: Order, amounts: number[]): number[] {
+  const lines = order.lines ?? []
+  const shares = amounts.map(() => 0)
+  const eligible = lines.flatMap((line, index) => (line.coupon_eligible ? [index] : []))
+  const eligibleTotal = eligible.reduce((sum, index) => sum + amounts[index]!, 0)
+  if (!order.coupon || eligibleTotal <= 0) return shares
+
+  const value = toCents(order.coupon.value)
+  const discount =
+    order.coupon.type === 'percentage'
+      ? Math.floor((eligibleTotal * value + 5000) / 10000)
+      : Math.min(value, eligibleTotal)
+
+  let remainder = discount
+  for (const index of eligible) {
+    shares[index] = Math.floor((discount * amounts[index]!) / eligibleTotal)
+    remainder -= shares[index]!
+  }
+  const largestFirst = [...eligible].sort((a, b) => amounts[b]! - amounts[a]! || a - b)
+  for (const index of largestFirst) {
+    if (remainder <= 0) break
+    const extra = Math.min(amounts[index]! - shares[index]!, remainder)
+    shares[index]! += extra
+    remainder -= extra
+  }
+  return shares
+}
+
+/**
  * The Order's total after Partial cancellation, priced the way the API re-prices it
- * (`App\Services\OrderPricing::reprice`): quantity × unit price per line, VAT at the
- * Order's rate on taxable lines rounded half up to cents per line, shipping kept.
+ * (`App\Services\OrderPricing::reprice`): quantity × unit price per line less its Coupon
+ * share, VAT at the Order's rate on taxable lines rounded half up to cents per line,
+ * shipping kept.
  */
 export function totalAfterCancellingCents(order: Order, cancellations: LineCancellation[]): number {
   const rate = toCents(order.vat_rate)
   const cancelled = new Map(cancellations.map((line) => [line.line_id, line.quantity]))
-  const lines = (order.lines ?? []).reduce((sum, line) => {
-    const amount = (line.quantity - (cancelled.get(line.id) ?? 0)) * toCents(line.unit_price)
-    const vat = line.taxable ? Math.floor((amount * rate + 5000) / 10000) : 0
-    return sum + amount + vat
+  const lines = order.lines ?? []
+  const amounts = lines.map(
+    (line) => (line.quantity - (cancelled.get(line.id) ?? 0)) * toCents(line.unit_price),
+  )
+  const shares = couponShares(order, amounts)
+  const linesTotal = lines.reduce((sum, line, index) => {
+    const net = amounts[index]! - shares[index]!
+    const vat = line.taxable ? Math.floor((net * rate + 5000) / 10000) : 0
+    return sum + net + vat
   }, 0)
-  return lines + toCents(order.shipping_total)
+  return linesTotal + toCents(order.shipping_total)
 }
 
 /**

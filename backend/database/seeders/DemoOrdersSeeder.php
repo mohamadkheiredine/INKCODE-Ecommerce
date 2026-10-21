@@ -7,6 +7,7 @@ use App\Actions\Orders\ConfirmOrder;
 use App\Actions\Orders\CreateOrder;
 use App\Actions\Shipping\QuoteShipping;
 use App\Enums\ProductStatus;
+use App\Models\Coupon;
 use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\User;
@@ -60,6 +61,8 @@ class DemoOrdersSeeder extends Seeder
                     'warehouse_id' => $warehouse->id,
                     'shipping_method_id' => app(QuoteShipping::class)->handle($address->country_code, $address->city)->methods[0]->id,
                     'notes' => null,
+                    // Every third Order uses the demo SAVE10 Coupon (counted once Confirmed).
+                    'coupon_code' => $index % 3 === 1 && Coupon::query()->where('code', 'SAVE10')->exists() ? 'SAVE10' : null,
                     'lines' => $this->lines($variants->all(), $index),
                 ]);
 

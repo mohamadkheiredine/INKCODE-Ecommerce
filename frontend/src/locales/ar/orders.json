@@ -7,6 +7,9 @@
   "allWarehouses": "كل المستودعات",
   "from": "من",
   "to": "إلى",
+  "couponPlaceholder": "مثال: SAVE10",
+  "applyCoupon": "تطبيق",
+  "couponApplied": "تم تطبيق {{code}}: خصم {{discount}} على المنتجات المشمولة.",
   "emptyTitle": "لا توجد طلبات بعد",
   "emptyDescription": "أدخل أول طلب لعميل. يبقى قيد الانتظار حتى تؤكده.",
   "emptyDescriptionReadOnly": "تظهر الطلبات هنا فور إدخالها.",
@@ -29,7 +32,8 @@
     "billingAddress": "عنوان الفوترة",
     "shippingMethod": "طريقة الشحن",
     "createdBy": "أدخله",
-    "notes": "ملاحظات"
+    "notes": "ملاحظات",
+    "coupon": "رمز القسيمة"
   },
   "statuses": {
     "pending": "قيد الانتظار",
@@ -43,6 +47,7 @@
   "totals": {
     "items": "المنتجات",
     "discount": "الخصم",
+    "discountWithCoupon": "الخصم ({{code}})",
     "vat": "ضريبة القيمة المضافة",
     "shipping": "الشحن (بدون ضريبة)",
     "shippingVia": "الشحن · {{method}} (بدون ضريبة)",
@@ -113,6 +118,7 @@
     "warehouseRequired": "اختر المستودع المنفِّذ.",
     "shippingMethodRequired": "اختر طريقة الشحن.",
     "notesTooLong": "اجعل الملاحظات أقل من 1,000 حرف.",
+    "couponTooLong": "رمز القسيمة 40 حرفًا على الأكثر.",
     "quantity": "أدخل عدداً صحيحاً من 1 إلى 10,000.",
     "noLines": "أضف متغيّراً واحداً على الأقل.",
     "noteRequired": "اكتب الملاحظة أولاً."

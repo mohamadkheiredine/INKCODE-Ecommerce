@@ -8,6 +8,7 @@ return [
         'shipping_address_id' => 'shipping address',
         'warehouse_id' => 'Fulfilling warehouse',
         'shipping_method_id' => 'Shipping method',
+        'coupon_code' => 'Coupon code',
         'lines' => 'lines',
         'variant_id' => 'Variant',
         'quantity' => 'quantity',

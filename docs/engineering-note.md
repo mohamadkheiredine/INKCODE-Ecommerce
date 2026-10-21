@@ -164,6 +164,12 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - `PaymentGateway` is the seam to a real provider; the bound `MockCardGateway` approves or declines by the `card_outcome` test option. Card details are refused by validation (`card_number`, `cvc` are `prohibited`). A declined charge returns 201 with `status: failed`, so the idempotency middleware keeps (and replays) it; every active Finance User gets a `payment_declined` bell notification.
   - Payments and Refunds take an `Idempotency-Key` (the existing middleware) and also store it on the row, unique per Order. The ledger and payment timeline entries are only sent to Roles with `payments.view` (Inventory sees the Payment status but not the rows).
   - Demo data: `DemoPaymentsSeeder` records, as the demo Finance User and through the real actions, Cash on delivery, Manual, Card (one after a declined attempt), a deposit and a goodwill Refund.
+- **Coupons (#20).**
+  - One `CouponValidator` decides whether a code applies, for the quote, create, edit and Confirm; a refusal is 422 `coupon_invalid` with `details.reason` and `details.field`, so the SPA puts it under the Coupon field. The quote reports the reason instead of failing, and prices without the Coupon.
+  - `OrderPricing` spreads the discount over the eligible lines by value: shares are cut to the cent and the leftover cents go to the largest line (never beyond a line's own value); VAT is then charged per line on the discounted amount.
+  - The Order keeps a snapshot of its Coupon (code, type, value) and each line's `coupon_eligible`, so Partial cancellation re-prices with the terms it was sold with even after the Coupon is edited.
+  - Uses are `coupon_redemptions` rows made at Confirm under a lock on the Coupon row (Order → Coupon → stock, the same order everywhere), released (kept, with `released_at`) on full cancellation; a multi-process test confirms 8 Orders at once against a limit of 3 and gets exactly 3. Editing a Confirmed Order moves or releases its use; an Order that already holds a use is not re-checked against dates and limits.
+  - A Coupon that Orders use cannot be deleted (restricting foreign keys, 409 `in_use`); ending it is the way to stop it.
 
 ## Known limitations
 

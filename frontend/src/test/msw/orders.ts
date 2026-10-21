@@ -48,6 +48,7 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
     customer: { id: 1, name: 'Rana Haddad', email: 'rana@example.com', phone: null },
     warehouse: { id: 1, name: 'Beirut Central', code: 'BEY-01' },
     shipping_method: { id: 3, name: 'Standard' },
+    coupon: null,
     billing_address: ADDRESS,
     shipping_address: ADDRESS,
     currency_code: 'USD',
@@ -77,6 +78,7 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
         cancelled_quantity: 0,
         unit_price: '19.99',
         discount_amount: '0.00',
+        coupon_eligible: false,
         taxable: true,
         vat_rate: '5.00',
         vat_amount: '3.00',
@@ -210,11 +212,27 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
       const body = (await request.json()) as {
         lines: OrderLineInput[]
         shipping_method_id: number | null
+        coupon_code: string | null
       }
+      // SAVE10 takes 10% off every line; any other code is unknown.
+      const coupon: OrderQuote['coupon'] =
+        body.coupon_code === null
+          ? null
+          : body.coupon_code === 'SAVE10'
+            ? { code: 'SAVE10', is_valid: true, type: 'percentage', value: '10.00' }
+            : {
+                code: body.coupon_code,
+                is_valid: false,
+                reason: 'not_found',
+                message: `There is no Coupon with the code ${body.coupon_code}.`,
+              }
+      const rate = coupon?.is_valid ? 0.1 : 0
       const cents = (amount: number) => Math.round(amount * 100)
       const lines = body.lines.map((line) => {
         const variant = variants.find((item) => item.id === line.variant_id)!
-        const amount = cents(Number(variant.price) * line.quantity)
+        const gross = cents(Number(variant.price) * line.quantity)
+        const discount = Math.round(gross * rate)
+        const amount = gross - discount
         const vat = Math.round(amount * 0.05)
         return {
           variant_id: variant.id,
@@ -223,7 +241,8 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
           options: variant.options,
           quantity: line.quantity,
           unit_price: variant.price,
-          discount_amount: '0.00',
+          discount_amount: fromCents(discount),
+          coupon_eligible: rate > 0,
           taxable: true,
           vat_rate: '5.00',
           vat_amount: fromCents(vat),
@@ -234,17 +253,19 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
         (sum, line) => sum + cents(Number(line.unit_price) * line.quantity),
         0,
       )
+      const discounts = lines.reduce((sum, line) => sum + cents(Number(line.discount_amount)), 0)
       const vat = lines.reduce((sum, line) => sum + cents(Number(line.vat_amount)), 0)
       const shipping = body.shipping_method_id ? 500 : 0
       return HttpResponse.json({
         data: {
           vat_rate: '5.00',
           items_total: fromCents(items),
-          discount_total: '0.00',
+          discount_total: fromCents(discounts),
           vat_total: fromCents(vat),
           shipping_total: fromCents(shipping),
-          total: fromCents(items + vat + shipping),
+          total: fromCents(items - discounts + vat + shipping),
           lines,
+          coupon,
           warehouses: [
             {
               id: 2,

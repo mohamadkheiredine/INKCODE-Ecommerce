@@ -20,6 +20,8 @@ use App\Http\Controllers\Catalog\ProductImageController;
 use App\Http\Controllers\Catalog\ProductImageOrderController;
 use App\Http\Controllers\Catalog\VariantController;
 use App\Http\Controllers\Catalog\VariantGenerationController;
+use App\Http\Controllers\Coupons\CouponController;
+use App\Http\Controllers\Coupons\CouponRedemptionController;
 use App\Http\Controllers\Customers\CustomerAddressController;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerNoteController;
@@ -207,6 +209,12 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
     Route::post('/orders/{order}/refunds', [OrderRefundController::class, 'store'])
         ->middleware('idempotent')
         ->name('orders.refunds.store');
+    // Coupons: Roles with coupons.view look (with each Coupon's usage); CouponPolicy lets
+    // only coupons.manage change them. Orders apply them through the Order endpoints.
+    Route::apiResource('coupons', CouponController::class)
+        ->middlewareFor('show', 'can:view,coupon')
+        ->middlewareFor('destroy', 'can:delete,coupon');
+    Route::get('/coupons/{coupon}/redemptions', [CouponRedemptionController::class, 'index'])->name('coupons.redemptions.index');
 
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])

@@ -80,7 +80,9 @@
     "invoice": "Invoice",
     "transfers": "Transfers",
     "payments": "Payments",
-    "reconciliation": "Reconciliation"
+    "reconciliation": "Reconciliation",
+    "coupons": "Coupons",
+    "coupon": "Coupon"
   },
   "navGroups": {
     "dashboard": "Dashboard",

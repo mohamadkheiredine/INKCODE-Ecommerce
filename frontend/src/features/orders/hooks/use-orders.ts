@@ -8,6 +8,7 @@ import type {
   OrderLineInput,
   OrderStatus,
   OrderUpdateInput,
+  QuoteCouponInput,
 } from '../types'
 
 export function useOrders(query: ListQuery, enabled = true) {
@@ -24,10 +25,14 @@ export function useOrder(id: number) {
 }
 
 /** The live quote; it waits for at least one line. */
-export function useOrderQuote(lines: OrderLineInput[], shippingMethodId: number | null) {
+export function useOrderQuote(
+  lines: OrderLineInput[],
+  shippingMethodId: number | null,
+  coupon: QuoteCouponInput = { code: '', customerId: 0 },
+) {
   return useQuery({
-    queryKey: orderKeys.quote(lines, shippingMethodId),
-    queryFn: () => ordersApi.quote(lines, shippingMethodId),
+    queryKey: orderKeys.quote(lines, shippingMethodId, coupon),
+    queryFn: () => ordersApi.quote(lines, shippingMethodId, coupon),
     placeholderData: keepPreviousData,
     enabled: lines.length > 0,
   })

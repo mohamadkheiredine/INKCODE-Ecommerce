@@ -80,7 +80,9 @@
     "invoice": "فاتورة",
     "transfers": "التحويلات",
     "payments": "المدفوعات",
-    "reconciliation": "المطابقة"
+    "reconciliation": "المطابقة",
+    "coupons": "القسائم",
+    "coupon": "القسيمة"
   },
   "navGroups": {
     "dashboard": "لوحة التحكم",

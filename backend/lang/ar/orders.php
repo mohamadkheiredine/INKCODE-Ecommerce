@@ -8,6 +8,7 @@ return [
         'shipping_address_id' => 'عنوان الشحن',
         'warehouse_id' => 'المستودع المنفِّذ',
         'shipping_method_id' => 'طريقة الشحن',
+        'coupon_code' => 'رمز القسيمة',
         'lines' => 'البنود',
         'variant_id' => 'المتغيّر',
         'quantity' => 'الكمية',

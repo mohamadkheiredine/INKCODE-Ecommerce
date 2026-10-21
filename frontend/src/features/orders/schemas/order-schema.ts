@@ -3,7 +3,7 @@ import type { OrderInput, OrderLineInput } from '../types'
 
 const QUANTITY = /^[1-9]\d{0,4}$/
 
-/** As StoreOrderRequest: a Customer and two of their addresses, a Warehouse, a method, lines. */
+/** As StoreOrderRequest: a Customer and two of their addresses, a Warehouse, a method, an optional Coupon code, lines. */
 export const orderSchema = z.object({
   customer_id: z.string().min(1, 'orders:validation.customerRequired'),
   billing_address_id: z.string().min(1, 'orders:validation.addressRequired'),
@@ -11,6 +11,7 @@ export const orderSchema = z.object({
   warehouse_id: z.string().min(1, 'orders:validation.warehouseRequired'),
   shipping_method_id: z.string().min(1, 'orders:validation.shippingMethodRequired'),
   notes: z.string().trim().max(1000, 'orders:validation.notesTooLong'),
+  coupon_code: z.string().trim().max(40, 'orders:validation.couponTooLong'),
   lines: z
     .array(
       z.object({
@@ -36,6 +37,7 @@ export const EMPTY_ORDER: OrderFormValues = {
   warehouse_id: '',
   shipping_method_id: '',
   notes: '',
+  coupon_code: '',
   lines: [],
 }
 
@@ -54,6 +56,7 @@ export function toOrderInput(values: OrderFormValues): OrderInput {
     warehouse_id: Number(values.warehouse_id),
     shipping_method_id: Number(values.shipping_method_id),
     notes: values.notes,
+    coupon_code: values.coupon_code.trim() || null,
     lines: values.lines.map((line) => ({
       variant_id: line.variant_id,
       quantity: Number(line.quantity),

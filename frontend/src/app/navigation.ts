@@ -1,5 +1,6 @@
 import { auditLogNav } from '@/features/audit/nav'
 import { attributesNav, brandsNav, categoriesNav, productsNav } from '@/features/catalog/nav'
+import { couponsNav } from '@/features/coupons/nav'
 import { customersNav } from '@/features/customers/nav'
 import { homeNav } from '@/features/home/nav'
 import {
@@ -36,6 +37,7 @@ export const NAV_ENTRIES: readonly NavEntry[] = [
   warehousesNav,
   shippingZonesNav,
   carriersNav,
+  couponsNav,
   usersNav,
   rolesNav,
   auditLogNav,

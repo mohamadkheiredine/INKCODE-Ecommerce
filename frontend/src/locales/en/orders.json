@@ -7,6 +7,9 @@
   "allWarehouses": "All Warehouses",
   "from": "From",
   "to": "To",
+  "couponPlaceholder": "e.g. SAVE10",
+  "applyCoupon": "Apply",
+  "couponApplied": "{{code}} applied: {{discount}} off the eligible items.",
   "emptyTitle": "No Orders yet",
   "emptyDescription": "Enter the first Order for a Customer. It starts Pending until you confirm it.",
   "emptyDescriptionReadOnly": "Orders appear here as soon as someone enters one.",
@@ -29,7 +32,8 @@
     "billingAddress": "Billing address",
     "shippingMethod": "Shipping method",
     "createdBy": "Entered by",
-    "notes": "Notes"
+    "notes": "Notes",
+    "coupon": "Coupon code"
   },
   "statuses": {
     "pending": "Pending",
@@ -43,6 +47,7 @@
   "totals": {
     "items": "Items",
     "discount": "Discount",
+    "discountWithCoupon": "Discount ({{code}})",
     "vat": "VAT",
     "shipping": "Shipping (no VAT)",
     "shippingVia": "Shipping · {{method}} (no VAT)",
@@ -113,6 +118,7 @@
     "warehouseRequired": "Choose the Fulfilling warehouse.",
     "shippingMethodRequired": "Choose a Shipping method.",
     "notesTooLong": "Keep the notes under 1,000 characters.",
+    "couponTooLong": "A Coupon code has at most 40 characters.",
     "quantity": "Enter a whole number from 1 to 10,000.",
     "noLines": "Add at least one Variant.",
     "noteRequired": "Write the note first."

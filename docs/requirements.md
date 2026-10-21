@@ -45,7 +45,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 
 - [x] Payment transaction ledger, manual payment, cash on delivery, reconciliation (#19: Payment ledger rows with kind, Payment method, amount, status, gateway reference, User and Idempotency-Key; Payment status derived after every write; Payments page with filters and a Reconciliation view summed from the ledger itself)
 - [x] Mock payment gateway adapter (no live gateway) with idempotency keys (#19: `PaymentGateway` interface + `MockCardGateway` deciding by a test option, never taking card details; declined charges kept as Failed and sent to Finance Users' bells)
-- [ ] Coupons: percentage / fixed, validity dates, usage limits, eligible items, stacking rules
+- [x] Coupons: percentage / fixed, validity dates, usage limits, eligible items, stacking rules (#20)
 - [ ] Shipping zones, carriers, rates, tracking references, shipment history, partial shipments
   - [x] Shipping zones (countries or cities), flat-price Shipping methods, Carriers with tracking link templates, and the address quote (#14)
   - [ ] Shipments: tracking numbers, status history, partial shipments (#18)

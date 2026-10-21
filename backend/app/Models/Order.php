@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Contracts\Auditable;
+use App\Enums\CouponType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\Audited;
+use App\Services\OrderPricing;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +28,10 @@ use Illuminate\Support\Carbon;
  * @property int $customer_id
  * @property int $warehouse_id
  * @property int $shipping_method_id
+ * @property int|null $coupon_id
+ * @property string|null $coupon_code
+ * @property CouponType|null $coupon_type
+ * @property string|null $coupon_value
  * @property array{recipient_name: string, phone: string|null, country_code: string, city: string, line1: string, line2: string|null, postal_code: string|null} $billing_address
  * @property array{recipient_name: string, phone: string|null, country_code: string, city: string, line1: string, line2: string|null, postal_code: string|null} $shipping_address
  * @property string $shipping_method_name
@@ -47,6 +53,7 @@ use Illuminate\Support\Carbon;
  * @property-read Customer $customer
  * @property-read Warehouse $warehouse
  * @property-read ShippingMethod $shippingMethod
+ * @property-read Coupon|null $coupon
  * @property-read User|null $user
  * @property-read User|null $assignee
  * @property-read Collection<int, OrderLine> $lines
@@ -55,7 +62,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Payment> $payments
  */
 #[Fillable([
-    'number', 'status', 'payment_status', 'customer_id', 'warehouse_id', 'shipping_method_id',
+    'number', 'status', 'payment_status', 'customer_id', 'warehouse_id', 'shipping_method_id', 'coupon_id', 'coupon_code', 'coupon_type', 'coupon_value',
     'billing_address', 'shipping_address', 'shipping_method_name', 'currency_code', 'vat_rate',
     'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'captured_amount', 'refunded_amount', 'notes', 'user_id', 'assignee_id', 'placed_at',
 ])]
@@ -92,6 +99,8 @@ class Order extends Model implements Auditable
             'payment_status' => PaymentStatus::class,
             'captured_amount' => 'decimal:2',
             'refunded_amount' => 'decimal:2',
+            'coupon_type' => CouponType::class,
+            'coupon_value' => 'decimal:2',
             'placed_at' => 'datetime',
         ];
     }
@@ -120,6 +129,28 @@ class Order extends Model implements Auditable
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class);
+    }
+
+    /**
+     * The Coupon it uses, if any (its code, type and value are also kept on the Order).
+     *
+     * @return BelongsTo<Coupon, $this>
+     */
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    /**
+     * The Coupon's terms as {@see OrderPricing::reprice()} takes them.
+     *
+     * @return array{type: CouponType, value: string}|null
+     */
+    public function couponTerms(): ?array
+    {
+        return $this->coupon_type === null || $this->coupon_value === null
+            ? null
+            : ['type' => $this->coupon_type, 'value' => $this->coupon_value];
     }
 
     /**
@@ -239,7 +270,7 @@ class Order extends Model implements Auditable
         return [
             ...$this->only(
                 'number', 'customer_id', 'warehouse_id', 'shipping_method_id', 'billing_address', 'shipping_address',
-                'vat_rate', 'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes', 'assignee_id',
+                'coupon_code', 'vat_rate', 'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes', 'assignee_id',
             ),
             'status' => $this->status->value,
             'lines' => $this->lines

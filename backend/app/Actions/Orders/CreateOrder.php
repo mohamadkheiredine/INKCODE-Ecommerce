@@ -8,7 +8,9 @@ use App\Exceptions\BusinessRuleViolation;
 use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Variant;
+use App\Services\AppliedCoupon;
 use App\Services\AuditTrail;
+use App\Services\CouponValidator;
 use App\Services\OrderPricing;
 use App\Services\Settings;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -17,7 +19,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Creates a Pending Order: prices its lines (VAT per line, untaxed shipping), snapshots the
- * addresses, Shipping method and Variants, gives it the next Order number of its year,
+ * addresses, Shipping method, Variants and Coupon (checked by {@see CouponValidator}, and
+ * only counted as used at Confirm), gives it the next Order number of its year,
  * and records its first status and an audit entry, all in one transaction. Stock is not
  * touched until the Order is Confirmed ({@see ConfirmOrder}).
  */
@@ -26,15 +29,17 @@ final class CreateOrder
     public function __construct(
         private readonly QuoteShipping $quoteShipping,
         private readonly OrderPricing $pricing,
+        private readonly CouponValidator $couponValidator,
         private readonly Settings $settings,
         private readonly AuditTrail $auditTrail,
         private readonly AuthFactory $auth,
     ) {}
 
     /**
-     * @param  array{customer_id: int, billing_address_id: int, shipping_address_id: int, warehouse_id: int, shipping_method_id: int, notes: string|null, lines: list<array{variant_id: int, quantity: int}>}  $values
+     * @param  array{customer_id: int, billing_address_id: int, shipping_address_id: int, warehouse_id: int, shipping_method_id: int, notes: string|null, coupon_code?: string|null, lines: list<array{variant_id: int, quantity: int}>}  $values
      *
-     * @throws BusinessRuleViolation 422 `shipping_method_unavailable` when the method does not deliver to the shipping address
+     * @throws BusinessRuleViolation 422 `shipping_method_unavailable` when the method does not deliver to the shipping address,
+     *                               422 `coupon_invalid` when the Coupon does not apply
      */
     public function handle(array $values): Order
     {
@@ -46,12 +51,19 @@ final class CreateOrder
             ->with(['product:id,name,taxable', 'attributeValues.attribute:id,name'])
             ->findMany(array_column($values['lines'], 'variant_id'))
             ->keyBy('id');
+        $couponCode = $values['coupon_code'] ?? null;
+        $applied = $couponCode === null ? null : $this->couponValidator->validate(
+            $couponCode,
+            array_map(fn (array $line): array => [...$line, 'unit_price' => $variants[$line['variant_id']]->price], $values['lines']),
+            $values['customer_id'],
+        );
         $priced = $this->pricing->price(
             array_map(fn (array $line): array => ['variant' => $variants[$line['variant_id']], 'quantity' => $line['quantity']], $values['lines']),
             $method->price,
+            $applied,
         );
 
-        return DB::transaction(function () use ($values, $billing, $shipping, $method, $priced): Order {
+        return DB::transaction(function () use ($values, $billing, $shipping, $method, $priced, $applied): Order {
             $userId = $this->auth->guard()->id();
             $userId = $userId === null ? null : (int) $userId;
             $placedAt = Carbon::now();
@@ -62,6 +74,7 @@ final class CreateOrder
                 'customer_id' => $values['customer_id'],
                 'warehouse_id' => $values['warehouse_id'],
                 'shipping_method_id' => $method->id,
+                ...($applied?->orderSnapshot() ?? AppliedCoupon::none()),
                 'billing_address' => self::snapshot($billing),
                 'shipping_address' => self::snapshot($shipping),
                 'shipping_method_name' => $method->name,
