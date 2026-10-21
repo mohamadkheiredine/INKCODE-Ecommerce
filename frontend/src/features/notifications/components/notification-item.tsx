@@ -3,6 +3,7 @@ import {
   CheckIcon,
   ClipboardListIcon,
   CreditCardIcon,
+  RotateCcwIcon,
   type LucideIcon,
   SparklesIcon,
 } from 'lucide-react'
@@ -18,6 +19,7 @@ const TYPE_ICONS: Record<string, LucideIcon> = {
   welcome: SparklesIcon,
   order_assigned: ClipboardListIcon,
   payment_declined: CreditCardIcon,
+  return_requested: RotateCcwIcon,
 }
 
 /** Only paths inside the app are followed; anything else shows as plain text. */

@@ -44,7 +44,8 @@
     "cancellation_return": "Cancellation return",
     "adjustment": "Adjustment",
     "transfer_out": "Transfer out",
-    "transfer_in": "Transfer in"
+    "transfer_in": "Transfer in",
+    "return_restock": "Return restock"
   },
   "warehouses": {
     "description": "The places that hold stock and ship Orders.",

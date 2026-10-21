@@ -34,6 +34,7 @@ const LIST_CONFIG: ListQueryConfig = {
 function sourceHref(source: StockMovement['source']): string | null {
   if (source.type === 'receipt') return `/inventory/receipts/${source.id}`
   if (source.type === 'order') return `/orders/${source.id}`
+  if (source.type === 'return') return `/returns/${source.id}`
   return null
 }
 

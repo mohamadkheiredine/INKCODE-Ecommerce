@@ -12,6 +12,7 @@ import {
 } from '@/features/inventory/nav'
 import { ordersNav } from '@/features/orders/nav'
 import { paymentsNav } from '@/features/payments/nav'
+import { returnsNav } from '@/features/returns/nav'
 import { settingsNav } from '@/features/settings/nav'
 import { rolesNav, usersNav } from '@/features/users/nav'
 import { carriersNav, shippingZonesNav } from '@/features/shipping/nav'
@@ -24,6 +25,7 @@ import type { NavEntry } from '@/lib/navigation'
 export const NAV_ENTRIES: readonly NavEntry[] = [
   homeNav,
   ordersNav,
+  returnsNav,
   paymentsNav,
   customersNav,
   productsNav,

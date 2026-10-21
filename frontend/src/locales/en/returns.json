@@ -1,0 +1,109 @@
+{
+  "title": "Returns",
+  "description": "Items Customers send back, from request to Restock decision and Refund.",
+  "detailDescription": "Approve, receive, decide each item's restock, then refund what the Customer paid.",
+  "search": "Search by Return, Order or Customer",
+  "allStatuses": "All statuses",
+  "allReasons": "All reasons",
+  "loading": "Loading Returns…",
+  "emptyTitle": "No Returns yet",
+  "emptyDescription": "Returns are requested from a Delivered Order's page, within the Return window.",
+  "goToDelivered": "Go to Delivered Orders",
+  "notFound": "This Return does not exist or was removed.",
+  "noneOnOrder": "No Returns on this Order.",
+  "details": "Details",
+  "items": "Returned items",
+  "paid": "Paid",
+  "cancel": "Cancel",
+  "returnedOf_one": "{{returned}} of {{ordered}} returned",
+  "returnedOf_other": "{{returned}} of {{ordered}} returned",
+  "window": {
+    "openUntil": "Return window open until {{date}}",
+    "closed": "The Return window has closed."
+  },
+  "statuses": {
+    "requested": "Requested",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "received": "Received",
+    "completed": "Completed"
+  },
+  "reasons": {
+    "damaged": "Damaged",
+    "wrong_item": "Wrong item",
+    "not_as_described": "Not as described",
+    "changed_mind": "Changed mind",
+    "other": "Other"
+  },
+  "decisions": {
+    "restock": "Back to stock",
+    "write_off": "Write-off"
+  },
+  "fields": {
+    "number": "Return",
+    "order": "Order",
+    "customer": "Customer",
+    "reason": "Reason",
+    "note": "Note",
+    "units": "Units",
+    "status": "Status",
+    "requestedAt": "Requested",
+    "approvedAt": "Approved",
+    "rejectedAt": "Rejected",
+    "receivedAt": "Received",
+    "completedAt": "Completed",
+    "refund": "Refund",
+    "refundAmount": "Refund amount"
+  },
+  "request": {
+    "action": "Request return",
+    "title": "Return items from {{number}}",
+    "description": "Choose how many units of each item come back and why. Stock does not change until each item's Restock decision.",
+    "returnable_one": "{{count}} unit can be returned",
+    "returnable_other": "{{count}} units can be returned",
+    "quantityFor": "Units of {{sku}} to return",
+    "submit": "Request return",
+    "done": "Return {{number}} requested."
+  },
+  "decide": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveTitle": "Approve {{number}}",
+    "rejectTitle": "Reject {{number}}",
+    "approveDescription": "The Customer may send the items back. Add a note if useful.",
+    "rejectDescription": "Nothing comes back and the units can be requested again. Say why.",
+    "approveDone": "Return {{number}} approved.",
+    "rejectDone": "Return {{number}} rejected."
+  },
+  "receive": {
+    "action": "Mark received",
+    "done": "Return {{number}} received."
+  },
+  "restock": {
+    "notYet": "Each item gets its Restock decision once the Return is Received.",
+    "choose": "Choose…",
+    "decisionFor": "Restock decision for {{sku}}",
+    "save": "Save decisions",
+    "chooseFirst": "Choose a Restock decision for at least one item.",
+    "pending": "Decision pending",
+    "done": "Restock decisions saved."
+  },
+  "refund": {
+    "title": "Refund",
+    "items": "Paid for the items",
+    "shipping": "Shipping",
+    "shippingRefunded": "Already refunded",
+    "refundable": "Order can still refund",
+    "alsoShipping": "Also refund shipping",
+    "cap": "At most {{cap}}. You may lower it; 0 completes the Return without a Refund.",
+    "submit": "Complete with Refund",
+    "withShipping": "includes shipping",
+    "done": "Return {{number}} completed with a Refund of {{amount}}."
+  },
+  "validation": {
+    "chooseItems": "Enter how many units of at least one item come back.",
+    "tooMany": "Return at most {{max}} units of an item.",
+    "amount": "Enter an amount with at most two decimals.",
+    "aboveCap": "The Refund can be at most {{cap}}."
+  }
+}

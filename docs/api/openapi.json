@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8003/api/v1"
+            "url": "http://localhost:8000/api/v1"
         }
     ],
     "paths": {
@@ -6919,6 +6919,660 @@
                 }
             }
         },
+        "/returns": {
+            "get": {
+                "operationId": "returns.index",
+                "tags": [
+                    "Return"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "requested_at",
+                                "number",
+                                "-requested_at",
+                                "-number",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/ReturnStatus"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[reason]",
+                        "in": "query",
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/ReturnReason"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ReturnResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}": {
+            "get": {
+                "operationId": "returns.show",
+                "tags": [
+                    "Return"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/returns": {
+            "post": {
+                "operationId": "orders.returns.store",
+                "summary": "Refused with 409 `order_not_delivered`, `return_window_closed` or\n`return_exceeds_delivered` (more units than delivered minus already returned)",
+                "tags": [
+                    "Return"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreReturnRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/approve": {
+            "post": {
+                "operationId": "returns.approve",
+                "tags": [
+                    "ReturnDecision"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DecideReturnRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/reject": {
+            "post": {
+                "operationId": "returns.reject",
+                "tags": [
+                    "ReturnDecision"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DecideReturnRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/receive": {
+            "post": {
+                "operationId": "returns.receive",
+                "tags": [
+                    "ReturnReceipt"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReturnResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/refund": {
+            "post": {
+                "operationId": "returns.refund",
+                "tags": [
+                    "ReturnRefund"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RefundReturnRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ReturnResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/returns/{orderReturn}/restock": {
+            "post": {
+                "operationId": "returns.restock",
+                "tags": [
+                    "ReturnRestock"
+                ],
+                "parameters": [
+                    {
+                        "name": "orderReturn",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order return ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RestockReturnRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ReturnResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ReturnResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "order",
+                                                        "lines"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "operationId": "roles.index",
@@ -11706,6 +12360,20 @@
                 ],
                 "title": "CustomerResource"
             },
+            "DecideReturnRequest": {
+                "type": "object",
+                "description": "Approving or rejecting a Requested Return, with an optional note (returns.approve).",
+                "properties": {
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    }
+                },
+                "title": "DecideReturnRequest"
+            },
             "DeductionStage": {
                 "type": "string",
                 "description": "The Order status at which Reserved units leave On-hand, chosen in Settings. The values are the matching Order statuses, so the Order flow can compare the two directly.\n",
@@ -12101,6 +12769,18 @@
                             "type": "string"
                         }
                     },
+                    "returns": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "return_window_ends_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
                     "timeline": {
                         "type": "array",
                         "prefixItems": [
@@ -12353,6 +13033,20 @@
                         ]
                     },
                     "user": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "return": {
                         "type": [
                             "object",
                             "null"
@@ -12785,6 +13479,24 @@
                 ],
                 "title": "ReconciliationResource"
             },
+            "RefundReturnRequest": {
+                "type": "object",
+                "description": "Completing a Return with its Refund (refunds.issue): the amount (zero completes it\nwithout one) and whether the Order's shipping is refunded too.",
+                "properties": {
+                    "amount": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 9999999999.99
+                    },
+                    "refund_shipping": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "amount"
+                ],
+                "title": "RefundReturnRequest"
+            },
             "ReorderProductImagesRequest": {
                 "type": "object",
                 "description": "A Product's images in their new order: each of its image ids exactly once; the first\nbecomes the main image.",
@@ -12802,6 +13514,229 @@
                     "image_ids"
                 ],
                 "title": "ReorderProductImagesRequest"
+            },
+            "RestockDecision": {
+                "type": "string",
+                "description": "What happens to a Received Return line: back into On-hand at the Fulfilling warehouse, or a Write-off (it never re-enters stock). Values are stored.\n",
+                "enum": [
+                    "restock",
+                    "write_off"
+                ],
+                "title": "RestockDecision"
+            },
+            "RestockReturnRequest": {
+                "type": "object",
+                "description": "Restock decisions for some lines of a Received Return (returns.receive): each line\nonce, back into stock or a Write-off.",
+                "properties": {
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "line_id": {
+                                    "type": "integer"
+                                },
+                                "decision": {
+                                    "$ref": "#/components/schemas/RestockDecision"
+                                }
+                            },
+                            "required": [
+                                "line_id",
+                                "decision"
+                            ]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "lines"
+                ],
+                "title": "RestockReturnRequest"
+            },
+            "ReturnReason": {
+                "type": "string",
+                "description": "Why the Customer sends the items back. Values are stored.\n",
+                "enum": [
+                    "damaged",
+                    "wrong_item",
+                    "not_as_described",
+                    "changed_mind",
+                    "other"
+                ],
+                "title": "ReturnReason"
+            },
+            "ReturnResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "decision_note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "refund_shipping": {
+                        "type": "boolean"
+                    },
+                    "refund_amount": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "order": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "number": {
+                                "type": "string"
+                            },
+                            "currency_code": {
+                                "type": "string"
+                            },
+                            "customer": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "id"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "number",
+                            "currency_code",
+                            "customer"
+                        ]
+                    },
+                    "user": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "refund": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {}
+                    },
+                    "units": {
+                        "type": "integer"
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "refund_suggestion": {
+                        "type": "object",
+                        "properties": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "shipping": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "refundable": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "items",
+                            "shipping",
+                            "refundable"
+                        ]
+                    },
+                    "requested_at": {
+                        "type": "string"
+                    },
+                    "decided_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "received_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "completed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "reason",
+                    "note",
+                    "decision_note",
+                    "refund_shipping",
+                    "refund_amount",
+                    "requested_at",
+                    "decided_at",
+                    "received_at",
+                    "completed_at"
+                ],
+                "title": "ReturnResource"
+            },
+            "ReturnStatus": {
+                "type": "string",
+                "description": "Where a Return is: Requested \u2192 Approved or Rejected; Approved \u2192 Received (the items arrived) \u2192 Completed (every item has its Restock decision and the Refund, if any, is recorded). This enum is the one place the allowed moves are defined.\n",
+                "enum": [
+                    "requested",
+                    "approved",
+                    "rejected",
+                    "received",
+                    "completed"
+                ],
+                "title": "ReturnStatus"
             },
             "Role": {
                 "type": "string",
@@ -13258,7 +14193,7 @@
             },
             "StockMovementType": {
                 "type": "string",
-                "description": "Why a Stock movement happened. Values are stored, so cases are added but never renamed or removed. Each later ticket that changes stock adds its own case.\n| |\n|---|\n| `receipt` <br/> Stock arriving from a supplier (a Receipt): adds On-hand. |\n| `reservation` <br/> An Order was Confirmed: its units are promised to it (adds Reserved). |\n| `release` <br/> An Order holding Reserved units was cancelled: they are free again (removes Reserved). |\n| `deduction` <br/> An Order reached the Deduction stage: its Reserved units leave On-hand (removes both). |\n| `cancellation_return` <br/> Units deducted for an Order were cancelled before it shipped: they are back on hand. |\n| `adjustment` <br/> A correction with a reason (count correction, damaged, lost, found): adds or removes On-hand. |\n| `transfer_out` <br/> A sent Transfer leaving its source Warehouse: removes On-hand. |\n| `transfer_in` <br/> A received Transfer arriving at its destination Warehouse: adds On-hand. |",
+                "description": "Why a Stock movement happened. Values are stored, so cases are added but never renamed or removed. Each later ticket that changes stock adds its own case.\n| |\n|---|\n| `receipt` <br/> Stock arriving from a supplier (a Receipt): adds On-hand. |\n| `reservation` <br/> An Order was Confirmed: its units are promised to it (adds Reserved). |\n| `release` <br/> An Order holding Reserved units was cancelled: they are free again (removes Reserved). |\n| `deduction` <br/> An Order reached the Deduction stage: its Reserved units leave On-hand (removes both). |\n| `cancellation_return` <br/> Units deducted for an Order were cancelled before it shipped: they are back on hand. |\n| `adjustment` <br/> A correction with a reason (count correction, damaged, lost, found): adds or removes On-hand. |\n| `transfer_out` <br/> A sent Transfer leaving its source Warehouse: removes On-hand. |\n| `transfer_in` <br/> A received Transfer arriving at its destination Warehouse: adds On-hand. |\n| `return_restock` <br/> A Received Return line whose Restock decision puts it back: adds On-hand. |",
                 "enum": [
                     "receipt",
                     "reservation",
@@ -13267,7 +14202,8 @@
                     "cancellation_return",
                     "adjustment",
                     "transfer_out",
-                    "transfer_in"
+                    "transfer_in",
+                    "return_restock"
                 ],
                 "title": "StockMovementType"
             },
@@ -14233,6 +15169,50 @@
                     "amount"
                 ],
                 "title": "StoreRefundRequest"
+            },
+            "StoreReturnRequest": {
+                "type": "object",
+                "description": "A Return request: the reason, an optional note, and how many units of which of the\nOrder's lines come back (each line once). Whether the Order is Delivered, inside the\nReturn window and has those units left to return is the Return action's decision.",
+                "properties": {
+                    "reason": {
+                        "$ref": "#/components/schemas/ReturnReason"
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "line_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                }
+                            },
+                            "required": [
+                                "line_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "reason",
+                    "lines"
+                ],
+                "title": "StoreReturnRequest"
             },
             "StoreSettingsResource": {
                 "type": "object",

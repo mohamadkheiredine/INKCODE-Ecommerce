@@ -108,6 +108,15 @@ export function PaymentsPage() {
             {row.original.status === 'failed' && (
               <span className="ms-2 text-xs text-destructive">{t('outcomes.failed')}</span>
             )}
+            {row.original.return && (
+              <Link
+                to={`/returns/${row.original.return.id}`}
+                dir="ltr"
+                className="ms-2 font-mono text-xs text-muted-foreground hover:text-primary hover:underline"
+              >
+                {row.original.return.number}
+              </Link>
+            )}
           </span>
         ),
       },
