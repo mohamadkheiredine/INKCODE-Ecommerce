@@ -43,6 +43,10 @@ use App\Http\Controllers\Orders\OrderLineCancellationController;
 use App\Http\Controllers\Orders\OrderNoteController;
 use App\Http\Controllers\Orders\OrderQuoteController;
 use App\Http\Controllers\Orders\SellableVariantController;
+use App\Http\Controllers\Payments\OrderPaymentController;
+use App\Http\Controllers\Payments\OrderRefundController;
+use App\Http\Controllers\Payments\PaymentController;
+use App\Http\Controllers\Payments\ReconciliationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
 use App\Http\Controllers\Settings\StoreLogoController;
@@ -191,6 +195,18 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
         ->name('orders.cancel-lines');
     Route::put('/orders/{order}/assignee', [OrderAssigneeController::class, 'update'])->name('orders.assign');
     Route::post('/orders/{order}/notes', [OrderNoteController::class, 'store'])->name('orders.notes.store');
+
+    // Payments: Roles with payments.view see the ledgers and reconciliation; payments.record
+    // records payments and refunds.issue gives money back (StorePaymentRequest,
+    // StoreRefundRequest). Both are safe to retry with an Idempotency-Key.
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/reconciliation', [ReconciliationController::class, 'index'])->name('payments.reconciliation');
+    Route::post('/orders/{order}/payments', [OrderPaymentController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.payments.store');
+    Route::post('/orders/{order}/refunds', [OrderRefundController::class, 'store'])
+        ->middleware('idempotent')
+        ->name('orders.refunds.store');
 
     // Settings: only the Admin (settings.manage) sees or changes them all.
     Route::get('/settings', [StoreSettingsController::class, 'show'])

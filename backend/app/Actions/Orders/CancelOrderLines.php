@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\AuditTrail;
 use App\Services\OrderPricing;
 use App\Services\OrderStock;
+use App\Services\PaymentLedger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -17,7 +18,8 @@ use Illuminate\Validation\ValidationException;
  * Partial cancellation: cancels some units of some lines before the Order ships. The units
  * move to each line's `cancelled_quantity`, their stock is released (or put back On-hand
  * past the Deduction stage), and the Order is re-priced at its own VAT rate; shipping is
- * kept. The reason, when given, is added to the timeline as a note. Cancelling every
+ * kept; money received beyond the new total is given back as a Refund in the same step.
+ * The reason, when given, is added to the timeline as a note. Cancelling every
  * remaining unit cancels the whole Order instead ({@see CancelOrder}).
  */
 final class CancelOrderLines
@@ -28,6 +30,7 @@ final class CancelOrderLines
         private readonly OrderPricing $pricing,
         private readonly OrderStock $orderStock,
         private readonly AuditTrail $auditTrail,
+        private readonly PaymentLedger $paymentLedger,
     ) {}
 
     /**
@@ -81,6 +84,7 @@ final class CancelOrderLines
 
             $this->orderStock->adjust($order, $order->status, $deltas, $note);
             $this->auditTrail->updated($order->load('lines'), $before);
+            $this->paymentLedger->settle($order, $note);
             if ($note !== null) {
                 $this->addOrderNote->handle($order, $user, $note);
             }

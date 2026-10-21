@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\Auditable;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Concerns\Audited;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $number
  * @property OrderStatus $status
+ * @property PaymentStatus $payment_status
  * @property int $customer_id
  * @property int $warehouse_id
  * @property int $shipping_method_id
@@ -34,6 +36,8 @@ use Illuminate\Support\Carbon;
  * @property string $vat_total
  * @property string $shipping_total
  * @property string $total
+ * @property string $captured_amount
+ * @property string $refunded_amount
  * @property string|null $notes
  * @property int|null $user_id
  * @property int|null $assignee_id
@@ -48,15 +52,27 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, OrderLine> $lines
  * @property-read Collection<int, OrderStatusChange> $statusChanges
  * @property-read Collection<int, OrderNote> $orderNotes
+ * @property-read Collection<int, Payment> $payments
  */
 #[Fillable([
-    'number', 'status', 'customer_id', 'warehouse_id', 'shipping_method_id',
+    'number', 'status', 'payment_status', 'customer_id', 'warehouse_id', 'shipping_method_id',
     'billing_address', 'shipping_address', 'shipping_method_name', 'currency_code', 'vat_rate',
-    'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'notes', 'user_id', 'assignee_id', 'placed_at',
+    'items_total', 'discount_total', 'vat_total', 'shipping_total', 'total', 'captured_amount', 'refunded_amount', 'notes', 'user_id', 'assignee_id', 'placed_at',
 ])]
 class Order extends Model implements Auditable
 {
     use Audited;
+
+    /**
+     * A new Order has an empty Payment ledger.
+     *
+     * @var array<string, string>
+     */
+    protected $attributes = [
+        'payment_status' => 'unpaid',
+        'captured_amount' => '0.00',
+        'refunded_amount' => '0.00',
+    ];
 
     /**
      * @return array<string, string>
@@ -73,6 +89,9 @@ class Order extends Model implements Auditable
             'vat_total' => 'decimal:2',
             'shipping_total' => 'decimal:2',
             'total' => 'decimal:2',
+            'payment_status' => PaymentStatus::class,
+            'captured_amount' => 'decimal:2',
+            'refunded_amount' => 'decimal:2',
             'placed_at' => 'datetime',
         ];
     }
@@ -153,8 +172,45 @@ class Order extends Model implements Auditable
     }
 
     /**
+     * Its Payment ledger, oldest first.
+     *
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->orderBy('id');
+    }
+
+    /**
+     * What the Customer owes: the total, or nothing once the Order is Cancelled.
+     */
+    public function amountOwed(): string
+    {
+        return $this->status === OrderStatus::Cancelled ? '0.00' : $this->total;
+    }
+
+    /**
+     * The Captured amount minus Refunds: what the store still holds, and the most a new
+     * Refund may be.
+     */
+    public function netCaptured(): string
+    {
+        return bcsub($this->captured_amount, $this->refunded_amount, 2);
+    }
+
+    /**
+     * What is still to be paid (never negative); a payment may be at most this.
+     */
+    public function amountDue(): string
+    {
+        $due = bcsub($this->amountOwed(), $this->netCaptured(), 2);
+
+        return bccomp($due, '0', 2) > 0 ? $due : '0.00';
+    }
+
+    /**
      * Loads what one Order's page shows: Customer, Warehouse, creator, Assignee, lines,
-     * status history and notes.
+     * status history, notes and Payment ledger.
      */
     public function loadForDisplay(): static
     {
@@ -166,6 +222,7 @@ class Order extends Model implements Auditable
             'orderNotes.user:id,name',
             'lines.variant:id,product_id',
             'statusChanges.user:id,name',
+            'payments.user:id,name',
         ]);
     }
 

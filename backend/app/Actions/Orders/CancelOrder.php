@@ -7,18 +7,21 @@ use App\Exceptions\BusinessRuleViolation;
 use App\Models\Order;
 use App\Models\OrderLine;
 use App\Services\OrderStock;
+use App\Services\PaymentLedger;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Cancels a whole Order before it is Shipped, with an optional reason kept in its status
  * history. In the same transaction an Order still holding Reserved units releases them,
- * and one past the Deduction stage puts its units back On-hand ({@see OrderStock}).
+ * and one past the Deduction stage puts its units back On-hand ({@see OrderStock}); money
+ * already received is given back as a Refund ({@see PaymentLedger::settle()}).
  */
 final class CancelOrder
 {
     public function __construct(
         private readonly MoveOrderStatus $moveOrderStatus,
         private readonly OrderStock $orderStock,
+        private readonly PaymentLedger $paymentLedger,
     ) {}
 
     /**
@@ -32,6 +35,7 @@ final class CancelOrder
             $this->orderStock->adjust($order, $from, $order->lines
                 ->mapWithKeys(fn (OrderLine $line): array => [$line->variant_id => -$line->quantity])
                 ->all(), $note);
+            $this->paymentLedger->settle($order, $note);
 
             return $order;
         });

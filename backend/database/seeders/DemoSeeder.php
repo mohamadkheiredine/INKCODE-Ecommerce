@@ -24,6 +24,8 @@ class DemoSeeder extends Seeder
             DemoInventorySeeder::class,
             // Orders need the stocked Products, the Customers and the Shipping methods.
             DemoOrdersSeeder::class,
+            // Payment ledgers for those Orders.
+            DemoPaymentsSeeder::class,
         ]);
     }
 }

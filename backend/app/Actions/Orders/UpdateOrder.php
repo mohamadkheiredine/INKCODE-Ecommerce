@@ -10,6 +10,7 @@ use App\Models\Variant;
 use App\Services\AuditTrail;
 use App\Services\OrderPricing;
 use App\Services\OrderStock;
+use App\Services\PaymentLedger;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -17,7 +18,8 @@ use Illuminate\Support\Facades\DB;
  * Lines already on the Order keep their snapshot (name, SKU, unit price); new lines are
  * priced from the Variant now; every line is re-priced at the Order's own VAT rate. A
  * Confirmed Order reserves the extra units and releases the removed ones in the same
- * transaction, all or nothing. From Preparing onward it is a Locked order.
+ * transaction, all or nothing; money received beyond a lower new total is given back as a
+ * Refund. From Preparing onward it is a Locked order.
  */
 final class UpdateOrder
 {
@@ -26,6 +28,7 @@ final class UpdateOrder
         private readonly OrderPricing $pricing,
         private readonly OrderStock $orderStock,
         private readonly AuditTrail $auditTrail,
+        private readonly PaymentLedger $paymentLedger,
     ) {}
 
     /**
@@ -99,6 +102,7 @@ final class UpdateOrder
 
             $this->orderStock->adjust($order, $order->status, $deltas);
             $this->auditTrail->updated($order->load('lines'), $before);
+            $this->paymentLedger->settle($order);
 
             return $order;
         });

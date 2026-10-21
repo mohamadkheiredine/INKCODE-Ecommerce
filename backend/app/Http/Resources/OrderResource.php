@@ -3,10 +3,12 @@
 namespace App\Http\Resources;
 
 use App\Enums\OrderStatus;
+use App\Enums\Permission;
 use App\Models\Order;
 use App\Models\OrderLine;
 use App\Models\OrderNote;
 use App\Models\OrderStatusChange;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -44,6 +46,10 @@ class OrderResource extends JsonResource
             'vat_total' => $this->vat_total,
             'shipping_total' => $this->shipping_total,
             'total' => $this->total,
+            'payment_status' => $this->payment_status->value,
+            'captured_amount' => $this->captured_amount,
+            'refunded_amount' => $this->refunded_amount,
+            'amount_due' => $this->amountDue(),
             'notes' => $this->notes,
             'user' => $this->whenLoaded('user', fn (): ?array => $this->user?->only('id', 'name')),
             'assignee' => $this->whenLoaded('assignee', fn (): ?array => $this->assignee?->only('id', 'name')),
@@ -70,23 +76,31 @@ class OrderResource extends JsonResource
             'status_history' => $this->whenLoaded('statusChanges', fn (): array => $this->statusChanges
                 ->map(fn (OrderStatusChange $change): array => $this->statusChange($change))
                 ->all()),
+            'payments' => $this->when(
+                $this->relationLoaded('payments') && $this->seesPayments($request),
+                fn (): array => PaymentResource::collection($this->payments)->resolve($request),
+            ),
             'timeline' => $this->when(
                 $this->relationLoaded('statusChanges') && $this->relationLoaded('orderNotes'),
-                fn (): array => $this->timeline(),
+                fn (): array => $this->timeline($request),
             ),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 
     /**
-     * Status changes and notes merged, oldest first (a status change before a note made in
-     * the same second). Later tickets add payments, Shipments and Returns.
+     * Status changes, notes and (for Users with payments.view) Payment ledger rows merged,
+     * oldest first; in the same second a status change comes first, then payments, then
+     * notes. Later tickets add Shipments and Returns.
      *
      * @return list<array<string, mixed>>
      */
-    private function timeline(): array
+    private function timeline(Request $request): array
     {
         $events = [
+            ...($this->relationLoaded('payments') && $this->seesPayments($request)
+                ? $this->payments->map(fn (Payment $payment): array => ['type' => 'payment', ...(new PaymentResource($payment))->resolve($request)])
+                : []),
             ...$this->statusChanges->map(fn (OrderStatusChange $change): array => ['type' => 'status', ...$this->statusChange($change)]),
             ...$this->orderNotes->map(fn (OrderNote $note): array => [
                 'type' => 'note',
@@ -96,9 +110,16 @@ class OrderResource extends JsonResource
                 'created_at' => $note->created_at->toIso8601String(),
             ]),
         ];
-        usort($events, fn (array $a, array $b): int => [$a['created_at'], $a['type'] === 'note', $a['id']] <=> [$b['created_at'], $b['type'] === 'note', $b['id']]);
+        $rank = ['status' => 0, 'payment' => 1, 'note' => 2];
+        usort($events, fn (array $a, array $b): int => [$a['created_at'], $rank[$a['type']], $a['id']] <=> [$b['created_at'], $rank[$b['type']], $b['id']]);
 
         return $events;
+    }
+
+    /** The Payment ledger is shown only to Roles with payments.view. */
+    private function seesPayments(Request $request): bool
+    {
+        return $request->user()?->hasPermissionTo(Permission::PaymentsView->value) ?? false;
     }
 
     /**

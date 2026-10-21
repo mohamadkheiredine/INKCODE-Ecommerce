@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Actions\Profile\ChangePassword;
+use App\Contracts\PaymentGateway;
 use App\Models\Adjustment;
 use App\Models\Order;
 use App\Models\OrderNote;
 use App\Models\Receipt;
 use App\Models\Transfer;
+use App\Services\Payments\MockCardGateway;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -22,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // The demo store charges Cards through the mock gateway; a real provider binds here instead.
+        $this->app->bind(PaymentGateway::class, MockCardGateway::class);
     }
 
     /**
