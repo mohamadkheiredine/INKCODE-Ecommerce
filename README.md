@@ -132,6 +132,8 @@ Every permission is checked by the API on each request; the interface only hides
 
 ## Testing
 
+Contributors: run `git config core.hooksPath .githooks` once per clone to check style (Pint, oxlint, Prettier) on staged files before each commit. `tests/Feature/Demo/DemoDataTest.php` seeds the demo store and runs every "must be zero" query of [docs/demo-data-checks.sql](docs/demo-data-checks.sql).
+
 ```bash
 # Backend: Pest feature + unit + architecture tests on MySQL (inkcode_testing)
 cd backend && composer test

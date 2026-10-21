@@ -7,8 +7,8 @@ Last full run: **21 October 2026**, on Windows 11 with PHP 8.4, Node 24 and MySQ
 | Gate | Result |
 |---|---|
 | Pint (code style) | passed |
-| Larastan, level 6 | passed, 0 errors |
-| Pest, in parallel on MySQL (`inkcode_testing_test_N`) | **762 passed**, 3,867 assertions, 0 failed (about 110 s) |
+| Larastan, level 6 (`app/` and `database/`) | passed, 0 errors |
+| Pest, in parallel on MySQL (`inkcode_testing_test_N`) | **764 passed**, 0 failed (about 110 s) |
 
 The Pest suite covers authentication and session security, the permission matrix for every Role (403 for each forbidden action), Product Variants and SKUs, stock ledger and Warehouses, the Order flow and its invalid transitions (409), Shipments and partial fulfillment, Payments and Refunds (never above the captured amount), Coupons, Returns and Restock decisions, Customer Lifetime value and Segments, dashboard KPIs and reports (which must agree), exports, audit trail, settings and search. Architecture tests are in `tests/Unit/ArchTest.php`. Real multi-process concurrency tests are in `tests/Concurrency`, including simultaneous Orders on limited stock (no overselling, no double deduction) and simultaneous Coupon redemptions.
 
@@ -31,7 +31,7 @@ The specs in `frontend/e2e` (sign-in, app shell, catalog, Products with Variants
 
 ## Demo data consistency: `docs/demo-data-checks.sql`
 
-Run against a freshly seeded database (`php artisan migrate:fresh --seed` in demo mode):
+Run against a freshly seeded database (`php artisan migrate:fresh --seed` in demo mode). The same "must be zero" queries also run in the Pest suite on every test run (`tests/Feature/Demo/DemoDataTest.php`):
 
 | Check | Result |
 |---|---|

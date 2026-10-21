@@ -48,7 +48,7 @@ Start MySQL first: `docker compose up -d mysql` (Docker Desktop must be running)
 | API docs | `/docs/api` (Scramble) · `composer api-docs` exports `docs/api/openapi.json` | |
 | Fresh demo data | `php artisan migrate:fresh --seed` | |
 
-Run both `check` commands before every commit. CI runs the same checks on GitHub.
+Run both `check` commands before every commit. CI runs the same checks on GitHub. Once per clone, `git config core.hooksPath .githooks` enables the pre-commit hook (Pint, oxlint and Prettier on staged files).
 
 To run the real GitHub workflow locally (useful while GitHub Actions is blocked), use [`act`](https://github.com/nektos/act) with Docker. Stop the dev MySQL first (`docker stop inkcode-mysql`) because the CI service also binds port 3306, then run:
 
