@@ -173,7 +173,9 @@
     "noteAdded": "أُضيفت الملاحظة.",
     "payment": "دفعة بقيمة {{amount}} · {{method}}",
     "refund": "استرداد بقيمة {{amount}} · {{method}}",
-    "paymentFailed": "دفعة بطاقة مرفوضة بقيمة {{amount}}"
+    "paymentFailed": "دفعة بطاقة مرفوضة بقيمة {{amount}}",
+    "shipmentShipped": "شُحنت الشحنة {{number}}",
+    "shipmentDelivered": "سُلّمت الشحنة {{number}}"
   },
   "invoice": {
     "action": "الفاتورة",
@@ -185,5 +187,50 @@
     "billTo": "الفوترة إلى",
     "shipTo": "الشحن إلى",
     "vatNote": "تُحتسب ضريبة القيمة المضافة {{rate}}% لكل بند على المنتجات الخاضعة لها. لا ضريبة على الشحن."
+  },
+  "shipments": {
+    "title": "الشحنات",
+    "progressLabel": "الوحدات المشحونة",
+    "unitsShipped": "شُحنت {{shipped}} من {{units}} وحدات",
+    "progress": {
+      "unfulfilled": "لم يُشحن",
+      "partially_shipped": "شُحن جزئياً",
+      "shipped": "تم الشحن",
+      "delivered": "تم التسليم"
+    },
+    "statuses": {
+      "shipped": "تم الشحن",
+      "delivered": "تم التسليم"
+    },
+    "emptyTitle": "لا شحنات بعد",
+    "emptyReady": "اشحن الطلب في شحنة واحدة أو أكثر، مع شركة شحن ورقم تتبع.",
+    "emptyNotReady": "يمكن إنشاء الشحنات عندما يصبح الطلب جاهزاً للشحن.",
+    "create": "إنشاء شحنة",
+    "dialogTitle": "شحن {{number}}",
+    "dialogDescription": "اختر شركة الشحن، وأدخل رقم التتبع وعدد وحدات كل بند في هذه الشحنة.",
+    "carrier": "شركة الشحن",
+    "chooseCarrier": "اختر شركة شحن",
+    "carriersError": "تعذّر تحميل شركات الشحن.",
+    "trackingNumber": "رقم التتبع",
+    "leftToShip_zero": "{{formatted}} وحدة متبقية للشحن",
+    "leftToShip_one": "وحدة واحدة متبقية للشحن",
+    "leftToShip_two": "وحدتان متبقيتان للشحن",
+    "leftToShip_few": "{{formatted}} وحدات متبقية للشحن",
+    "leftToShip_many": "{{formatted}} وحدة متبقية للشحن",
+    "leftToShip_other": "{{formatted}} وحدة متبقية للشحن",
+    "quantityFor": "وحدات {{sku}} المراد شحنها",
+    "keep": "ليس الآن",
+    "submit": "شحن هذه الوحدات",
+    "done": "أُنشئت شحنة للطلب {{number}}.",
+    "doneShipped": "شُحن كل ما تبقّى من الطلب {{number}}.",
+    "track": "تتبّع هذه الشحنة",
+    "markDelivered": "تأكيد التسليم",
+    "delivered": "سُلّمت الشحنة {{number}}.",
+    "history": "{{status}} بواسطة {{user}}، {{when}}",
+    "validation": {
+      "carrier": "اختر شركة شحن.",
+      "tracking": "أدخل رقم التتبع.",
+      "quantities": "اشحن وحدة واحدة على الأقل، وبحدّ أقصى ما تبقّى من كل بند."
+    }
   }
 }

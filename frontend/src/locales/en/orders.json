@@ -169,7 +169,9 @@
     "noteAdded": "The note was added.",
     "payment": "Payment of {{amount}} · {{method}}",
     "refund": "Refund of {{amount}} · {{method}}",
-    "paymentFailed": "Declined Card payment of {{amount}}"
+    "paymentFailed": "Declined Card payment of {{amount}}",
+    "shipmentShipped": "Shipment {{number}} shipped",
+    "shipmentDelivered": "Shipment {{number}} delivered"
   },
   "invoice": {
     "action": "Invoice",
@@ -181,5 +183,46 @@
     "billTo": "Bill to",
     "shipTo": "Ship to",
     "vatNote": "VAT {{rate}}% is charged per line on taxable items. Shipping has no VAT."
+  },
+  "shipments": {
+    "title": "Shipments",
+    "progressLabel": "Units shipped",
+    "unitsShipped": "{{shipped}} of {{units}} units shipped",
+    "progress": {
+      "unfulfilled": "Not shipped",
+      "partially_shipped": "Partially shipped",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "statuses": {
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "emptyTitle": "No Shipments yet",
+    "emptyReady": "Ship the Order in one Shipment or several, with a Carrier and a tracking number.",
+    "emptyNotReady": "Shipments can be created once the Order is Ready for shipping.",
+    "create": "Create Shipment",
+    "dialogTitle": "Ship {{number}}",
+    "dialogDescription": "Choose the Carrier, enter the tracking number and how many units of each line this Shipment carries.",
+    "carrier": "Carrier",
+    "chooseCarrier": "Choose a Carrier",
+    "carriersError": "The Carriers could not be loaded.",
+    "trackingNumber": "Tracking number",
+    "leftToShip_one": "{{formatted}} unit left to ship",
+    "leftToShip_other": "{{formatted}} units left to ship",
+    "quantityFor": "Units of {{sku}} to ship",
+    "keep": "Not now",
+    "submit": "Ship these units",
+    "done": "A Shipment of {{number}} was created.",
+    "doneShipped": "Everything left of {{number}} has shipped.",
+    "track": "Track this Shipment",
+    "markDelivered": "Mark delivered",
+    "delivered": "Shipment {{number}} was delivered.",
+    "history": "{{status}} by {{user}}, {{when}}",
+    "validation": {
+      "carrier": "Choose a Carrier.",
+      "tracking": "Enter the tracking number.",
+      "quantities": "Ship at least one unit, and at most the units each line has left to ship."
+    }
   }
 }

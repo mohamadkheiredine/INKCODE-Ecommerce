@@ -5,6 +5,8 @@ import type {
   OrderLineInput,
   OrderQuote,
   SellableVariant,
+  Shipment,
+  ShipmentInput,
   StockShortage,
   TimelineEvent,
   LineCancellation,
@@ -76,6 +78,7 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
         options: [{ attribute: 'Color', value: 'Red' }],
         quantity: 3,
         cancelled_quantity: 0,
+        shipped_quantity: 0,
         unit_price: '19.99',
         discount_amount: '0.00',
         coupon_eligible: false,
@@ -95,6 +98,8 @@ export function anOrder(overrides: Partial<Order> = {}): Order {
         created_at: STAMP,
       },
     ],
+    shipments: [],
+    fulfillment: { status: 'unfulfilled', shipped_units: 0, units: 3 },
     created_at: STAMP,
     ...overrides,
   }
@@ -365,6 +370,58 @@ export function orderStore(initial: Order[] = [], options: StoreOptions = {}) {
           cancelled_quantity: line.cancelled_quantity + cancelled,
         }
       })
+      return HttpResponse.json({ data: order })
+    }),
+    http.post('*/api/v1/orders/:id/shipments', async ({ request, params }) => {
+      await record('shipments', request.clone())
+      const input = (await request.json()) as ShipmentInput
+      const order = find(params.id)!
+      const shipment: Shipment = {
+        id: nextId++,
+        number: `${order.number}-${(order.shipments ?? []).length + 1}`,
+        status: 'shipped',
+        carrier: { id: input.carrier_id, name: 'Aramex' },
+        tracking_number: input.tracking_number,
+        tracking_url: `https://track.example/?n=${input.tracking_number}`,
+        shipped_at: STAMP,
+        delivered_at: null,
+        lines: input.lines.map((line) => ({
+          order_line_id: line.line_id,
+          quantity: line.quantity,
+        })),
+        status_history: [
+          { id: nextId++, from_status: null, to_status: 'shipped', user: null, created_at: STAMP },
+        ],
+      }
+      order.shipments = [...(order.shipments ?? []), shipment]
+      order.lines = (order.lines ?? []).map((line) => ({
+        ...line,
+        shipped_quantity:
+          line.shipped_quantity +
+          (input.lines.find((item) => item.line_id === line.id)?.quantity ?? 0),
+      }))
+      const units = order.lines.reduce((sum, line) => sum + line.quantity, 0)
+      const shipped = order.lines.reduce((sum, line) => sum + line.shipped_quantity, 0)
+      order.fulfillment = {
+        status: shipped < units ? 'partially_shipped' : 'shipped',
+        shipped_units: shipped,
+        units,
+      }
+      if (shipped === units) move(order, 'shipped')
+      return HttpResponse.json({ data: order })
+    }),
+    http.post('*/api/v1/orders/:id/shipments/:shipment/deliver', async ({ request, params }) => {
+      await record('deliver', request)
+      const order = find(params.id)!
+      order.shipments = (order.shipments ?? []).map((shipment) =>
+        shipment.id === Number(params.shipment)
+          ? { ...shipment, status: 'delivered', delivered_at: STAMP }
+          : shipment,
+      )
+      if (order.status === 'shipped' && order.shipments.every((s) => s.status === 'delivered')) {
+        move(order, 'delivered')
+        order.fulfillment = { ...order.fulfillment!, status: 'delivered' }
+      }
       return HttpResponse.json({ data: order })
     }),
     http.put('*/api/v1/orders/:id/assignee', async ({ request, params }) => {

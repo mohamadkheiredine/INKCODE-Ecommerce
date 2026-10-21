@@ -1,4 +1,10 @@
-import { CircleDotIcon, MessageSquareTextIcon, Undo2Icon, WalletIcon } from 'lucide-react'
+import {
+  CircleDotIcon,
+  MessageSquareTextIcon,
+  TruckIcon,
+  Undo2Icon,
+  WalletIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -54,7 +60,10 @@ export function CancelLinesDialog({
   const dir = useDirection()
   const { number } = useFormatters()
   const cancelLines = useCancelOrderLines()
-  const lines = (order.lines ?? []).filter((line) => line.quantity > 0)
+  // Shipped units cannot be cancelled: each line offers only what is left to ship.
+  const lines = (order.lines ?? [])
+    .map((line) => ({ ...line, quantity: line.quantity - (line.shipped_quantity ?? 0) }))
+    .filter((line) => line.quantity > 0)
   const [quantities, setQuantities] = useState<Record<number, string>>({})
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -74,10 +83,10 @@ export function CancelLinesDialog({
     const value = quantities[line.id]?.trim() ?? ''
     return value !== '' && (!/^\d+$/.test(value) || Number(value) > line.quantity)
   })
-  // Cancelling every remaining unit cancels the whole Order, which then owes nothing.
+  // Cancelling every unit (none shipped) cancels the whole Order, which then owes nothing.
   const cancelsEverything =
     chosen.reduce((sum, line) => sum + line.quantity, 0) ===
-    lines.reduce((sum, line) => sum + line.quantity, 0)
+    (order.lines ?? []).reduce((sum, line) => sum + line.quantity, 0)
 
   const submit = async () => {
     setError(null)
@@ -274,6 +283,13 @@ function timelineTitle(event: TimelineEvent, money: (amount: Amount) => string):
             amount: money(event.amount),
             method: t(`payments:methods.${event.method}`),
           })
+    case 'shipment':
+      return t(
+        event.to_status === 'delivered'
+          ? 'orders:timeline.shipmentDelivered'
+          : 'orders:timeline.shipmentShipped',
+        { number: event.shipment.number },
+      )
     case 'status':
       return event.from_status === null
         ? t('orders:historyCreated')
@@ -281,8 +297,16 @@ function timelineTitle(event: TimelineEvent, money: (amount: Amount) => string):
   }
 }
 
+/** The note shown under an entry: a note's body, or the reason a status or payment carries. */
+function timelineNote(event: TimelineEvent): string | null {
+  if (event.type === 'note') return event.body
+  if (event.type === 'shipment') return null
+  return event.note
+}
+
 const TIMELINE_ICONS = {
   status: { icon: CircleDotIcon, className: 'text-primary' },
+  shipment: { icon: TruckIcon, className: 'text-chart-3' },
   note: { icon: MessageSquareTextIcon, className: 'text-muted-foreground' },
   payment: { icon: WalletIcon, className: 'text-success' },
   refund: { icon: Undo2Icon, className: 'text-destructive' },
@@ -348,9 +372,9 @@ export function TimelineCard({ order }: { order: Order }) {
                       when: dateTime(event.created_at),
                     })}
                   </span>
-                  {(event.type === 'note' ? event.body : event.note) && (
+                  {timelineNote(event) && (
                     <p dir="auto" className="text-sm whitespace-pre-line text-muted-foreground">
-                      {event.type === 'note' ? event.body : event.note}
+                      {timelineNote(event)}
                     </p>
                   )}
                 </div>

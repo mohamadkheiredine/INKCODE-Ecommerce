@@ -44,6 +44,8 @@ export type OrderLine = {
   quantity: number
   /** Units removed by Partial cancellation. */
   cancelled_quantity: number
+  /** Units already in the Order's Shipments. */
+  shipped_quantity: number
   unit_price: Amount
   discount_amount: Amount
   /** Whether the Order's Coupon discounts this line. */
@@ -63,9 +65,53 @@ export type OrderStatusChange = {
   created_at: string
 }
 
-/** One entry of an Order's timeline (oldest first): a status change, payment or note. */
+/** Where a Shipment is, mirroring `App\Enums\ShipmentStatus`. */
+export type ShipmentStatus = 'shipped' | 'delivered'
+
+export type ShipmentStatusChange = {
+  id: number
+  from_status: ShipmentStatus | null
+  to_status: ShipmentStatus
+  user: { id: number; name: string } | null
+  created_at: string
+}
+
+/** A parcel carrying some units of the Order's lines, with its Carrier and tracking number. */
+export type Shipment = {
+  id: number
+  number: string
+  status: ShipmentStatus
+  carrier: { id: number; name: string }
+  tracking_number: string
+  /** The Carrier's tracking page, or null when the Carrier has no tracking link. */
+  tracking_url: string | null
+  shipped_at: string
+  delivered_at: string | null
+  lines: { order_line_id: number; quantity: number }[]
+  status_history: ShipmentStatusChange[]
+}
+
+/** Shipment progress, separate from the Order status. */
+export type Fulfillment = {
+  status: 'unfulfilled' | 'partially_shipped' | 'shipped' | 'delivered'
+  shipped_units: number
+  units: number
+}
+
+/** Units of each line a new Shipment carries. */
+export type ShipmentInput = {
+  carrier_id: number
+  tracking_number: string
+  lines: { line_id: number; quantity: number }[]
+}
+
+/**
+ * One entry of an Order's timeline (oldest first): a status change, a Shipment step, a
+ * payment or Refund (for Roles with payments.view) or a note.
+ */
 export type TimelineEvent =
   | ({ type: 'status' } & OrderStatusChange)
+  | ({ type: 'shipment'; shipment: { id: number; number: string } } & ShipmentStatusChange)
   | ({ type: 'payment' } & Payment)
   | {
       type: 'note'
@@ -126,6 +172,8 @@ export type Order = {
   units?: number
   lines?: OrderLine[]
   status_history?: OrderStatusChange[]
+  shipments?: Shipment[]
+  fulfillment?: Fulfillment
   timeline?: TimelineEvent[]
   /** The Payment ledger, oldest first; only for Roles with payments.view. */
   payments?: Payment[]
@@ -146,6 +194,14 @@ export type OrderUpdateInput = {
 
 /** Partial cancellation: units of each line to cancel. */
 export type LineCancellation = { line_id: number; quantity: number }
+
+/** Statuses whose Order page shows Shipments (from Preparing, before they can be created). */
+export const SHIPMENT_STATUSES: readonly OrderStatus[] = [
+  'preparing',
+  'ready_for_shipping',
+  'shipped',
+  'delivered',
+]
 
 /** The statuses an Order moves forward to by hand (Shipped comes with Shipments). */
 export const ADVANCE_STATUSES: readonly OrderStatus[] = ['preparing', 'ready_for_shipping']
@@ -177,7 +233,7 @@ export type OrderQuote = {
   vat_total: Amount
   shipping_total: Amount
   total: Amount
-  lines: Omit<OrderLine, 'id' | 'product_id' | 'cancelled_quantity'>[]
+  lines: Omit<OrderLine, 'id' | 'product_id' | 'cancelled_quantity' | 'shipped_quantity'>[]
   /** Whether the Coupon code applies; when it does not, the lines are priced without it. */
   coupon: QuoteCoupon | null
   warehouses: (WarehouseRef & { is_sufficient: boolean; shortages: StockShortage[] })[]

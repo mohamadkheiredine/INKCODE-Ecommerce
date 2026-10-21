@@ -1,5 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ListQuery } from '@/lib/list-query'
+import { carrierKeys, carriersApi } from '@/features/shipping/api/carriers-api'
 import { orderKeys, ordersApi } from '../api/orders-api'
 import type {
   LineCancellation,
@@ -9,6 +10,7 @@ import type {
   OrderStatus,
   OrderUpdateInput,
   QuoteCouponInput,
+  ShipmentInput,
 } from '../types'
 
 export function useOrders(query: ListQuery, enabled = true) {
@@ -140,6 +142,54 @@ export function useCancelOrderLines() {
       idempotencyKey: string
     }) => ordersApi.cancelLines(id, lines, note, idempotencyKey),
     onSuccess: changed,
+  })
+}
+
+export function useShipOrder() {
+  const changed = useOrderChanged()
+  return useMutation({
+    mutationFn: ({
+      id,
+      input,
+      idempotencyKey,
+    }: {
+      id: number
+      input: ShipmentInput
+      idempotencyKey: string
+    }) => ordersApi.ship(id, input, idempotencyKey),
+    onSuccess: changed,
+  })
+}
+
+export function useDeliverShipment() {
+  const changed = useOrderChanged()
+  return useMutation({
+    mutationFn: ({
+      id,
+      shipmentId,
+      idempotencyKey,
+    }: {
+      id: number
+      shipmentId: number
+      idempotencyKey: string
+    }) => ordersApi.deliverShipment(id, shipmentId, idempotencyKey),
+    onSuccess: changed,
+  })
+}
+
+/** Carriers to ship with (the first 100 by name); only fetched while a Shipment is entered. */
+export function useShipmentCarriers(enabled: boolean) {
+  return useQuery({
+    queryKey: [...carrierKeys.all, 'shipment-options'],
+    queryFn: () =>
+      carriersApi.list({
+        search: '',
+        filters: {},
+        sort: { field: 'name', direction: 'asc' },
+        page: 1,
+        perPage: 100,
+      }),
+    enabled,
   })
 }
 
