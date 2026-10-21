@@ -2,7 +2,19 @@
 
 A full-stack e-commerce administration platform built for the INKCODE engineering assessment: a React + TypeScript single-page app (static build) talking to a versioned Laravel REST API backed by MySQL.
 
-> **Status:** Phase 1 in progress. Project foundation, tooling and CI are in place; feature modules are being built phase by phase. See [docs/requirements.md](docs/requirements.md) for the live checklist and the [Status](#status) section below for what is incomplete.
+> **Status:** every module in the brief is built and connected to the API and MySQL: dashboard, catalog with Variants, Customers, inventory across Warehouses, Orders and fulfillment, payments, Coupons, shipping, Returns and Refunds, reports with CSV/Excel export, Users & Roles, notifications, audit log, settings and global search. The demo store is seeded at the brief's scale (200 Products, 1,000 Orders, 300 Customers, 3 Warehouses). What is still incomplete is listed under [Incomplete / assumptions](#incomplete--assumptions).
+
+## Screenshots
+
+Taken from the running app with the seeded demo store. All of them are in [docs/screenshots](docs/screenshots/).
+
+| Executive dashboard | Orders (Order, Payment and Fulfillment statuses) |
+|---|---|
+| ![Executive dashboard](docs/screenshots/01-dashboard.png) | ![Orders list](docs/screenshots/02-orders.png) |
+| **Order detail** | **Product with generated Variants** |
+| ![Order detail](docs/screenshots/03-order-detail.png) | ![Product Variants](docs/screenshots/05-product-variants.png) |
+| **Arabic, right to left, dark theme** | **Phone layout** |
+| ![Dashboard in Arabic and dark theme](docs/screenshots/13-dashboard-ar-dark.png) | ![Dashboard on a phone](docs/screenshots/15-dashboard-mobile.png) |
 
 ## Tech stack
 
@@ -53,6 +65,13 @@ composer dev          # http://localhost:8000
 | `FRONTEND_URL` | `http://localhost:5173` | Allowed CORS origin (credentials enabled) |
 | `SANCTUM_STATEFUL_DOMAINS` | `localhost:5173,127.0.0.1:5173` | Hosts that get cookie-based SPA auth |
 | `SESSION_DOMAIN` | `null` locally, `.example.com` in production | Session cookie scope |
+| `DEMO_MODE` | `true` | Seeds the demo store and one demo account per Role (local/review only) |
+| `DEMO_FULL_SCALE` | `true` | With demo mode: 200 Products and 1,000 Orders over the last year; `false` keeps the small demo store |
+| `DB_EMULATE_PREPARES` | `false` | Set `true` on **Docker Desktop for Windows**, whose port proxy adds ~40 ms to every native prepared statement (seeding drops from over an hour to a few minutes) |
+
+#### Demo data
+
+Seeding in demo mode builds the store the brief asks for, entirely through the same actions the API uses, so every total, stock balance, Payment and report agrees: **200 Products** (about 1,100 Variants from Color × Size × Material, Draft and Archived ones included), **1,000 Orders** spread over the last 12 months in every status (Pending to Delivered, Cancelled, partial Shipments), **300 Customers** in every Segment, **3 active Warehouses** (plus a deactivated one) with Receipts, Adjustments and Transfers, Cash on delivery / Manual / Card payments (some declined first), goodwill Refunds, Returns at every step with Restock and Write-off decisions, Coupons, and the audit trail of all of it. A fixed random seed shapes it, so every fresh seed builds the same kind of store with dates relative to the day you seed. [docs/demo-data-checks.sql](docs/demo-data-checks.sql) proves the result is consistent: every query in its "must be zero" section returns 0.
 
 ### 3. Frontend SPA
 
@@ -120,7 +139,7 @@ cd frontend && npm run check
 cd frontend && npx playwright install chromium && npm run test:e2e
 ```
 
-Latest executed results are recorded in `docs/test-results.md` (added before submission).
+Latest executed results are recorded in [docs/test-results.md](docs/test-results.md).
 
 ## API documentation
 
@@ -141,7 +160,13 @@ php artisan migrate --force
 php artisan config:cache && php artisan route:cache && php artisan view:cache
 ```
 
-Deployment notes: the SPA and API must share a registrable domain for Sanctum cookie auth (for example `admin.example.com` + `api.example.com`). See [ADR 0002](docs/adr/0002-sanctum-spa-cookie-authentication.md). Full deployment notes will be added in Phase 5.
+### Deployment notes
+
+- **Two deployables.** `frontend/dist` is plain static files for any static host or CDN (serve `index.html` for unknown paths, since the SPA routes on the client). The Laravel API runs on PHP 8.4 behind Nginx or Apache with MySQL 8.
+- **One registrable domain** for Sanctum cookie auth, for example `admin.example.com` (SPA) and `api.example.com` (API). See [ADR 0002](docs/adr/0002-sanctum-spa-cookie-authentication.md).
+- **SPA build variable:** `VITE_API_URL=https://api.example.com` (empty only in development, where Vite forwards `/api`).
+- **API variables:** `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://api.example.com`, `FRONTEND_URL=https://admin.example.com`, `SANCTUM_STATEFUL_DOMAINS=admin.example.com`, `SESSION_DOMAIN=.example.com`, `SESSION_SECURE_COOKIE=true`, and **`DEMO_MODE=false`** (no demo accounts or quick logins).
+- **Release steps:** `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, `php artisan db:seed --force` (Roles and permissions only when demo mode is off), `php artisan storage:link` (product images and logos), then `php artisan optimize`. Create the first Admin with `php artisan tinker` or a one-off seeder.
 
 ## Project documents
 
@@ -212,14 +237,24 @@ Deployment notes: the SPA and API must share a registrable domain for Sanctum co
   - Six reports under Insights → Reports: Sales (by day, week or month), Products (top sellers by sales or units), Categories (with each one's share), Customers (top spenders, New vs Returning), Returns (by reason, with the return rate) and Inventory (stock per Variant, low stock, Stock value). Each has the dashboard's date range in the URL and a summary compared with the previous period.
   - Admin and Finance download any report as CSV or Excel (.xlsx), named like `sales-report-2026-09-21-to-2026-10-20.xlsx`: the same rows as the screen, headers in the User's language, numbers stored as real numbers. Exporting is its own permission (`reports.export`); Operations, Inventory, Sales and Viewer only view, and Support has no access.
   - A test checks that the reports' totals equal the dashboard's for the same range.
+- **Adjustments, Transfers and low-stock alerts (#12):** reasoned stock corrections, Transfers between Warehouses (Draft → In transit → Received) and a bell alert when a Variant drops to its Low-stock threshold, all through the stock service and its movement ledger.
+- **Orders with stock reservation (#16) and the Order flow (#17):** a live quote (VAT, shipping, Coupon) while an Order is entered; Confirm reserves stock under row locks, so simultaneous Orders never oversell (proved by a multi-process test). The flow Pending → Confirmed → Preparing → Ready for shipping → Shipped → Delivered lives in one state machine; any other jump gets 409. Lines and addresses lock from Preparing on. Partial cancellation, Assignees, notes, a timeline and a printable Invoice complete the Order page. The list shows Order, Payment and Fulfillment statuses, Shipping method and Assignee.
+- **Payment ledger (#19):** Cash on delivery, Manual and mock Card payments (approve or decline) and Refunds are rows in one append-only ledger, from which the Payment status is derived. Every write takes an `Idempotency-Key`, Refunds can never exceed what was captured, and a reconciliation view compares each Order's total with its ledger.
+- **Returns (#21):** Requested → Approved → Received → Restock decision (Restock or Write-off, per line) → Refund. Stock only comes back on an explicit Restock, and the Refund is capped by what the store still holds for the Order.
+- **Customer Lifetime value and Segments (#22):** VIP, Regular, At risk and New, computed from Counted orders and the ledger, filterable on the Customers list.
+- **Users & Roles (#25):** the Admin creates, edits, deactivates and reactivates Users and sees the read-only permission matrix. The last active Admin cannot be removed.
+- **Global search and quick actions (#27):** a command palette (Ctrl/⌘ K) searches Orders, Products and Customers (only the groups the User's Role may list) and offers the quick actions that Role allows.
 
 ### Incomplete / assumptions
 
-- The remaining feature modules ([docs/requirements.md](docs/requirements.md)) are being built ticket by ticket. The sidebar only lists modules that work.
+- **Not built:** a one-command Docker stack for the API and SPA (MySQL runs in Docker; the API and SPA run with the commands above). Playwright covers sign-in, the app shell, catalog, Products with Variants, inventory, Customers, Orders (create, confirm, cancel), shipping, settings, Users and the audit log; the remaining demo scenarios (concurrency, the full lifecycle, Returns and Refunds, financial reconciliation, least privilege) are proven by Pest feature and multi-process concurrency tests instead of browser tests.
+- Demo Products have no images: the image upload works (up to ten per Product), but the seeders do not generate picture files.
+- **An Order carries at most one Coupon** (no stacking): the simplest unambiguous stacking rule. A second code replaces the first.
+- Cancelling units of an Order that are already past the Deduction stage but not shipped puts them back On-hand at once. They never left the Warehouse, so this is not a Return restock; shipped units can only come back through a Return.
 - Marking a notification as read is the User's own reading state and is not audited. Categories and Brands that Products use cannot be deleted (restricting foreign keys).
 - A Product or Variant that appears on an Order can only be archived, never deleted. This holds once Order lines reference Variants with a restricting foreign key (#16). Stock per Warehouse arrives with #11, and a Variant's empty Low-stock threshold follows the store default from Settings (#15).
 - Lifetime value and Segments are computed in SQL on every request from Counted orders and the Payment ledger (#22), so they are always current and need no recalculation job. Refusing to delete a Customer who has Orders relies on the restricting foreign key Orders add in #16.
-- Notification events arrive with the modules that raise them: low stock (#12), Order assigned (#17), card payment declined (#19) and Return requested (#21). Until then the bell shows the demo welcome.
+- Notifications are raised for low stock, an Order assigned to you, a declined card payment and a requested Return; they are checked every 30 seconds rather than pushed.
 - A User with no Role, or a deactivated User, cannot sign in; deactivating a User ends their sessions at once. The Admin manages Users and sees the read-only Roles & permissions matrix (#25).
 - Changing the Store currency relabels amounts; it never converts them (one currency, no exchange rates). The default language and theme apply to Users created from #25 on.
 - Conversion rate will only be shown if visit/session tracking is implemented; otherwise it is intentionally omitted.

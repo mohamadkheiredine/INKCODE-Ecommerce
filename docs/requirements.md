@@ -33,7 +33,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Stock movements, manual adjustments, transfers, receiving, low-stock alerts, valuation (#11: Stock movement ledger, Receipts with weighted Average cost, Stock value and low-stock filter; #12: Adjustments with a reason, two-step Transfers (Draft → In transit → Received, cancellable before sending), low-stock bell alerts sent once until stock recovers)
 - [x] Reserve on confirmation, release on eligible cancellation, deduct at the configured fulfillment stage, never twice (reserve on Confirm and release on Cancel, #16; each line counts its deducted and shipped units, so a unit leaves On-hand once even if the Deduction stage changes mid-flight, #18)
 - [x] Concurrency safe: no overselling under simultaneous orders (row locks + transactions; `php artisan demo:race` and its Pest test, #16)
-- [ ] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee (search, status/Warehouse/date filters, sorts and Customer done, #16; Payment status column #19, Assignee #17; Shipment status with #18)
+- [x] Orders list: customer, total, payment status, fulfillment status, shipping, date, assigned employee (search; status, Payment status, Warehouse, Customer, Assignee and date filters; sorts)
 - [x] Order detail: line items, variant details, discounts, taxes, shipping, billing/delivery addresses, timeline, notes, tracking, printable invoice (lines, VAT, shipping, addresses, timeline of status changes and notes, Assignee and the print-ready Invoice, #16 #17; Shipments with Carrier tracking links and their steps in the timeline, #18)
 - [x] Status flow enforced: Pending → Confirmed → Preparing → Ready for Shipping → Shipped → Delivered, plus valid cancellation paths (`OrderStatus` is the one machine; skipped or backward moves get 409 `invalid_transition` with `details.allowed`, #16 #17; Shipped and Delivered arrive with Shipments, #18)
 - [x] Order, payment and shipment statuses kept separate (Shipment status and Shipment progress are separate from the Order status, #18; Payment status is read from the Payment ledger, #19)
@@ -58,7 +58,7 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 - [x] Time ranges + period comparison, revenue chart, order-status breakdown, top products, recent orders, alerts
 - [x] Conversion rate shown only if visit/session tracking exists (otherwise omitted; visits are not tracked, so it is omitted, #23)
 - [x] Reports: sales, customers, products, categories, returns, inventory, with date filters, comparisons, CSV/Excel export (#24)
-- [ ] Every KPI and report computed from database records, never hard-coded
+- [x] Every KPI and report computed from database records, never hard-coded (one `Order::counted()` scope; a test checks reports equal the dashboard)
 - [x] Roles: Admin, Operations, Inventory, Sales, Support, Finance, Viewer, with granular permissions enforced by Policies; Users & Roles administration (#25): create a User with a Role and a temporary password, edit, change Role, deactivate (sessions end at once) and reactivate, no self-demotion and never without an active Admin, audited; read-only Roles & permissions matrix; the Viewer is refused every changing endpoint
 - [x] In-app notifications: a bell with the unread count, newest first, mark one or all as read, link to the record, 30 s polling paused in hidden tabs, messages in English and Arabic (#8). Events arrive with their modules: low stock (#12), Order assigned (#17), card payment declined (#19), Return requested (#21)
 - [x] Searchable audit log: every change is recorded with User, action, record and before/after values (#9); the Admin searches and filters it by User, record type, record, action and date and compares the values before and after (#26)
@@ -66,12 +66,12 @@ Scoring weights: UI/UX 25% · functional completeness 25% · backend architectur
 
 ## Phase 5: Testing, polish, deployment
 
-- [ ] Seeders: 200 products, 1,000 orders, 300 customers, 3 warehouses, variants, mixed statuses, payments, refunds, stock movements, staff roles, all internally consistent
-- [ ] Laravel tests: auth, authorization, variants, inventory, order workflow, returns, refunds, calculations
-- [ ] Vitest component/unit tests
-- [ ] Playwright end-to-end tests for the required demo scenarios
-- [ ] OpenAPI docs exported (`docs/api/openapi.json`) + Postman collection
-- [ ] Production build + deployment notes
+- [x] Seeders: 200 products, 1,000 orders, 300 customers, 3 warehouses, variants, mixed statuses, payments, refunds, stock movements, staff roles, all internally consistent (`DemoScaleSeeder`, checked by `docs/demo-data-checks.sql`)
+- [x] Laravel tests: auth, authorization, variants, inventory, order workflow, returns, refunds, calculations (plus multi-process concurrency tests)
+- [x] Vitest component/unit tests
+- [ ] Playwright end-to-end tests for the required demo scenarios (partial: Products with Variants, Orders create/confirm/cancel and the main screens; the other scenarios are proven by Pest tests)
+- [x] OpenAPI docs exported (`docs/api/openapi.json`, importable into Postman as a collection)
+- [x] Production build + deployment notes (README "Production build" and "Deployment notes")
 - [ ] Screenshots / walkthrough recording
 
 ## Required demo scenarios

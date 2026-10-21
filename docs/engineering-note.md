@@ -202,12 +202,27 @@ _(Fill this in honestly per feature: which logic you designed, which AI output y
   - "Counted order" is defined once (`Order::countedStatuses()` and the `counted()` scope, ADR 0006), shared by the dashboard (#23) and the Customer list. Refunds on a Cancelled Order are not subtracted, because its Revenue was never counted.
   - Segment rules live in one enum (`Segment::sqlCase()`), checked in order with the first match winning: New (first Counted order ≤ 30 days ago), VIP (Lifetime value ≥ $1,000), At risk (last Counted order ≥ 90 days ago), Regular. The order was our call where the glossary was silent (a $2,000 first Order is New; a lapsed big spender stays VIP). Pest tests pin each boundary to the second (30 days, 90 days, $999.99 vs $1,000.00).
 
+- **Pre-submission review of the whole codebase (21 Oct).** Three parallel AI reviews checked the code against `CLAUDE.md`, the ADRs, `docs/spec.md` and the brief: backend standards, frontend standards and spec. I verified each finding before fixing it. Corrected:
+  - **Two deadlocks against ADR 0008.** `CreateAdjustment` inserted the Adjustment, and `UpdateOrder` wrote a Confirmed Order's new lines, *before* the stock service locked the Variant. The foreign-key check takes a shared lock first, so two simultaneous edits of one Variant could deadlock and return 500. Both now lock the Variant (or reserve) first.
+  - **Demo data at the brief's scale** (`DemoScaleSeeder`, ticket #28): 200 Products and 1,000 Orders over 12 months, all through the real actions. `docs/demo-data-checks.sql` proves the result is consistent (balances equal movements, totals add up, ledgers match, no over-refund). Feature tests keep the small store (`DEMO_FULL_SCALE=false`).
+  - **Seeding took over an hour on Windows.** Measuring showed 0.3 ms per plain query but 43 ms per native prepared statement through Docker Desktop's port proxy. The new opt-in `DB_EMULATE_PREPARES` brings the full seed to about 3.5 minutes and the Pest suite to under 2 minutes.
+  - **The Orders list was missing three columns the brief requires.** It now shows Fulfillment status, Shipping method and Assignee, and filters by Payment status and Assignee.
+  - **Stale screens after a change.** A Return restock did not refresh stock or Products, and Orders, Payments and Returns did not refresh Customers' Lifetime value, the dashboard or reports. Hand-typed query keys were replaced with the key factories.
+  - **Smaller fixes.** A Receipt total was added up with floats (it now uses the API's total and cent arithmetic). A server error on Customer tags was passed through `t()`. Report downloads revoked their blob URL too early. A missing test now covers refusing to delete a Customer who has Orders.
+  - **Reported but left as is.** Two writers of Return status (`RefundReturn` completes it). Transfer moves kept in the action rather than the enum. Small queries in three controllers. Recipients of notifications chosen by Role name rather than permission. Each of these behaves correctly today; see the architecture review notes.
+
 ## Known limitations
 
-_(List anything incomplete, simplified or assumed. Mirror the README "Status" section.)_
+These are the same items as the README's "Incomplete / assumptions" section, plus engineering caveats.
 
-- Locally, `php artisan serve` handles one request at a time on Windows, so Playwright runs one browser at a time there; CI and the Docker stack can run in parallel.
-- Ending an active session when an Admin deactivates a User arrives with Users & Roles administration (#25).
-- Refusing to delete a Customer who has Orders relies on the restricting foreign key from the Orders table (#16); `DeleteCustomer` already turns it into a 409, and the Pest test for it lands with Orders.
-- Refusing to delete a Category or Brand that Products use relies on restricting foreign keys from the Products table (#10); the 409 path has no backend test until then.
-- `npm audit` reports 7 high advisories, all inside the `shadcn` CLI's development-only dependencies (`braces` via `fast-glob`); nothing from them ships in the SPA, and the suggested fix is a downgrade, so they are left until the CLI updates.
+- **No one-command Docker stack** for the API and SPA. MySQL runs in Docker; the API and SPA start with the README commands.
+- **Browser tests cover the main screens, not all six demo scenarios.** Playwright covers sign-in, the app shell, catalog, Products with Variants, inventory, Customers, Orders (create, confirm, cancel), shipping, settings, Users and the audit log. Concurrency, the full Order lifecycle, Returns and Refunds, financial reconciliation and least privilege are proven by Pest feature tests and real multi-process concurrency tests instead.
+- **Demo Products have no images.** Uploading works, but the seeders do not generate picture files.
+- **One Coupon per Order** is the stacking rule. A second code replaces the first.
+- **Cancelling deducted but unshipped units** puts them back On-hand at once: they never left the Warehouse, so it is not a Return restock. Shipped units come back only through a Return.
+- **The payment gateway is a mock** (`MockCardGateway`), and it is called inside the Order's database transaction. That is safe for a mock. A real gateway would need the charge recorded outside the transaction (or reconciled by webhook), so a rollback could never leave a captured charge without its ledger row.
+- **Card Refunds go to the latest approved Card charge.** With several partial Card charges, a real gateway would need the Refund split across them.
+- **Docker Desktop for Windows** adds about 40 ms to each round trip of a native prepared statement. Set `DB_EMULATE_PREPARES=true` there; otherwise seeding the full demo store takes over an hour instead of a few minutes. Linux, macOS and CI are not affected.
+- **Locally on Windows, `php artisan serve` handles one request at a time**, so Playwright runs one browser at a time there.
+- **`npm audit` reports high advisories only inside the `shadcn` CLI's development dependencies** (`braces` via `fast-glob`). Nothing from them ships in the SPA, and the suggested fix is a downgrade, so they are left until the CLI updates.
+- **GitHub Actions is blocked by a billing lock on the account**, so CI runs fail before any step. The same workflow passes locally under `act`, and both `check` gates pass locally (see `docs/test-results.md`).
