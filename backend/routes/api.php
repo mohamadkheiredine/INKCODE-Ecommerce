@@ -51,6 +51,7 @@ use App\Http\Controllers\Payments\PaymentController;
 use App\Http\Controllers\Payments\ReconciliationController;
 use App\Http\Controllers\Profile\PasswordController;
 use App\Http\Controllers\Profile\PreferencesController;
+use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\Settings\StoreLogoController;
 use App\Http\Controllers\Settings\StoreProfileController;
 use App\Http\Controllers\Settings\StoreSettingsController;
@@ -78,6 +79,9 @@ Route::middleware(['auth:sanctum', EnsureUserIsActive::class])->group(function (
     Route::put('/auth/me/password', [PasswordController::class, 'update'])
         ->middleware('throttle:password-change')
         ->name('auth.me.password');
+
+    // Global search (Ctrl+K): every User may search; the groups follow their Role (SearchEverything).
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     // Every User has their own notifications; these only ever touch the signed-in User's.
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
