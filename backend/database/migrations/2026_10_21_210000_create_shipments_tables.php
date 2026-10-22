@@ -71,7 +71,7 @@ return new class extends Migration
         Schema::dropIfExists('shipment_status_changes');
         Schema::dropIfExists('shipment_lines');
         Schema::dropIfExists('shipments');
-        DB::statement('ALTER TABLE order_lines DROP CHECK order_lines_fulfillment_bounds');
+        DB::statement('ALTER TABLE order_lines DROP CONSTRAINT order_lines_fulfillment_bounds');
         Schema::table('order_lines', function (Blueprint $table) {
             $table->dropColumn(['deducted_quantity', 'shipped_quantity']);
         });

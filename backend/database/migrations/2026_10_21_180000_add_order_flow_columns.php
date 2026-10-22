@@ -23,7 +23,7 @@ return new class extends Migration
         Schema::table('order_lines', function (Blueprint $table) {
             $table->unsignedInteger('cancelled_quantity')->default(0)->after('quantity');
         });
-        DB::statement('ALTER TABLE order_lines DROP CHECK order_lines_quantity_positive');
+        DB::statement('ALTER TABLE order_lines DROP CONSTRAINT order_lines_quantity_positive');
         DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_quantity_positive CHECK (quantity + cancelled_quantity > 0)');
 
         Schema::create('order_notes', function (Blueprint $table) {
@@ -39,7 +39,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('order_notes');
-        DB::statement('ALTER TABLE order_lines DROP CHECK order_lines_quantity_positive');
+        DB::statement('ALTER TABLE order_lines DROP CONSTRAINT order_lines_quantity_positive');
         DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_quantity_positive CHECK (quantity > 0)');
         Schema::table('order_lines', function (Blueprint $table) {
             $table->dropColumn('cancelled_quantity');
